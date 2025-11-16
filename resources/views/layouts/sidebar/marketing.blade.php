@@ -68,14 +68,14 @@
             @endif
         </a>
         <ul class="menu-sub">
-            @can('permintaankiriman.index')
+            {{-- @can('permintaankiriman.index')
                 <li class="menu-item {{ request()->is(['permintaankiriman', 'permintaankiriman/*']) ? 'active' : '' }}">
                     <a href="{{ route('permintaankiriman.index') }}" class="menu-link">
                         <div>Permintaan Kiriman</div>
                     </a>
                 </li>
-            @endcan
-            @if (auth()->user()->hasAnyPermission(['omancabang.index', 'oman.index']))
+            @endcan --}}
+            {{-- @if (auth()->user()->hasAnyPermission(['omancabang.index', 'oman.index']))
                 @if (auth()->user()->hasAllPermissions(['omancabang.index', 'oman.index']))
                     <li class="menu-item {{ request()->is(['omancabang', 'omancabang/*', 'oman', 'oman/*']) ? 'active' : '' }}">
                         <a href="{{ route('omancabang.index') }}" class="menu-link">
@@ -95,8 +95,8 @@
                         </a>
                     </li>
                 @endif
-            @endif
-            @if (auth()->user()->hasAnyPermission(['targetkomisi.index', 'ratiodriverhelper.index']))
+            @endif --}}
+            {{-- @if (auth()->user()->hasAnyPermission(['targetkomisi.index', 'ratiodriverhelper.index']))
                 @if (auth()->user()->hasAllPermissions(['targetkomisi.index', 'ratiodriverhelper.index']))
                     <li class="menu-item {{ request()->is(['targetkomisi', 'targetkomisi/*', 'ratiodriverhelper']) ? 'active' : '' }}">
                         <a href="{{ route('targetkomisi.index') }}" class="menu-link">
@@ -125,7 +125,7 @@
                         </a>
                     </li>
                 @endif
-            @endif
+            @endif --}}
             @can('penjualan.index')
                 <li class="menu-item {{ request()->is(['penjualan', 'penjualan/*']) ? 'active' : '' }}">
                     <a href="{{ route('penjualan.index') }}" class="menu-link">
@@ -140,7 +140,7 @@
                     </a>
                 </li>
             @endcan
-            @if (auth()->user()->hasAnyPermission(['ajuanlimit.index', 'ajuanfaktur.index', 'ajuanrouting.index']))
+            {{-- @if (auth()->user()->hasAnyPermission(['ajuanlimit.index', 'ajuanfaktur.index', 'ajuanrouting.index']))
                 <li class="menu-item {{ request()->is(['ajuanlimit', 'ajuanlimit/*', 'ajuanfaktur']) ? 'active' : '' }}">
                     <a href="{{ route('ajuanlimit.index') }}" class="menu-link">
                         <div>Pengajuan</div>
@@ -150,7 +150,7 @@
 
                     </a>
                 </li>
-            @endif
+            @endif --}}
             @if (auth()->user()->hasAnyPermission($laporanpermissions))
                 <li class="menu-item {{ request()->is(['laporanmarketing']) ? 'active' : '' }}">
                     <a href="{{ route('laporanmarketing.index') }}" class="menu-link">

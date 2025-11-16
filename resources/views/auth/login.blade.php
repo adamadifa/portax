@@ -49,7 +49,7 @@
 
         .left-panel {
             flex: 1;
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
+            background: #03204f;
             padding: 40px;
             display: flex;
             flex-direction: column;
@@ -100,7 +100,7 @@
         .form-header-icon {
             width: 32px;
             height: 32px;
-            color: #1e3a8a;
+            color: #03204f;
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 20px;
@@ -143,8 +143,8 @@
 
         .form-input:focus {
             outline: none;
-            border-color: #1e3a8a;
-            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+            border-color: #03204f;
+            box-shadow: 0 0 0 3px rgba(3, 32, 79, 0.1);
         }
 
         .password-wrapper {
@@ -165,14 +165,14 @@
         }
 
         .password-toggle:hover {
-            color: #1e3a8a;
+            color: #03204f;
         }
 
         .btn-primary {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            color: white;
+            background: #ffc800;
+            color: #1a1a1a;
             border: none;
             border-radius: 12px;
             font-size: 16px;
@@ -184,7 +184,8 @@
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.3);
+            box-shadow: 0 8px 20px rgba(255, 200, 0, 0.4);
+            background: #ffd700;
         }
 
         .btn-primary:active {
@@ -233,7 +234,7 @@
         }
 
         .social-btn:hover {
-            border-color: #1e3a8a;
+            border-color: #03204f;
             background: #f9fafb;
         }
 
@@ -244,7 +245,7 @@
         }
 
         .signup-link a {
-            color: #1e3a8a;
+            color: #03204f;
             text-decoration: none;
             font-weight: 500;
         }
@@ -317,8 +318,8 @@
                 @csrf
 
                 <div class="form-group">
-                    <label for="id_user" class="form-label">Your email</label>
-                    <input type="text" class="form-input" id="id_user" name="id_user" placeholder="farazhaidet786@gmail.com" autofocus
+                    <label for="id_user" class="form-label">Username / Email</label>
+                    <input type="text" class="form-input" id="id_user" name="id_user" placeholder="username@example.com" autofocus
                         value="{{ old('id_user') }}" />
                 </div>
 
@@ -340,21 +341,7 @@
                 <span class="divider-text">or continue with</span>
             </div>
 
-            <div class="social-buttons">
-                <button type="button" class="social-btn" aria-label="Login with Behance">
-                    <i class="fa-brands fa-behance"></i>
-                </button>
-                <button type="button" class="social-btn" aria-label="Login with Google">
-                    <i class="fa-brands fa-google"></i>
-                </button>
-                <button type="button" class="social-btn" aria-label="Login with Facebook">
-                    <i class="fa-brands fa-facebook"></i>
-                </button>
-            </div>
 
-            <div class="signup-link">
-                Don't have an account? <a href="{{ route('register') ?? '#' }}">Sign up</a>
-            </div>
         </div>
     </div>
 

@@ -5,144 +5,222 @@
 @section('navigasi')
     <span>Retur</span>
 @endsection
+
+<style>
+    /* Retur Page Specific Styles */
+    .retur-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+
+    .retur-header {
+        background: linear-gradient(135deg, #03204f 0%, #1e3a8a 100%);
+        color: #ffffff !important;
+        padding: 16px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .retur-header h4 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #ffffff !important;
+    }
+
+    .retur-header i {
+        color: #ffffff !important;
+    }
+
+    .retur-header .btn {
+        background: #ffc800;
+        color: #1a1a1a;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .retur-header .btn:hover {
+        background: #ffd700;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(255, 200, 0, 0.3);
+    }
+</style>
+
 <div class="row">
     <div class="col-lg-12 col-sm-12 col-xs-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                @can('retur.create')
-                    <a href="{{ route('retur.create') }}" class="btn btn-primary" id="btnCreate"><i class="fa fa-plus me-2"></i> Input Retur</a>
-                @endcan
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12">
-                        <form action="{{ route('retur.index') }}">
-                            <div class="row">
-                                <div class="col-lg-6 col-sm-12 col-md-12">
-                                    <x-input-with-icon label="Dari" value="{{ Request('dari') }}" name="dari" icon="ti ti-calendar"
-                                        datepicker="flatpickr-date" />
-                                </div>
-                                <div class="col-lg-6 col-sm-12 col-md-12">
-                                    <x-input-with-icon label="Sampai" value="{{ Request('sampai') }}" name="sampai" icon="ti ti-calendar"
-                                        datepicker="flatpickr-date" />
-                                </div>
-                            </div>
-                            @hasanyrole($roles_show_cabang)
-                                <div class="row">
-                                    <div class="col-lg-12 col-md-12 col-sm-12">
-                                        <x-select label="Semua Cabang" name="kode_cabang_search" :data="$cabang" key="kode_cabang"
-                                            textShow="nama_cabang" upperCase="true" selected="{{ Request('kode_cabang_search') }}"
-                                            select2="select2Kodecabangsearch" />
-                                    </div>
-                                </div>
-                            @endrole
-
-                            <div class="row">
-                                <div class="col-lg-3 col-sm-12 col-md-12">
-                                    <div class="form-group mb-3">
-                                        <select name="kode_salesman_search" id="kode_salesman_search" class="form-select select2Kodesalesmansearch">
-                                            <option value="">Salesman</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                    <x-input-with-icon label="No. Faktur" value="{{ Request('no_faktur_search') }}" name="no_faktur_search"
-                                        icon="ti ti-barcode" />
-                                </div>
-                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                    <x-input-with-icon label="Kode Pelanggan" value="{{ Request('kode_pelanggan_search') }}"
-                                        name="kode_pelanggan_search" icon="ti ti-barcode" />
-                                </div>
-                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                    <x-input-with-icon label="Nama Pelanggan" value="{{ Request('nama_pelanggan_search') }}"
-                                        name="nama_pelanggan_search" icon="ti ti-users" />
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12">
-                                    <div class="form-group mb-3">
-                                        <button class="btn btn-primary w-100"><i class="ti ti-search me-1"></i>Cari
-                                            Data</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </form>
-                    </div>
+        <div class="card retur-card">
+            <div class="retur-header">
+                <h4>
+                    <i class="ti ti-arrow-back-up"></i>
+                    Data Retur
+                </h4>
+                <div class="btn-group">
+                    @can('retur.create')
+                        <a href="{{ route('retur.create') }}" class="btn" id="btnCreate">
+                            <i class="ti ti-plus me-2"></i>Input Retur
+                        </a>
+                    @endcan
                 </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="table-responsive mb-2">
-                            <table class="table table-bordered ">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>No. Retur</th>
-                                        <th>Tanggal</th>
-                                        <th>No. Faktur</th>
-                                        <th>Nama Pelanggan</th>
-                                        <th>Nama Cabang</th>
-                                        <th>Salesman</th>
-                                        <th>Jenis Retur</th>
-                                        <th>Total</th>
-                                        <th>#</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($retur as $d)
-                                        <tr>
-                                            <td>{{ $d->no_retur }}</td>
-                                            <td>{{ DateToIndo($d->tanggal) }}</td>
-                                            <td>{{ $d->no_faktur }}</td>
-                                            <td>{{ textUpperCase($d->nama_pelanggan) }}</td>
-                                            <td>{{ textUpperCase($d->nama_cabang) }}</td>
-                                            <td>{{ textUpperCase($d->nama_salesman) }}</td>
-                                            <td>
-                                                @if ($d->jenis_retur == 'GB')
-                                                    <span class="badge bg-success">Ganti Barang</span>
-                                                @else
-                                                    <span class="badge bg-danger">Potong Faktur</span>
-                                                @endif
-                                            </td>
-                                            <td class="text-end">{{ formatRupiah($d->total_retur) }}</td>
-                                            <td>
-                                                <div class="d-flex">
-                                                    {{-- @can('retur.edit')
-                                          <div>
-                                             <a class="me-1"
-                                                href="{{ route('retur.edit', Crypt::encrypt($d->no_retur)) }}"><i
-                                                   class="ti ti-edit text-success"></i></a>
-                                          </div>
-                                       @endcan --}}
-                                                    @can('retur.show')
-                                                        <div>
-                                                            <a class="btnShow me-1" href="#" no_retur = "{{ Crypt::encrypt($d->no_retur) }}">
-                                                                <i class="ti ti-file-description text-info"></i>
-                                                            </a>
-                                                        </div>
-                                                    @endcan
-                                                    @can('retur.delete')
-                                                        <div>
-                                                            <form method="POST" name="deleteform" class="deleteform"
-                                                                action="{{ route('retur.delete', Crypt::encrypt($d->no_retur)) }}">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <a href="#" class="delete-confirm me-1">
-                                                                    <i class="ti ti-trash text-danger"></i>
-                                                                </a>
-                                                            </form>
-                                                        </div>
-                                                    @endcan
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+            </div>
+            <div class="card-body" style="padding: 20px;">
+                <!-- Search Form -->
+                <div class="search-card">
+                    <form action="{{ route('retur.index') }}">
+                        <!-- Row 1: Dari dan Sampai (Full Width dibagi 2) -->
+                        <div class="row g-2 mb-1">
+                            <div class="col-lg-6 col-sm-12 col-md-12">
+                                <x-input-with-icon label="Dari" value="{{ Request('dari') }}" name="dari" icon="ti ti-calendar"
+                                    datepicker="flatpickr-date" />
+                            </div>
+                            <div class="col-lg-6 col-sm-12 col-md-12">
+                                <x-input-with-icon label="Sampai" value="{{ Request('sampai') }}" name="sampai" icon="ti ti-calendar"
+                                    datepicker="flatpickr-date" />
+                            </div>
                         </div>
-                        <div style="float: right;">
-                            {{ $retur->links() }}
+                        <!-- Row 2: Cabang (jika ada) -->
+                        @hasanyrole($roles_show_cabang)
+                            <div class="row g-2 mb-2">
+                                <div class="col-12">
+                                    <x-select label="Semua Cabang" name="kode_cabang_search" :data="$cabang" key="kode_cabang"
+                                        textShow="nama_cabang" upperCase="true" selected="{{ Request('kode_cabang_search') }}"
+                                        select2="select2Kodecabangsearch" />
+                                </div>
+                            </div>
+                        @endhasanyrole
+                        <!-- Row 3: Salesman, No. Faktur, Kode Pelanggan, Nama Pelanggan sejajar (full width dibagi 4) -->
+                        <div class="row g-2 mb-2">
+                            <div class="col-lg-3 col-sm-12 col-md-12">
+                                <select name="kode_salesman_search" id="kode_salesman_search" class="form-select select2Kodesalesmansearch">
+                                    <option value="">Semua Salesman</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-12 col-sm-12">
+                                <x-input-with-icon label="No. Faktur" value="{{ Request('no_faktur_search') }}" name="no_faktur_search"
+                                    icon="ti ti-barcode" />
+                            </div>
+                            <div class="col-lg-3 col-md-12 col-sm-12">
+                                <x-input-with-icon label="Kode Pelanggan" value="{{ Request('kode_pelanggan_search') }}"
+                                    name="kode_pelanggan_search" icon="ti ti-barcode" />
+                            </div>
+                            <div class="col-lg-3 col-md-12 col-sm-12">
+                                <x-input-with-icon label="Nama Pelanggan" value="{{ Request('nama_pelanggan_search') }}"
+                                    name="nama_pelanggan_search" icon="ti ti-users" />
+                            </div>
                         </div>
-                    </div>
+                        <!-- Row 4: Button Cari -->
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <button type="submit" class="btn w-100"
+                                    style="background: #03204f; color: white; border: none; border-radius: 8px; padding: 10px 20px;">
+                                    <i class="ti ti-search me-1"></i>Cari Data
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table class="table modern-table">
+                        <thead>
+                            <tr>
+                                <th>No. Retur</th>
+                                <th>Tanggal</th>
+                                <th>No. Faktur</th>
+                                <th>Nama Pelanggan</th>
+                                <th>Nama Cabang</th>
+                                <th>Salesman</th>
+                                <th class="text-center">Jenis Retur</th>
+                                <th class="text-end">Total</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($retur as $d)
+                                <tr>
+                                    <td>
+                                        <span class="code-badge">
+                                            <i class="ti ti-arrow-back-up me-1"></i>{{ $d->no_retur }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <i class="ti ti-calendar me-1" style="color: #6c757d;"></i>{{ DateToIndo($d->tanggal) }}
+                                    </td>
+                                    <td>
+                                        <span class="code-badge" style="background: #6c757d;">
+                                            <i class="ti ti-file-invoice me-1"></i>{{ $d->no_faktur }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="table-name">
+                                            <i class="ti ti-user me-1" style="color: #6c757d;"></i>{{ textUpperCase($d->nama_pelanggan) }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <i class="ti ti-building me-1" style="color: #6c757d;"></i>{{ textUpperCase($d->nama_cabang) }}
+                                    </td>
+                                    <td>
+                                        <i class="ti ti-user-circle me-1" style="color: #6c757d;"></i>{{ textUpperCase($d->nama_salesman) }}
+                                    </td>
+                                    <td class="text-center">
+                                        @if ($d->jenis_retur == 'GB')
+                                            <span class="status-badge aktif">Ganti Barang</span>
+                                        @else
+                                            <span class="status-badge nonaktif">Potong Faktur</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-end" style="font-weight: 600; color: #03204f;">
+                                        {{ formatRupiah($d->total_retur) }}
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            @can('retur.show')
+                                                <a href="#" class="action-btn detail btnShow" 
+                                                   no_retur="{{ Crypt::encrypt($d->no_retur) }}" 
+                                                   title="Detail">
+                                                    <i class="ti ti-file-description"></i>
+                                                </a>
+                                            @endcan
+                                            @can('retur.delete')
+                                                <form method="POST" name="deleteform" class="deleteform d-inline"
+                                                    action="{{ route('retur.delete', Crypt::encrypt($d->no_retur)) }}">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <a href="#" class="action-btn delete delete-confirm" title="Hapus">
+                                                        <i class="ti ti-trash"></i>
+                                                    </a>
+                                                </form>
+                                            @endcan
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="9" class="text-center py-4">
+                                        <i class="ti ti-inbox" style="font-size: 40px; color: #d1d5db;"></i>
+                                        <p class="mt-2" style="color: #9ca3af;">Tidak ada data retur</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-wrapper">
+                    {{ $retur->links() }}
                 </div>
             </div>
         </div>
@@ -215,6 +293,7 @@
 
         $(".btnShow").click(function(e) {
             e.preventDefault();
+            loading();
             const no_retur = $(this).attr('no_retur');
             $("#modal").modal("show");
             $("#modal").find(".modal-title").text("Detail Retur");

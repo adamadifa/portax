@@ -4,15 +4,188 @@
 
 <style>
     .modern-navbar {
-        background: white !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
-        border-bottom: 1px solid rgba(30, 58, 138, 0.1);
+        background: #ffc800 !important;
+        box-shadow: none !important;
+        border-bottom: none !important;
         padding: 0.75rem 1.5rem;
+        padding-right: 1.5rem !important;
         min-height: 70px;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: visible !important;
+    }
+
+    /* Override navbar-detached untuk membuat fluid */
+    .layout-navbar.navbar-detached.modern-navbar,
+    .layout-navbar.navbar-detached {
+        margin: 0 !important;
+        border-radius: 0 !important;
+        padding: 0.75rem 1.5rem !important;
+    }
+
+    /* Override untuk layout fixed - hitung lebar dengan benar */
+    @media (min-width: 1200px) {
+
+        .layout-menu-fixed:not(.layout-menu-collapsed) .layout-navbar.navbar-detached.modern-navbar,
+        .layout-menu-fixed:not(.layout-menu-collapsed) .layout-navbar.navbar-detached {
+            width: calc(100% - 280px) !important;
+            max-width: calc(100% - 280px) !important;
+            margin: 0 !important;
+            left: 280px !important;
+            right: 0 !important;
+            box-sizing: border-box;
+        }
+
+        .layout-menu-fixed.layout-menu-collapsed:not(.layout-menu-hover) .layout-navbar.navbar-detached.modern-navbar,
+        .layout-menu-fixed.layout-menu-collapsed:not(.layout-menu-hover) .layout-navbar.navbar-detached {
+            width: calc(100% - 80px) !important;
+            max-width: calc(100% - 80px) !important;
+            margin: 0 !important;
+            left: 80px !important;
+            right: 0 !important;
+            box-sizing: border-box;
+        }
+
+        .layout-menu-fixed.layout-menu-collapsed.layout-menu-hover .layout-navbar.navbar-detached.modern-navbar,
+        .layout-menu-fixed.layout-menu-collapsed.layout-menu-hover .layout-navbar.navbar-detached {
+            width: calc(100% - 280px) !important;
+            max-width: calc(100% - 280px) !important;
+            margin: 0 !important;
+            left: 280px !important;
+            right: 0 !important;
+            box-sizing: border-box;
+        }
+    }
+
+    /* Untuk mobile dan tablet */
+    @media (max-width: 1199.98px) {
+
+        .layout-navbar.navbar-detached.modern-navbar,
+        .layout-navbar.navbar-detached {
+            width: 100% !important;
+            margin: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+        }
+    }
+
+    /* Membuat konten menyatu dengan navbar */
+    .content-wrapper {
+        padding-top: 0 !important;
+    }
+
+    .content-wrapper .container-fluid {
+        padding-top: 0 !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+
+    /* Memastikan navbar benar-benar fluid */
+    .layout-page {
+        flex-direction: column;
+    }
+
+    .layout-navbar {
+        flex-shrink: 0;
+    }
+
+    /* Memastikan navbar-nav-right dan dropdown terlihat */
+    .navbar-nav-right {
+        position: relative;
+        z-index: 1000;
+        width: 100%;
+        display: flex !important;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: nowrap;
+        overflow: visible !important;
+        gap: 0.5rem;
+        max-width: 100%;
+    }
+
+    /* Memastikan navbar tidak overflow */
+    .modern-navbar {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .modern-navbar .navbar {
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: visible !important;
+    }
+
+    .modern-navbar .navbar-nav {
+        position: relative;
+        z-index: 1001;
+        display: flex !important;
+        flex-wrap: nowrap;
+        overflow: visible !important;
+    }
+
+    .modern-navbar ul.navbar-nav {
+        margin-left: auto !important;
+        flex-shrink: 0;
+        min-width: 0;
+    }
+
+    /* Memastikan notifikasi tidak terpotong */
+    .modern-navbar .nav-item:last-child {
+        margin-right: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    /* Memastikan user avatar di kanan tidak terpotong */
+    .modern-navbar .navbar-nav:last-child {
+        margin-right: 0 !important;
+    }
+
+    /* Memastikan padding kanan navbar tidak memotong notifikasi */
+    @media (max-width: 1199.98px) {
+        .modern-navbar {
+            padding-right: 1rem !important;
+        }
+    }
+
+    /* Memastikan dropdown menu tidak terpotong di kanan */
+    .modern-navbar .dropdown-menu-end {
+        right: 0 !important;
+        left: auto !important;
+    }
+
+    .modern-navbar .nav-item {
+        position: relative;
+        z-index: 1002;
+        flex-shrink: 0;
+    }
+
+    .modern-navbar .dropdown-menu {
+        z-index: 1050 !important;
+    }
+
+    /* Memastikan dropdown tidak tertutup */
+    .modern-dropdown-menu {
+        z-index: 1050 !important;
+        position: absolute !important;
+    }
+
+    /* Memastikan badge terlihat */
+    .modern-badge {
+        z-index: 1002;
     }
 
     .modern-navbar .navbar-search-wrapper {
         position: relative;
+        flex-shrink: 1;
+        min-width: 0;
+    }
+
+    /* Memastikan search tidak mengambil terlalu banyak ruang */
+    .modern-navbar .navbar-nav:first-child {
+        flex: 0 1 auto;
+        min-width: 0;
     }
 
     .modern-search-input {
@@ -21,8 +194,10 @@
         border-radius: 12px;
         padding: 10px 16px 10px 44px;
         width: 320px;
+        max-width: 320px;
         font-size: 14px;
         transition: all 0.3s;
+        flex-shrink: 1;
     }
 
     .modern-search-input:focus {
@@ -31,6 +206,7 @@
         background: white;
         box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
         width: 400px;
+        max-width: 400px;
     }
 
     .modern-search-icon {
@@ -195,6 +371,27 @@
         color: #1e3a8a;
     }
 
+    /* Memastikan hamburger menu di navbar tidak terpengaruh styling sidebar */
+    .layout-navbar .layout-menu-toggle {
+        position: static !important;
+        transform: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        top: auto !important;
+        right: auto !important;
+    }
+
+    /* Override untuk semua state collapsed */
+    html.layout-menu-collapsed .layout-navbar .layout-menu-toggle,
+    html.layout-menu-collapsed:not(.layout-menu-hover) .layout-navbar .layout-menu-toggle {
+        position: static !important;
+        transform: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        top: auto !important;
+        right: auto !important;
+    }
+
     .modern-btn-primary {
         background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
         border: none;
@@ -220,10 +417,37 @@
         .modern-search-input:focus {
             width: 250px;
         }
+
+        /* Override untuk mobile */
+        .layout-navbar.navbar-detached.modern-navbar,
+        .layout-navbar.navbar-detached {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0.75rem 1rem !important;
+        }
+
+        .content-wrapper .container-fluid {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+
+        /* Memastikan notifikasi terlihat di mobile */
+        .navbar-nav-right {
+            flex-wrap: wrap;
+        }
+
+        .modern-navbar ul.navbar-nav {
+            margin-left: auto !important;
+            flex-wrap: nowrap;
+        }
+
+        .modern-search-input {
+            max-width: 100%;
+        }
     }
 </style>
 
-<nav class="layout-navbar container-fluid navbar navbar-expand-xl navbar-detached align-items-center modern-navbar" id="layout-navbar"
+<nav class="layout-navbar navbar navbar-expand-xl navbar-detached align-items-center modern-navbar" id="layout-navbar"
     @if ($agent->isMobile()) style="width:100% !important; margin:0 !important" @endif>
 
     <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">

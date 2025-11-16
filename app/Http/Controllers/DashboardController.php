@@ -48,27 +48,29 @@ class DashboardController extends Controller
 
         // dd($location);
 
-        $default_marketing = ['super admin', 'direktur', 'gm marketing', 'gm administrasi', 'regional sales manager', 'manager keuangan', 'manager audit'];
-        $user = User::findorfail(auth()->user()->id);
-        if ($user->hasAnyRole($default_marketing)) {
-            return $this->marketing();
-        } else if ($user->hasRole(['operation manager', 'sales marketing manager'])) {
-            return $this->operationmanager();
-        } else if ($user->hasRole('salesman')) {
-            return $this->salesman();
-        } else if ($user->hasRole('admin penjualan')) {
-            return $this->operationmanager();
-        } else if ($user->hasRole('admin persediaan cabang')) {
-            return $this->operationmanager();
-        } else if ($user->hasRole('gm operasional') || $user->hasRole('spv produksi') || $user->hasRole('manager produksi') || $user->hasRole('admin gudang pusat') || $user->hasRole('manager gudang') || $user->hasRole('spv gudang pusat') || $user->hasRole('spv pdqc')) {
-            return $this->operasional();
-        } else if ($user->hasAnyRole(['asst. manager hrd', 'spv presensi', 'spv recruitment'])) {
-            return $this->hrd();
-        } else if ($user->hasAnyRole(['owner'])) {
-            return $this->owner($request);
-        } else {
-            return $this->dashboarddefault();
-        }
+        // $default_marketing = ['super admin', 'direktur', 'gm marketing', 'gm administrasi', 'regional sales manager', 'manager keuangan', 'manager audit'];
+        // $user = User::findorfail(auth()->user()->id);
+        // if ($user->hasAnyRole($default_marketing)) {
+        //     return $this->marketing();
+        // } else if ($user->hasRole(['operation manager', 'sales marketing manager'])) {
+        //     return $this->operationmanager();
+        // } else if ($user->hasRole('salesman')) {
+        //     return $this->salesman();
+        // } else if ($user->hasRole('admin penjualan')) {
+        //     return $this->operationmanager();
+        // } else if ($user->hasRole('admin persediaan cabang')) {
+        //     return $this->operationmanager();
+        // } else if ($user->hasRole('gm operasional') || $user->hasRole('spv produksi') || $user->hasRole('manager produksi') || $user->hasRole('admin gudang pusat') || $user->hasRole('manager gudang') || $user->hasRole('spv gudang pusat') || $user->hasRole('spv pdqc')) {
+        //     return $this->operasional();
+        // } else if ($user->hasAnyRole(['asst. manager hrd', 'spv presensi', 'spv recruitment'])) {
+        //     return $this->hrd();
+        // } else if ($user->hasAnyRole(['owner'])) {
+        //     return $this->owner($request);
+        // } else {
+        //     return $this->dashboarddefault();
+        // }
+
+        return $this->dashboarddefault();
     }
 
 

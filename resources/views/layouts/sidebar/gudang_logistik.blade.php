@@ -1,4 +1,4 @@
-@if (auth()->user()->hasAnyPermission($gudang_logistik_permission))
+{{-- @if (auth()->user()->hasAnyPermission($gudang_logistik_permission))
     <li class="menu-item {{ request()->is($gudang_logistik_request) ? 'open' : '' }}">
 
         <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -22,4 +22,4 @@
             @endif
         </ul>
     </li>
-@endif
+@endif --}}

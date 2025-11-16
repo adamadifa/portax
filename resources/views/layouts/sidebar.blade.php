@@ -2,7 +2,7 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme custom-sidebar">
     <style>
         .custom-sidebar {
-            background: #1e3a8a !important;
+            background: #03204f !important;
             width: 280px;
             min-height: 100vh;
             display: flex;
@@ -11,33 +11,40 @@
         }
 
         .sidebar-header {
-            padding: 24px 20px;
+            padding: 20px 16px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 70px;
+            position: relative;
         }
 
         .sidebar-logo {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
         }
 
         .logo-shapes {
             display: flex;
             gap: 4px;
+            flex-shrink: 0;
         }
 
         .logo-shape {
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
         }
 
         .logo-shape-1 {
@@ -56,10 +63,29 @@
         }
 
         .sidebar-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: white;
             margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+        }
+
+        .layout-menu-toggle {
+            color: white !important;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .layout-menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .team-card {
@@ -92,7 +118,7 @@
         .team-icon-dot {
             width: 20px;
             height: 20px;
-            background: #1e3a8a;
+            background: #03204f;
             border-radius: 50%;
             position: relative;
         }
@@ -265,7 +291,7 @@
             right: 0;
             height: 50px;
             pointer-events: none;
-            background: linear-gradient(to bottom, rgba(30, 58, 138, 0.8), transparent);
+            background: linear-gradient(to bottom, rgba(3, 32, 79, 0.8), transparent);
             z-index: 1;
         }
 
@@ -306,7 +332,7 @@
         }
 
         .custom-sidebar .menu-item.active .menu-link,
-        .custom-sidebar .menu-item.open > .menu-link {
+        .custom-sidebar .menu-item.open>.menu-link {
             background: rgba(59, 130, 246, 0.2) !important;
             color: white !important;
         }
@@ -409,7 +435,7 @@
             transition: transform 0.3s;
         }
 
-        .custom-sidebar .menu-item.open > .menu-link.menu-toggle::after {
+        .custom-sidebar .menu-item.open>.menu-link.menu-toggle::after {
             transform: rotate(180deg);
         }
 
@@ -429,6 +455,201 @@
             }
         }
 
+        /* Collapsed state styling */
+        html.layout-menu-collapsed:not(.layout-menu-hover) .custom-sidebar {
+            width: 80px !important;
+            transition: width 0.3s ease;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .sidebar-header {
+            padding: 20px 12px;
+            justify-content: center;
+            min-height: 70px;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .sidebar-logo {
+            justify-content: center;
+            width: 100%;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .sidebar-title {
+            display: none;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .logo-shape {
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
+        }
+
+        /* Sembunyikan logo-shape tambahan saat collapsed */
+        html.layout-menu-collapsed:not(.layout-menu-hover) .logo-shape-2,
+        html.layout-menu-collapsed:not(.layout-menu-hover) .logo-shape-3 {
+            display: none !important;
+        }
+
+        /* Pastikan tidak ada border atau outline pada logo saat collapsed */
+        html.layout-menu-collapsed:not(.layout-menu-hover) .logo-shape {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Pastikan logo-shapes container tidak menampilkan circle tambahan */
+        html.layout-menu-collapsed:not(.layout-menu-hover) .logo-shapes {
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        /* Hanya tampilkan logo-shape pertama saat collapsed */
+        html.layout-menu-collapsed:not(.layout-menu-hover) .logo-shapes>*:not(.logo-shape-1) {
+            display: none !important;
+        }
+
+        /* Pastikan tidak ada pseudo-element yang membuat circle tambahan */
+        html.layout-menu-collapsed:not(.layout-menu-hover) .logo-shape::before,
+        html.layout-menu-collapsed:not(.layout-menu-hover) .logo-shape::after,
+        html.layout-menu-collapsed:not(.layout-menu-hover) .logo-shapes::before,
+        html.layout-menu-collapsed:not(.layout-menu-hover) .logo-shapes::after {
+            display: none !important;
+            content: none !important;
+        }
+
+        /* Hanya berlaku untuk toggle di sidebar, bukan di navbar */
+        html.layout-menu-collapsed:not(.layout-menu-hover) #layout-menu .layout-menu-toggle,
+        html.layout-menu-collapsed:not(.layout-menu-hover) .custom-sidebar .layout-menu-toggle {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            margin: 0;
+            padding: 4px;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .custom-sidebar .menu-link div {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            transition: opacity 0.2s, width 0.2s;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .custom-sidebar .menu-link {
+            justify-content: center;
+            padding: 12px;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .custom-sidebar .menu-icon {
+            margin: 0;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .custom-sidebar .menu-item>.menu-sub {
+            display: none !important;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .custom-sidebar .menu-link.menu-toggle::after {
+            display: none;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .user-profile {
+            padding: 20px 12px;
+            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .user-info {
+            display: none;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .user-menu-toggle {
+            display: none;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .user-avatar {
+            width: 36px;
+            height: 36px;
+        }
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .custom-sidebar .menu-header {
+            display: none;
+        }
+
+
+        html.layout-menu-collapsed:not(.layout-menu-hover) .sidebar-nav {
+            padding: 0 8px;
+        }
+
+        /* Hover state when collapsed - show tooltips or expand slightly */
+        html.layout-menu-collapsed.layout-menu-hover .custom-sidebar {
+            width: 280px !important;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+        }
+
+        html.layout-menu-collapsed.layout-menu-hover .custom-sidebar .menu-link div {
+            opacity: 1;
+            width: auto;
+        }
+
+        html.layout-menu-collapsed.layout-menu-hover .sidebar-title {
+            display: block;
+        }
+
+        html.layout-menu-collapsed.layout-menu-hover .user-info {
+            display: block;
+        }
+
+        html.layout-menu-collapsed.layout-menu-hover .user-menu-toggle {
+            display: block;
+        }
+
+        html.layout-menu-collapsed.layout-menu-hover .custom-sidebar .menu-link {
+            justify-content: flex-start;
+            padding: 12px 8px;
+        }
+
+        html.layout-menu-collapsed.layout-menu-hover .custom-sidebar .menu-header {
+            display: block;
+        }
+
+        html.layout-menu-collapsed.layout-menu-hover .sidebar-header {
+            justify-content: space-between;
+        }
+
+        html.layout-menu-collapsed.layout-menu-hover .sidebar-logo {
+            justify-content: flex-start;
+            width: auto;
+        }
+
+        html.layout-menu-collapsed.layout-menu-hover .logo-shape {
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+        }
+
+        /* Hanya berlaku untuk toggle di sidebar, bukan di navbar */
+        html.layout-menu-collapsed.layout-menu-hover #layout-menu .layout-menu-toggle,
+        html.layout-menu-collapsed.layout-menu-hover .custom-sidebar .layout-menu-toggle {
+            position: static;
+            transform: none;
+        }
+
+        /* Smooth transitions */
+        .custom-sidebar,
+        .sidebar-header,
+        .sidebar-logo,
+        .sidebar-title,
+        .logo-shape,
+        .layout-menu-toggle,
+        .custom-sidebar .menu-link,
+        .custom-sidebar .menu-link div,
+        .user-profile,
+        .user-info {
+            transition: all 0.3s ease;
+        }
+
         /* Mobile responsive */
         @media (max-width: 991px) {
             .custom-sidebar {
@@ -439,6 +660,11 @@
             .custom-sidebar.menu-open {
                 transform: translateX(0);
             }
+
+            /* Override collapsed styles on mobile */
+            html.layout-menu-collapsed .custom-sidebar {
+                width: 280px !important;
+            }
         }
     </style>
 
@@ -447,10 +673,8 @@
         <div class="sidebar-logo">
             <div class="logo-shapes">
                 <div class="logo-shape logo-shape-1">C</div>
-                <div class="logo-shape logo-shape-2">C</div>
-                <div class="logo-shape logo-shape-3">C</div>
             </div>
-            <h1 class="sidebar-title">Integration</h1>
+            <h1 class="sidebar-title">ChiliCore</h1>
         </div>
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto" style="color: white;">
             <i class="ti menu-toggle-icon d-none d-xl-block ti-sm align-middle"></i>
@@ -470,14 +694,7 @@
             </li>
 
             <!-- Additional Menu Items from Original -->
-            @if (in_array($level_user, [
-                    'super admin',
-                    'direktur',
-                    'gm administrasi',
-                    'manager keuangan',
-                    'regional operation manager',
-                    'spv accounting',
-                ]))
+            @if (in_array($level_user, ['super admin', 'direktur', 'gm administrasi', 'manager keuangan', 'regional operation manager', 'spv accounting']))
                 <li class="menu-item {{ request()->is(['dashboard/owner']) ? 'active' : '' }}">
                     <a href="{{ route('dashboard.owner') }}" class="menu-link">
                         <i class="menu-icon tf-icons ti ti-home"></i>
@@ -495,14 +712,14 @@
                 </li>
             @endif
 
-            @if (auth()->user()->hasAnyPermission(['sfa.trackingsalesman']))
+            {{-- @if (auth()->user()->hasAnyPermission(['sfa.trackingsalesman']))
                 <li class="menu-item {{ request()->is(['sfa/trackingsalesman']) ? 'active' : '' }}">
                     <a href="{{ route('sfa.trackingsalesman') }}" class="menu-link">
                         <i class="menu-icon tf-icons ti ti-location"></i>
                         <div>Tracking Salesman</div>
                     </a>
                 </li>
-            @endif
+            @endif --}}
 
             @if (auth()->user()->hasAnyPermission(['sfa.pelanggan']))
                 <li class="menu-item {{ request()->is(['sfa/pelanggan']) ? 'active' : '' }}">
@@ -531,19 +748,19 @@
             @include('layouts.sidebar.marketing')
             @include('layouts.sidebar.pembelian')
             @include('layouts.sidebar.keuangan')
-            @include('layouts.sidebar.accounting')
+            {{-- @include('layouts.sidebar.accounting') --}}
             @include('layouts.sidebar.maintenance')
             @include('layouts.sidebar.generalaffair')
-            @include('layouts.sidebar.hrd')
-            @include('layouts.sidebar.worksheetom')
+            {{-- @include('layouts.sidebar.hrd') --}}
+            {{-- @include('layouts.sidebar.worksheetom') --}}
 
 
-            <li class="menu-item {{ request()->is(['ticket', 'ticket/*']) ? 'active' : '' }}">
+            {{-- <li class="menu-item {{ request()->is(['ticket', 'ticket/*']) ? 'active' : '' }}">
                 <a href="{{ route('ticket.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons ti ti-ticket"></i>
                     <div>Ticket</div>
                 </a>
-            </li>
+            </li> --}}
         </ul>
     </div>
 
