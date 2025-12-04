@@ -34,6 +34,7 @@
             'permintaankiriman.index',
             'targetkomisi.index',
             'penjualan.index',
+            'pembelianmarketing.index',
             'retur.index',
             'ajuanlimit.index',
             ...$laporanpermissions,
@@ -50,6 +51,8 @@
             'ratiodriverhelper',
             'penjualan',
             'penjualan/*',
+            'pembelianmarketing',
+            'pembelianmarketing/*',
             'retur',
             'retur/*',
             'ajuanlimit',
@@ -130,6 +133,13 @@
                 <li class="menu-item {{ request()->is(['penjualan', 'penjualan/*']) ? 'active' : '' }}">
                     <a href="{{ route('penjualan.index') }}" class="menu-link">
                         <div>Penjualan</div>
+                    </a>
+                </li>
+            @endcan
+            @can('pembelianmarketing.index')
+                <li class="menu-item {{ request()->is(['pembelianmarketing', 'pembelianmarketing/*']) ? 'active' : '' }}">
+                    <a href="{{ route('pembelianmarketing.index') }}" class="menu-link">
+                        <div>Pembelian</div>
                     </a>
                 </li>
             @endcan

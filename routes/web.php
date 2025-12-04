@@ -111,7 +111,9 @@ use App\Http\Controllers\PencairanprogramenambulanController;
 use App\Http\Controllers\PencairanprogramikatanController;
 use App\Http\Controllers\PenilaiankaryawanController;
 use App\Http\Controllers\PenjualanController;
+use App\Http\Controllers\PembelianmarketingController;
 use App\Http\Controllers\PenyesuaiangudangcabangController;
+use App\Http\Controllers\ResetDataController;
 use App\Http\Controllers\PenyesuaianupahController;
 use App\Http\Controllers\PermintaankirimanController;
 use App\Http\Controllers\PermintaanproduksiController;
@@ -1090,6 +1092,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/penjualan/editproduk', 'editproduk')->name('penjualan.editproduk');
         Route::post('/penjualan/getfakturbypelanggan', 'getfakturbypelanggan')->name('penjualan.getfakturbypelanggan');
         Route::get('/penjualan/{no_faktur}/getpiutangfaktur', 'getpiutangfaktur')->name('penjualan.getpiutangfaktur');
+    });
+
+    Route::controller(PembelianmarketingController::class)->group(function () {
+        Route::get('/pembelianmarketing', 'index')->name('pembelianmarketing.index')->can('pembelianmarketing.index');
+        Route::get('/pembelianmarketing/create', 'create')->name('pembelianmarketing.create')->can('pembelianmarketing.create');
+        Route::post('/pembelianmarketing/store', 'store')->name('pembelianmarketing.store')->can('pembelianmarketing.store');
+        Route::get('/pembelianmarketing/{no_bukti}/edit', 'edit')->name('pembelianmarketing.edit')->can('pembelianmarketing.edit');
+        Route::put('/pembelianmarketing/{no_bukti}/update', 'update')->name('pembelianmarketing.update')->can('pembelianmarketing.update');
+        Route::delete('/pembelianmarketing/{no_bukti}/delete', 'destroy')->name('pembelianmarketing.delete')->can('pembelianmarketing.delete');
+        Route::get('/pembelianmarketing/{no_bukti}/show', 'show')->name('pembelianmarketing.show')->can('pembelianmarketing.show');
     });
 
     Route::controller(ReturController::class)->group(function () {
@@ -2397,4 +2409,11 @@ Route::get('/assignrole', function () {
         $user->assignRole($role);
     }
 });
+
+// Reset Data Routes - Super Admin Only
+Route::middleware(['auth'])->group(function () {
+    Route::get('/resetdata', [ResetDataController::class, 'index'])->name('resetdata.index')->middleware('role:super admin');
+    Route::post('/resetdata/reset', [ResetDataController::class, 'reset'])->name('resetdata.reset')->middleware('role:super admin');
+});
+
 require __DIR__ . '/auth.php';

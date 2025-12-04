@@ -754,6 +754,15 @@
             {{-- @include('layouts.sidebar.hrd') --}}
             {{-- @include('layouts.sidebar.worksheetom') --}}
 
+            @if (auth()->user()->hasRole('super admin'))
+                <li class="menu-header">System</li>
+                <li class="menu-item {{ request()->is(['resetdata', 'resetdata/*']) ? 'active' : '' }}">
+                    <a href="{{ route('resetdata.index') }}" class="menu-link">
+                        <i class="menu-icon tf-icons ti ti-alert-triangle" style="color: #dc3545;"></i>
+                        <div style="color: #dc3545;">Reset Data</div>
+                    </a>
+                </li>
+            @endif
 
             {{-- <li class="menu-item {{ request()->is(['ticket', 'ticket/*']) ? 'active' : '' }}">
                 <a href="{{ route('ticket.index') }}" class="menu-link">
