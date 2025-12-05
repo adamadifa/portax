@@ -36,9 +36,7 @@ class ResetDataController extends Controller
         'cabang',
         'wilayah',
         'regional',
-        'kategori_produk',
-        'jenis_produk',
-        'diskon',
+        'salesman_kategori',
     ];
 
     public function index()
@@ -79,14 +77,14 @@ class ResetDataController extends Controller
             // Get all tables
             $database = DB::getDatabaseName();
             $tables = DB::select("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{$database}'");
-            
+
             $deletedTables = 0;
             $skippedTables = 0;
             $log = [];
 
             foreach ($tables as $tableObj) {
                 $table = $tableObj->TABLE_NAME;
-                
+
                 // Skip protected tables
                 if (in_array($table, $this->protectedTables)) {
                     $skippedTables++;
@@ -124,11 +122,10 @@ class ResetDataController extends Controller
                 'protected_count' => $skippedTables,
                 'log' => $log,
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             DB::statement('SET FOREIGN_KEY_CHECKS=1');
-            
+
             return redirect()->back()->with([
                 'error' => 'Error saat reset data: ' . $e->getMessage()
             ]);
