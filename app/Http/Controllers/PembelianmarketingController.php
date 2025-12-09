@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Cabang;
 use App\Models\Salesman;
+use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Crypt;
+use Yajra\DataTables\Facades\DataTables;
 
 class PembelianmarketingController extends Controller
 {
@@ -91,9 +94,39 @@ class PembelianmarketingController extends Controller
         return view('marketing.pembelian.index', $data);
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        // TODO: Implement create method
+        $user = User::findOrFail(auth()->user()->id);
+        $roles_access_all_cabang = config('global.roles_access_all_cabang');
+
+        // Ajax request for supplier list (DataTables)
+        if ($request->ajax()) {
+            $query = Supplier::query();
+            $query->select(
+                'supplier.kode_supplier',
+                'supplier.nama_supplier',
+                'supplier.contact_person',
+                'supplier.no_hp_supplier',
+                'supplier.alamat_supplier'
+            );
+
+            // Filter by search
+            if ($request->has('search') && !empty($request->search['value'])) {
+                $searchValue = $request->search['value'];
+                $query->where(function ($q) use ($searchValue) {
+                    $q->where('supplier.nama_supplier', 'like', '%' . $searchValue . '%')
+                        ->orWhere('supplier.contact_person', 'like', '%' . $searchValue . '%');
+                });
+            }
+
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('action', function ($item) {
+                    return '<a href="#" kode_supplier="' . Crypt::encrypt($item->kode_supplier) . '" class="pilihsupplier"><i class="ti ti-external-link"></i></a>';
+                })
+                ->make();
+        }
+
         return view('marketing.pembelian.create');
     }
 
