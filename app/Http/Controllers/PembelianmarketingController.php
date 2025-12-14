@@ -83,14 +83,14 @@ class PembelianmarketingController extends Controller
 
         $query->orderBy('marketing_pembelian.tanggal', 'desc');
         $query->orderBy('marketing_pembelian.no_bukti', 'desc');
-        
+
         $pembelian = $query->cursorPaginate(15);
         $pembelian->appends(request()->all());
-        
+
         $data['pembelian'] = $pembelian;
         $cbg = new Cabang();
         $data['cabang'] = $cbg->getCabang();
-        
+
         return view('marketing.pembelian.index', $data);
     }
 
@@ -105,7 +105,6 @@ class PembelianmarketingController extends Controller
             $query->select(
                 'supplier.kode_supplier',
                 'supplier.nama_supplier',
-                'supplier.contact_person',
                 'supplier.no_hp_supplier',
                 'supplier.alamat_supplier'
             );
@@ -114,8 +113,7 @@ class PembelianmarketingController extends Controller
             if ($request->has('search') && !empty($request->search['value'])) {
                 $searchValue = $request->search['value'];
                 $query->where(function ($q) use ($searchValue) {
-                    $q->where('supplier.nama_supplier', 'like', '%' . $searchValue . '%')
-                        ->orWhere('supplier.contact_person', 'like', '%' . $searchValue . '%');
+                    $q->where('supplier.nama_supplier', 'like', '%' . $searchValue . '%');
                 });
             }
 

@@ -98,13 +98,13 @@
                      </a>
                  </li>
              @endcan --}}
-             {{-- @can('supplier.index')
+             @can('supplier.index')
                  <li class="menu-item {{ request()->is(['supplier', 'supplier/*']) ? 'active' : '' }}">
                      <a href="{{ route('supplier.index') }}" class="menu-link">
                          <div>Supplier</div>
                      </a>
                  </li>
-             @endcan --}}
+             @endcan
              {{-- <li class="menu-header small text-uppercase">
                  <span class="menu-header-text">HRD</span>
              </li> --}}

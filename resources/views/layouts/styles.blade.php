@@ -142,4 +142,38 @@
      .customizer .color-box.selected {
          box-shadow: 0 0 0 3px rgba(52, 144, 220, 0.5);
      }
+
+     /* Fix overlay issue on small screens */
+     .layout-overlay.layout-menu-toggle {
+         display: none !important;
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background-color: rgba(0, 0, 0, 0.5);
+         z-index: 998;
+         opacity: 0;
+         transition: opacity 0.3s ease;
+         pointer-events: none;
+     }
+
+     /* Show overlay only when menu is open on mobile */
+     @media (max-width: 1199.98px) {
+         html.layout-menu-open .layout-overlay.layout-menu-toggle,
+         body.layout-menu-open .layout-overlay.layout-menu-toggle,
+         .layout-menu-open .layout-overlay.layout-menu-toggle {
+             display: block !important;
+             opacity: 1;
+             pointer-events: auto;
+         }
+     }
+
+     /* Hide overlay on desktop - always hidden */
+     @media (min-width: 1200px) {
+         .layout-overlay.layout-menu-toggle {
+             display: none !important;
+             pointer-events: none !important;
+         }
+     }
  </style>

@@ -293,19 +293,28 @@
     <div class="login-container">
         <!-- Left Panel -->
         <div class="left-panel">
-            <div class="asterisk-icon">*</div>
+
             <div class="promo-text">
                 <div class="promo-text-small">You can easily</div>
-                <div class="promo-text-large">Get access your personal hub for clarity and productivity</div>
+                @php
+                    $domain = request()->getHost();
+                @endphp
+                <div class="promo-text-large">
+                    @if ($domain === 'cahayarianggalunggung.portax.site')
+                        PT. Cahaya Riang Galunggung
+                    @else
+                        Get Access
+                    @endif
+                </div>
             </div>
         </div>
 
         <!-- Right Panel -->
         <div class="right-panel">
             <div class="form-header">
-                <div class="form-header-icon">*</div>
+
                 <h1 class="form-title">Login</h1>
-                <p class="form-description">Access your tasks, notes, and projects anytime, anywhere - and keep everything flowing in one place.</p>
+                <p class="form-description">Silahkan Login Untuk Mengakses Aplikasi</p>
             </div>
 
             @if ($errors->has('id_user') || $errors->any())

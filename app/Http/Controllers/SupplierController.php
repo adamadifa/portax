@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
+use App\Models\Salesman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 
 class SupplierController extends Controller
 {
@@ -97,5 +99,90 @@ class SupplierController extends Controller
         } catch (\Exception $e) {
             return Redirect::back()->with(messageError($e->getMessage()));
         }
+    }
+
+    public function getSupplier($kode_supplier)
+    {
+        $kode_supplier = Crypt::decrypt($kode_supplier);
+        $supplier = Supplier::where('kode_supplier', $kode_supplier)->first();
+
+        if (!$supplier) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Supplier tidak ditemukan',
+                'data' => null
+            ], 404);
+        }
+
+        // Menambahkan field-field yang diharapkan JavaScript dengan nilai default
+        $user = auth()->user();
+        $supplier->status_aktif_supplier = '1'; // Default aktif
+        $supplier->kode_cabang = $user->kode_cabang ?? null;
+        $supplier->kode_salesman = $user->kode_salesman ?? null;
+        
+        // Get nama_salesman from salesman table if kode_salesman exists
+        $nama_salesman = null;
+        if ($user->kode_salesman) {
+            $salesman = Salesman::where('kode_salesman', $user->kode_salesman)->first();
+            $nama_salesman = $salesman ? $salesman->nama_salesman : null;
+        }
+        $supplier->nama_salesman = $nama_salesman;
+        $supplier->limit_supplier = 0; // Default limit
+        $supplier->latitude = null;
+        $supplier->longitude = null;
+        $supplier->foto = null;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail Supplier',
+            'data' => $supplier,
+            'saldo_voucher' => 0 // Default saldo voucher
+        ]);
+    }
+
+    public function getPiutangsupplier($kode_supplier)
+    {
+        $kode_supplier = Crypt::decrypt($kode_supplier);
+        
+        // Untuk pembelian, piutang supplier biasanya adalah hutang yang belum dibayar
+        // Untuk saat ini, return 0 karena belum ada implementasi hutang supplier
+        $sisa_piutang = 0;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sisa Piutang Supplier',
+            'data' => $sisa_piutang
+        ]);
+    }
+
+    public function getFakturkredit($kode_supplier)
+    {
+        $kode_supplier = Crypt::decrypt($kode_supplier);
+        
+        // Untuk pembelian, faktur kredit supplier biasanya adalah faktur pembelian yang belum dibayar
+        // Untuk saat ini, return 0 karena belum ada implementasi faktur kredit supplier
+        $faktur_kredit = 0;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Jumlah Faktur Kredit Belum Lunas',
+            'data' => $faktur_kredit
+        ]);
+    }
+
+    public function cekfotosupplier(Request $request)
+    {
+        $file = $request->get('file');
+        if ($file) {
+            // Remove leading slash if present
+            $file = ltrim($file, '/');
+            $exists = Storage::disk('public')->exists($file);
+        } else {
+            $exists = false;
+        }
+
+        return response()->json([
+            'exists' => $exists
+        ]);
     }
 }

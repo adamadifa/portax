@@ -226,13 +226,14 @@
                                     <td>
                                         <div class="action-buttons">
                                             @can('pembelianmarketing.edit')
-                                                <a href="/pembelianmarketing/{{ \Crypt::encrypt($d->no_bukti) }}/edit" class="action-btn edit" title="Edit">
+                                                <a href="/pembelianmarketing/{{ \Crypt::encrypt($d->no_bukti) }}/edit" class="action-btn edit"
+                                                    title="Edit">
                                                     <i class="ti ti-edit"></i>
                                                 </a>
                                             @endcan
                                             @can('pembelianmarketing.show')
-                                                <a href="{{ route('pembelianmarketing.show', Crypt::encrypt($d->no_bukti)) }}" class="action-btn detail"
-                                                    title="Detail">
+                                                <a href="{{ route('pembelianmarketing.show', Crypt::encrypt($d->no_bukti)) }}"
+                                                    class="action-btn detail" title="Detail">
                                                     <i class="ti ti-file-description"></i>
                                                 </a>
                                             @endcan
@@ -323,9 +324,3 @@
     });
 </script>
 @endpush
-
-
-
-
-
-

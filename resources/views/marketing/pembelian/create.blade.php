@@ -24,18 +24,14 @@
                     <div class="card">
                         <div class="card-body">
                             <x-input-with-icon label="No. Bukti" name="no_bukti" icon="ti ti-barcode" />
-                            <x-input-with-icon label="Tanggal" name="tanggal" icon="ti ti-calendar"
-                                datepicker="flatpickr-date" />
-                            <x-input-with-icon label="Supplier" name="nama_supplier" icon="ti ti-building-store"
-                                readonly="true" />
+                            <x-input-with-icon label="Tanggal" name="tanggal" icon="ti ti-calendar" datepicker="flatpickr-date" />
+                            <x-input-with-icon label="Supplier" name="nama_supplier" icon="ti ti-building-store" readonly="true" />
                             <input type="hidden" id="kode_supplier" name="kode_supplier">
                             <input type="hidden" id="kode_cabang_supplier" name="kode_cabang_supplier">
-                            <x-input-with-icon label="Salesman" name="nama_salesman" icon="ti ti-user"
-                                readonly="true" />
+                            <x-input-with-icon label="Salesman" name="nama_salesman" icon="ti ti-user" readonly="true" />
                             <input type="hidden" name="kode_salesman" id="kode_salesman">
                             <div class="form-group mb-3">
-                                <textarea name="keterangan" class="form-control" id="" cols="30" rows="5" id="keterangan"
-                                    placeholder="Keterangan"></textarea>
+                                <textarea name="keterangan" class="form-control" id="" cols="30" rows="5" id="keterangan" placeholder="Keterangan"></textarea>
                             </div>
                         </div>
                     </div>
@@ -44,8 +40,8 @@
             <div class="row">
                 <div class="col">
                     <div class="card h-100">
-                        <img class="card-img-top" src="../../assets/img/elements/2.jpg" alt="Card image cap"
-                            style="height:250px; object-fit:cover" id="foto">
+                        <img class="card-img-top" src="../../assets/img/elements/2.jpg" alt="Card image cap" style="height:250px; object-fit:cover"
+                            id="foto">
                         <div class="card-body">
                             <p class="card-text" id="alamat_supplier">
 
@@ -111,8 +107,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-lg-4 col-md-12 col-sm12">
-                                    <x-input-with-icon label="Produk" name="nama_produk" icon="ti ti-barcode"
-                                        height="80px" readonly="true" />
+                                    <x-input-with-icon label="Produk" name="nama_produk" icon="ti ti-barcode" height="80px" readonly="true" />
                                     <input type="hidden" id="kode_harga" name="kode_harga">
                                     <input type="hidden" id="kode_produk" name="kode_produk">
                                     <input type="hidden" id="isi_pcs_dus" name="isi_pcs_dus">
@@ -122,14 +117,13 @@
                                 <div class="col-lg-2 col-md-12 col-sm-12">
                                     <div class="row">
                                         <div class="col">
-                                            <x-input-with-icon label="Dus" name="jml_dus" icon="ti ti-box"
-                                                align="right" money="true" />
+                                            <x-input-with-icon label="Dus" name="jml_dus" icon="ti ti-box" align="right" money="true" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col">
-                                            <x-input-with-icon label="Harga / Dus" name="harga_dus"
-                                                icon="ti ti-moneybag" align="right" money="true" />
+                                            <x-input-with-icon label="Harga / Dus" name="harga_dus" icon="ti ti-moneybag" align="right"
+                                                money="true" />
                                             <input type="hidden" id="harga_dus_produk">
                                         </div>
                                     </div>
@@ -137,14 +131,13 @@
                                 <div class="col-lg-2 col-md-12 col-sm-12">
                                     <div class="row">
                                         <div class="col">
-                                            <x-input-with-icon label="Pack" name="jml_pack" icon="ti ti-box"
-                                                align="right" money="true" />
+                                            <x-input-with-icon label="Pack" name="jml_pack" icon="ti ti-box" align="right" money="true" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col">
-                                            <x-input-with-icon label="Harga / Pack" name="harga_pack"
-                                                icon="ti ti-moneybag" align="right" money="true" />
+                                            <x-input-with-icon label="Harga / Pack" name="harga_pack" icon="ti ti-moneybag" align="right"
+                                                money="true" />
                                             <input type="hidden" id="harga_pack_produk">
                                         </div>
                                     </div>
@@ -152,30 +145,28 @@
                                 <div class="col-lg-2 col-md-12 col-sm-12">
                                     <div class="row">
                                         <div class="col">
-                                            <x-input-with-icon label="Pack" name="jml_pcs" icon="ti ti-box"
-                                                align="right" money="true" />
+                                            <x-input-with-icon label="Pack" name="jml_pcs" icon="ti ti-box" align="right" money="true" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col">
-                                            <x-input-with-icon label="Harga / Pcs" name="harga_pcs"
-                                                icon="ti ti-moneybag" align="right" money="true" />
+                                            <x-input-with-icon label="Harga / Pcs" name="harga_pcs" icon="ti ti-moneybag" align="right"
+                                                money="true" />
                                             <input type="hidden" id="harga_pcs_produk">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-2">
                                     <div class="form-check mt-3 mb-3">
-                                        <input class="form-check-input status_promosi" name="status_promosi"
-                                            type="checkbox" value="1" id="status_promosi">
+                                        <input class="form-check-input status_promosi" name="status_promosi" type="checkbox" value="1"
+                                            id="status_promosi">
                                         <label class="form-check-label" for="status_promosi"> Promosi </label>
                                     </div>
                                 </div>
                             </div>
                             <div class="row mb-3">
                                 <div class="col">
-                                    <a href="#" id="tambahproduk" class="btn btn-primary w-100"><i
-                                            class="ti ti-plus me-1"></i>Tambah
+                                    <a href="#" id="tambahproduk" class="btn btn-primary w-100"><i class="ti ti-plus me-1"></i>Tambah
                                         Produk</a>
                                 </div>
                             </div>
@@ -236,15 +227,14 @@
                                     <div class="row">
                                         <div class="col">
                                             <div class="form-group mb-3">
-                                                <select name="jenis_transaksi" id="jenis_transaksi"
-                                                    class="form-select">
+                                                <select name="jenis_transaksi" id="jenis_transaksi" class="form-select">
                                                     <option value="">Jenis Transaksi</option>
                                                     <option value="T">TUNAI</option>
                                                     <option value="K">KREDIT</option>
                                                 </select>
                                             </div>
-                                            <x-input-with-icon label="Grand Total" name="grandtotal" id="grandtotal"
-                                                icon="ti ti-shopping-cart" align="right" disabled="true" />
+                                            <x-input-with-icon label="Grand Total" name="grandtotal" id="grandtotal" icon="ti ti-shopping-cart"
+                                                align="right" disabled="true" />
                                         </div>
                                     </div>
                                     <div class="row" id="jenis_bayar_tunai">
@@ -260,21 +250,19 @@
                                     </div>
                                     <div class="row" id="titipan">
                                         <div class="col">
-                                            <x-input-with-icon icon="ti ti-moneybag" name="titipan" money="true"
-                                                align="right" label="Titipan" />
+                                            <x-input-with-icon icon="ti ti-moneybag" name="titipan" money="true" align="right"
+                                                label="Titipan" />
                                         </div>
                                     </div>
                                     <div class="row" id="voucher_tunai">
                                         <div class="col">
-                                            <x-input-with-icon icon="ti ti-tag" name="voucher" money="true"
-                                                align="right" label="Voucher" />
+                                            <x-input-with-icon icon="ti ti-tag" name="voucher" money="true" align="right" label="Voucher" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col">
                                             <div class="form-group mb-3">
-                                                <button class="btn btn-primary w-100" id="btnSimpan"><i
-                                                        class="ti ti-send me-1"></i>Submit</button>
+                                                <button class="btn btn-primary w-100" id="btnSimpan"><i class="ti ti-send me-1"></i>Submit</button>
                                             </div>
                                         </div>
                                     </div>
@@ -290,8 +278,7 @@
 
 <x-modal-form id="modal" size="modal-xl" show="loadmodal" title="" />
 <x-modal-form id="modaleditProduk" size="" show="loadmodaleditProduk" title="" />
-<div class="modal fade" id="modalSupplier" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
-    aria-hidden="true">
+<div class="modal fade" id="modalSupplier" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -306,9 +293,8 @@
                                 <th>No.</th>
                                 <th>Kode</th>
                                 <th>Nama Supplier</th>
-                                <th>Salesman</th>
-                                <th>Wilayah</th>
-                                <th>Status</th>
+                                <th>No. HP</th>
+                                <th>Alamat</th>
                                 <th>#</th>
                             </tr>
                         </thead>
@@ -318,9 +304,8 @@
                                 <th>No.</th>
                                 <th>Kode</th>
                                 <th>Nama Supplier</th>
-                                <th>Salesman</th>
-                                <th>Wilayah</th>
-                                <th>Status</th>
+                                <th>No. HP</th>
+                                <th>Alamat</th>
                                 <th>#</th>
                             </tr>
                         </tfoot>
@@ -394,26 +379,18 @@
                     width: '30%'
                 },
                 {
-                    data: 'nama_salesman',
-                    name: 'nama_salesman',
-                    orderable: false,
-                    searchable: true,
-                    width: '20%'
-                },
-
-                {
-                    data: 'nama_wilayah',
-                    name: 'nama_wilayah',
+                    data: 'no_hp_supplier',
+                    name: 'no_hp_supplier',
                     orderable: false,
                     searchable: false,
-                    width: '30%'
+                    width: '15%'
                 },
                 {
-                    data: 'status_supplier',
-                    name: 'status_supplier',
+                    data: 'alamat_supplier',
+                    name: 'alamat_supplier',
                     orderable: false,
                     searchable: false,
-                    width: '30%'
+                    width: '40%'
                 },
                 {
                     data: 'action',
@@ -422,27 +399,7 @@
                     searchable: false,
                     width: '5%'
                 }
-            ],
-            initComplete: function() {
-                this.api().columns().every(function(index) {
-                    if (index == 2 || index ==
-                        3
-                    ) { // Only add search inputs for nama_supplier and nama_salesman columns
-                        var column = this;
-                        var input = document.createElement("input");
-                        $(input).appendTo($(column.header()))
-                            .on('keyup change', function() {
-                                column.search($(this).val(), false, false, true).draw();
-                            })
-                            .addClass('form-control form-control-sm mt-2');
-                    }
-                });
-            },
-            rowCallback: function(row, data, index) {
-                if (data.status_supplier == "NonAktif") {
-                    $("td", row).addClass("bg-danger text-white");
-                }
-            }
+            ]
         });
 
         $("#nama_supplier").on('click focus', function(e) {

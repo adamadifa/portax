@@ -440,6 +440,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/supplier/{kode_supplier}', 'update')->name('supplier.update')->can('supplier.update');
         Route::delete('/supplier/{kode_supplier}', 'destroy')->name('supplier.delete')->can('supplier.delete');
         Route::get('/supplier/{kode_supplier}/show', 'show')->name('supplier.show')->can('supplier.show');
+
+        //AJAX REQUEST
+        Route::get('/supplier/{kode_supplier}/getSupplier', 'getSupplier')->name('supplier.getSupplier');
+        Route::get('/supplier/{kode_supplier}/getPiutangsupplier', 'getPiutangsupplier')->name('supplier.getPiutangsupplier');
+        Route::get('/supplier/{kode_supplier}/getFakturkredit', 'getFakturkredit')->name('supplier.getFakturkredit');
+        Route::get('/supplier/cekfotosupplier', 'cekfotosupplier')->name('supplier.cekfotosupplier');
     });
 
     Route::controller(BarangpembelianController::class)->group(function () {
