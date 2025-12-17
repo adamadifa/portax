@@ -300,8 +300,27 @@
                     $domain = request()->getHost();
                 @endphp
                 <div class="promo-text-large">
-                    @if ($domain === 'cahayarianggalunggung.portax.site')
-                        PT. Cahaya Riang Galunggung
+                    @php
+                        $companies = [
+                            'intirasapanganpersada.portax.site' => 'PT. INTIRASA PANGAN PERSADA',
+                            'asiabogordistribusi.portax.site' => 'PT. ASIA BOGOR DISTRIBUSI',
+                            'suburmakmurutama.portax.site' => 'PT. SUBUR MAKMUR UTAMA',
+                            'bantenmajujaya.portax.site' => 'PT. BANTEN MAJU JAYA',
+                            'suburmakmuralami.portax.site' => 'PT. SUBUR MAKMUR ALAMI',
+                            'garutcahayaperkasa.portax.site' => 'PT. GARUT CAHAYA PERKASA',
+                            'intisaricapsaicindo.portax.site' => 'PT. INTI SARI CAPSAICINDO',
+                            'intirasalamisejahtera.portax.site' => 'PT. INTIRASA ALAMI SEJAHTERA',
+                            'cakrawalapangandistribusi.portax.site' => 'PT. CAKRAWALA PANGAN DISTRIBUSI',
+                            'langgengkaryaabhinaya.portax.site' => 'PT. LANGGENG KARYA ABHINAYA',
+                            'rasautamagemilang.portax.site' => 'PT. RASA UTAMA GEMILANG',
+                            'pangansemarangsejahtera.portax.site' => 'PT. PANGAN SEMARANG SEJAHTERA',
+                            'makmuranugrahdistribusindo.portax.site' => 'PT. MAKMUR ANUGRAH DISTRIBUSINDO',
+                            'cahayarianggalunggung.portax.site' => 'PT. CAHAYA RIANG GALUNGGUNG',
+                        ];
+                        $companyName = $companies[$domain] ?? null;
+                    @endphp
+                    @if ($companyName)
+                        {{ $companyName }}
                     @else
                         Get Access
                     @endif

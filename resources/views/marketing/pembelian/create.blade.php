@@ -37,49 +37,6 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col">
-                    <div class="card h-100">
-                        <img class="card-img-top" src="../../assets/img/elements/2.jpg" alt="Card image cap" style="height:250px; object-fit:cover"
-                            id="foto">
-                        <div class="card-body">
-                            <p class="card-text" id="alamat_supplier">
-
-                            </p>
-                            <table class="table">
-                                <tr>
-                                    <th style="width: 60%">No. HP</th>
-                                    <td id="no_hp_supplier" style="width: 40%"></td>
-                                </tr>
-                                <tr>
-                                    <th>Lokasi</th>
-                                    <td id="latitude"></td>
-                                </tr>
-                                <tr>
-                                    <th>Longitude</th>
-                                    <td id="longitude"></td>
-                                </tr>
-                                <tr>
-                                    <th>Limit</th>
-                                    <td id="limit_supplier_text"></td>
-                                </tr>
-                                <tr>
-                                    <th>Piutang</th>
-                                    <td id="sisa_piutang_text"></td>
-                                </tr>
-                                <tr>
-                                    <th>Faktur Kredit</th>
-                                    <td id="jmlfaktur_kredit"></td>
-                                </tr>
-                                <tr>
-                                    <th>Saldo Voucher</th>
-                                    <td id="saldo_voucher_text"></td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
         <div class="col-lg-9 col-md-12 col-sm-12">
             <div class="row mb-3">
@@ -411,97 +368,18 @@
 
         //Cek file Foto Supplier
         function checkFileExistence(fileFoto) {
-            var xhr = new XMLHttpRequest();
-            var filePath = '/supplier/' + fileFoto;
-            var foto = "{{ url(Storage::url('supplier')) }}/" + fileFoto;
-            var fotoDefault = "{{ asset('assets/img/elements/2.jpg') }}";
-            console.log(foto);
-            xhr.open('GET', '/supplier/cekfotosupplier?file=' + filePath, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        var response = JSON.parse(xhr.responseText);
-                        if (response.exists) {
-                            console.log('File exists');
-                            $("#foto").attr("src", foto);
-                        } else {
-                            console.log('File does not exist');
-                            $("#foto").attr("src", fotoDefault);
-                        }
-                    } else {
-                        console.error('Error checking file existence:', xhr.statusText);
-                    }
-                }
-            };
-            xhr.send();
+            // fungsi ini tidak digunakan lagi pada halaman pembelianmarketing
         }
 
         //GetPiutang
 
         function getPiutang(kode_supplier) {
-            buttonDisable();
-            $.ajax({
-                url: `/supplier/${kode_supplier}/getPiutangsupplier`,
-                type: 'GET',
-                cache: false,
-                success: function(response) {
-                    console.log(response);
-                    $("#sisa_piutang_text").text(convertToRupiah(response.data));
-                    $("#sisa_piutang").val(response.data);
-                    buttonEnable();
-                }
-            });
+            // fungsi ini tidak digunakan lagi pada halaman pembelianmarketing
         }
 
 
         function getFakturkredit(kode_supplier) {
-            buttonDisable();
-            $.ajax({
-                url: `/supplier/${kode_supplier}/getFakturkredit`,
-                type: 'GET',
-                cache: false,
-                success: function(response) {
-                    console.log(response);
-                    const unpaid_faktur = response.data.unpaid_faktur;
-                    const max_faktur = response.data.jml_faktur;
-                    const siklus_pembayaran = response.data.siklus_pembayaran;
-                    jmlfakturbelumlunas = unpaid_faktur;
-                    jmlfakturmax = max_faktur;
-
-                    console.log(jmlfakturbelumlunas);
-                    console.log(jmlfakturmax);
-
-                    // if (unpaid_faktur >= max_faktur && siklus_pembayaran === '0') {
-                    //     SwalWarning("nama_supplier", "Melebihi Maksimal Faktur Kredit");
-                    //     $("#no_faktur").val("");
-                    //     $("#tanggal").val("");
-                    //     $("#nama_supplier").val("");
-                    //     $("#kode_supplier").val("");
-                    //     $("#kode_salesman").val("");
-                    //     $("#nama_salesman").val("");
-                    //     $('#latitude').text("");
-                    //     $('#longitude').text("");
-                    //     $('#no_hp_supplier').text("");
-                    //     $('#limit_supplier_text').text("");
-                    //     $('#limit_supplier').val("");
-                    //     $('#alamat_supplier').text("");
-                    //     $('#sisa_piutang_text').text("");
-                    //     $("#jmlfaktur_kredit").text("");
-                    //     let fileFoto = "notfound.jpg";
-                    //     checkFileExistence(fileFoto);
-                    //     //Data Salesman
-                    // } else {
-                    //     $("#jmlfaktur_kredit").text(response.data.unpaid_faktur);
-                    //     $("#siklus_pembayaran").val(response.data.siklus_pembayaran);
-                    //     $("#max_kredit").val(response.data.jml_faktur);
-                    // }
-
-                    $("#jmlfaktur_kredit").text(response.data.unpaid_faktur);
-                    $("#siklus_pembayaran").val(response.data.siklus_pembayaran);
-                    $("#max_kredit").val(response.data.jml_faktur);
-                    buttonEnable();
-                }
-            });
+            // fungsi ini tidak digunakan lagi pada halaman pembelianmarketing
         }
 
 
@@ -527,7 +405,7 @@
                 type: "GET",
                 cache: false,
                 success: function(response) {
-                    //fill data to form
+                    // isi data pokok supplier saja
                     const status_aktif_supplier = response.data.status_aktif_supplier;
                     if (status_aktif_supplier === '0') {
                         Swal.fire({
@@ -541,32 +419,12 @@
                         kode_pel = response.data.kode_supplier;
                         $('#kode_cabang_supplier').val(response.data.kode_cabang);
                         kode_cabang_supplier = response.data.kode_cabang;
-                        //alert(kode_cabang_supplier);
                         $('#nama_supplier').val(response.data.nama_supplier);
-                        $('#latitude').text(response.data.latitude);
-                        $('#longitude').text(response.data.longitude);
-                        $('#no_hp_supplier').text(response.data.no_hp_supplier);
-                        $('#limit_supplier_text').text(convertToRupiah(response.data
-                            .limit_supplier));
-                        $('#limit_supplier').val(response.data.limit_supplier);
-                        $('#alamat_supplier').text(response.data.alamat_supplier);
-                        let fileFoto = response.data.foto;
-                        checkFileExistence(fileFoto);
-                        //Data Salesman
-                        $('#kode_salesman').val(response.data.kode_salesman);
-                        $('#nama_salesman').val(response.data.nama_salesman);
-                        $("#saldo_voucher_text").text(response.saldo_voucher);
-                        saldo_voucher = response.saldo_voucher
-                        //Get Piutang
-                        getPiutang(kode_supplier);
-                        //Get FaktuR Kredit
-                        getFakturkredit(kode_supplier);
+
                         generatenofaktur();
-                        //open modal
                         $('#modalSupplier').modal('hide');
                         buttonEnable();
                     }
-
                 }
             });
         }
