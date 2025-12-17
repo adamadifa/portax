@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 @php
+    $domain = request()->getHost();
     $companies = [
         'intirasapanganpersada.portax.site' => 'PT. INTIRASA PANGAN PERSADA',
         'asiabogordistribusi.portax.site' => 'PT. ASIA BOGOR DISTRIBUSI',
@@ -315,9 +316,7 @@
 
             <div class="promo-text">
                 <div class="promo-text-small">You can easily</div>
-                @php
-                    $domain = request()->getHost();
-                @endphp
+
                 <div class="promo-text-large">
 
                     @if ($companyName)
