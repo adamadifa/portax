@@ -8,6 +8,7 @@
    <x-input-with-icon icon="ti ti-access-point" label="Radius Cabang" name="radius_cabang" />
    <x-input-with-icon icon="ti ti-barcode" label="Kode PT" name="kode_pt" />
    <x-input-with-icon icon="ti ti-building" label="Nama PT" name="nama_pt" />
+   <x-input-with-icon icon="ti ti-world" label="Domain" name="domain" />
    <x-select label="Regional" name="kode_regional" :data="$regional" key="kode_regional" textShow="nama_regional" />
    <x-input-with-icon icon="ti ti-access-point" label="Urutan" name="urutan" />
    <div class="form-group mb-3">

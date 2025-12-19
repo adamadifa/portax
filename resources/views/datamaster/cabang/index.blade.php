@@ -40,13 +40,8 @@
                                         <th>No.</th>
                                         <th>Kode</th>
                                         <th>Nama Cabang</th>
-                                        <th style="width: 18%">Alamat</th>
-                                        <th>Telepon</th>
-                                        <th>Radius</th>
-                                        <th>Regional</th>
-                                        <th>Color</th>
-                                        <th>Kode PT</th>
                                         <th style="width: 20%">Nama PT</th>
+                                        <th>Domain</th>
                                         <th>#</th>
                                     </tr>
                                 </thead>
@@ -56,15 +51,8 @@
                                             <td> {{ $loop->iteration + $cabang->firstItem() - 1 }}</td>
                                             <td>{{ $d->kode_cabang }}</td>
                                             <td>{{ textUpperCase($d->nama_cabang) }}</td>
-                                            <td>{{ $d->alamat_cabang }}</td>
-                                            <td>{{ $d->telepon_cabang }}</td>
-                                            <td>{{ $d->radius_cabang }}</td>
-                                            <td>{{ $d->nama_regional }}</td>
-                                            <td>
-                                                <span class="badge" style="background-color:{{ $d->color_marker }}">{{ $d->color_marker }}</span>
-                                            </td>
-                                            <td>{{ $d->kode_pt }}</td>
                                             <td>{{ $d->nama_pt }}</td>
+                                            <td>{{ $d->domain }}</td>
                                             <td>
                                                 <div class="d-flex">
                                                     @can('cabang.edit')

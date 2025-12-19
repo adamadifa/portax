@@ -22,13 +22,13 @@
                      </a>
                  </li>
              @endcan --}}
-             {{-- @can('cabang.index')
+             @can('cabang.index')
                  <li class="menu-item {{ request()->is(['cabang', 'cabang/*']) ? 'active' : '' }}">
                      <a href="{{ route('cabang.index') }}" class="menu-link">
                          <div>Cabang</div>
                      </a>
                  </li>
-             @endcan --}}
+             @endcan
              @can('salesman.index')
                  <li class="menu-item {{ request()->is(['salesman', 'salesman/*']) ? 'active' : '' }}">
                      <a href="{{ route('salesman.index') }}" class="menu-link">

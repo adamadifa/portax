@@ -52,6 +52,7 @@ class CabangController extends Controller
             'kode_regional' => 'required',
             'kode_pt' => 'required',
             'nama_pt' => 'required',
+            'domain' => 'nullable|string',
             'urutan' => 'required',
         ]);
 
@@ -66,6 +67,7 @@ class CabangController extends Controller
                 'radius_cabang' => $request->radius_cabang,
                 'kode_pt' => $request->kode_pt,
                 'nama_pt' => $request->nama_pt,
+                'domain' => $request->domain,
                 'kode_regional' => $request->kode_regional,
                 'urutan' => $request->urutan,
                 'color_marker' => $request->color_marker
@@ -110,6 +112,7 @@ class CabangController extends Controller
             'kode_regional' => 'required',
             'kode_pt' => 'required',
             'nama_pt' => 'required',
+            'domain' => 'nullable|string',
             'urutan' => 'required',
         ]);
 
@@ -124,6 +127,7 @@ class CabangController extends Controller
                 'kode_regional' => $request->kode_regional,
                 'kode_pt' => $request->kode_pt,
                 'nama_pt' => $request->nama_pt,
+                'domain' => $request->domain,
                 'urutan' => $request->urutan,
                 'color_marker' => $request->color_marker
             ]);

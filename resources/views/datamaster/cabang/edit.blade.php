@@ -14,6 +14,7 @@
       value="{{ $cabang->radius_cabang }}" />
    <x-input-with-icon icon="ti ti-barcode" label="Kode PT" name="kode_pt" value="{{ $cabang->kode_pt }}" />
    <x-input-with-icon icon="ti ti-building" label="Nama PT" name="nama_pt" value="{{ $cabang->nama_pt }}" />
+   <x-input-with-icon icon="ti ti-world" label="Domain" name="domain" value="{{ $cabang->domain }}" />
    <x-select label="Regional" name="kode_regional" :data="$regional" key="kode_regional" textShow="nama_regional"
       selected="{{ $cabang->kode_regional }}" />
    <x-input-with-icon icon="ti ti-access-point" label="Urutan" name="urutan" value="{{ $cabang->urutan }}" />

@@ -50,7 +50,8 @@ class ResetDataCommand extends Command
         'cabang',
         'wilayah',
         'regional',
-        'salesman_kategori'
+        'salesman_kategori',
+        'hrd_departemen'
 
     ];
 
