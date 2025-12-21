@@ -28,11 +28,6 @@
                             <x-input-with-icon label="Supplier" name="nama_supplier" icon="ti ti-building-store" readonly="true" />
                             <input type="hidden" id="kode_supplier" name="kode_supplier">
                             <input type="hidden" id="kode_cabang_supplier" name="kode_cabang_supplier">
-                            <x-input-with-icon label="Salesman" name="nama_salesman" icon="ti ti-user" readonly="true" />
-                            <input type="hidden" name="kode_salesman" id="kode_salesman">
-                            <div class="form-group mb-3">
-                                <textarea name="keterangan" class="form-control" id="" cols="30" rows="5" id="keterangan" placeholder="Keterangan"></textarea>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -63,62 +58,21 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-lg-4 col-md-12 col-sm12">
-                                    <x-input-with-icon label="Produk" name="nama_produk" icon="ti ti-barcode" height="80px" readonly="true" />
+                                <div class="col-lg-5 col-md-12 col-sm-12">
+                                    <x-input-with-icon label="Produk" name="nama_produk" icon="ti ti-barcode" readonly="true" />
                                     <input type="hidden" id="kode_harga" name="kode_harga">
                                     <input type="hidden" id="kode_produk" name="kode_produk">
                                     <input type="hidden" id="isi_pcs_dus" name="isi_pcs_dus">
                                     <input type="hidden" id="isi_pcs_pack" name="isi_pcs_pack">
                                     <input type="hidden" id="kode_kategori_diskon" name="kode_kategori_diskon">
                                 </div>
-                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-icon label="Dus" name="jml_dus" icon="ti ti-box" align="right" money="true" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-icon label="Harga / Dus" name="harga_dus" icon="ti ti-moneybag" align="right"
-                                                money="true" />
-                                            <input type="hidden" id="harga_dus_produk">
-                                        </div>
-                                    </div>
+                                <div class="col-lg-3 col-md-12 col-sm-12">
+                                    <x-input-with-icon label="Dus" name="jml_dus" icon="ti ti-box" align="right" money="true" />
                                 </div>
-                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-icon label="Pack" name="jml_pack" icon="ti ti-box" align="right" money="true" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-icon label="Harga / Pack" name="harga_pack" icon="ti ti-moneybag" align="right"
-                                                money="true" />
-                                            <input type="hidden" id="harga_pack_produk">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-icon label="Pack" name="jml_pcs" icon="ti ti-box" align="right" money="true" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-icon label="Harga / Pcs" name="harga_pcs" icon="ti ti-moneybag" align="right"
-                                                money="true" />
-                                            <input type="hidden" id="harga_pcs_produk">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-2">
-                                    <div class="form-check mt-3 mb-3">
-                                        <input class="form-check-input status_promosi" name="status_promosi" type="checkbox" value="1"
-                                            id="status_promosi">
-                                        <label class="form-check-label" for="status_promosi"> Promosi </label>
-                                    </div>
+                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                    <x-input-with-icon label="Harga / Dus" name="harga_dus" icon="ti ti-moneybag" align="right"
+                                        money="true" />
+                                    <input type="hidden" id="harga_dus_produk">
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -133,25 +87,18 @@
                                         <table class="table table-bordered" id="tabelproduk">
                                             <thead class="text-center table-dark">
                                                 <tr>
-                                                    <th rowspan="2">Kode</th>
-                                                    <th rowspan="2">Nama Barang</th>
-                                                    <th colspan="6">Quantity</th>
-                                                    <th rowspan="2">Subtotal</th>
-                                                    <th rowspan="2">Aksi</th>
-                                                </tr>
-                                                <tr>
+                                                    <th>Kode</th>
+                                                    <th>Nama Barang</th>
                                                     <th>Dus</th>
-                                                    <th>Harga</th>
-                                                    <th>Pack</th>
-                                                    <th>Harga</th>
-                                                    <th>Pcs</th>
-                                                    <th>Harga</th>
+                                                    <th>Harga / Dus</th>
+                                                    <th>Subtotal</th>
+                                                    <th>Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="loadproduk"></tbody>
                                             <tfoot class="table-dark">
                                                 <tr>
-                                                    <td colspan="8">SUBTOTAL</td>
+                                                    <td colspan="4">SUBTOTAL</td>
                                                     <td class="text-end" id="subtotal"></td>
                                                     <td></td>
                                                 </tr>
@@ -161,41 +108,28 @@
                                 </div>
                             </div>
                             <div class="row mt-3">
-                                <input type="hidden" id="potongan_aida" name="potongan_aida" value="0">
-                                <input type="hidden" id="potongan_swan" name="potongan_swan" value="0">
-                                <input type="hidden" id="potongan_stick" name="potongan_stick" value="0">
-                                <input type="hidden" id="potongan_sambal" name="potongan_sambal" value="0">
-                                <input type="hidden" id="potis_aida" name="potis_aida" value="0">
-                                <input type="hidden" id="potis_swan" name="potis_swan" value="0">
-                                <input type="hidden" id="potis_stick" name="potis_stick" value="0">
-                                <input type="hidden" id="peny_aida" name="peny_aida" value="0">
-                                <input type="hidden" id="peny_swan" name="peny_swan" value="0">
-                                <input type="hidden" id="peny_stick" name="peny_stick" value="0">
-                                <div class="col-lg-3 col-sm-12">
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="divider text-start divider-primary">
-                                                <div class="divider-text" style="font-size: 1rem">
-                                                    <i class="ti ti-moneybag"></i> Pembayaran
-                                                </div>
-                                            </div>
+                                <div class="col-12 d-flex justify-content-end">
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <input type="hidden" id="potongan_aida" name="potongan_aida" value="0">
+                                        <input type="hidden" id="potongan_swan" name="potongan_swan" value="0">
+                                        <input type="hidden" id="potongan_stick" name="potongan_stick" value="0">
+                                        <input type="hidden" id="potongan_sambal" name="potongan_sambal" value="0">
+                                        <input type="hidden" id="potis_aida" name="potis_aida" value="0">
+                                        <input type="hidden" id="potis_swan" name="potis_swan" value="0">
+                                        <input type="hidden" id="potis_stick" name="potis_stick" value="0">
+                                        <input type="hidden" id="peny_aida" name="peny_aida" value="0">
+                                        <input type="hidden" id="peny_swan" name="peny_swan" value="0">
+                                        <input type="hidden" id="peny_stick" name="peny_stick" value="0">
+                                        <div class="form-group mb-3">
+                                            <select name="jenis_transaksi" id="jenis_transaksi" class="form-select">
+                                                <option value="">Jenis Transaksi</option>
+                                                <option value="T">TUNAI</option>
+                                                <option value="K">KREDIT</option>
+                                            </select>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="form-group mb-3">
-                                                <select name="jenis_transaksi" id="jenis_transaksi" class="form-select">
-                                                    <option value="">Jenis Transaksi</option>
-                                                    <option value="T">TUNAI</option>
-                                                    <option value="K">KREDIT</option>
-                                                </select>
-                                            </div>
-                                            <x-input-with-icon label="Grand Total" name="grandtotal" id="grandtotal" icon="ti ti-shopping-cart"
-                                                align="right" disabled="true" />
-                                        </div>
-                                    </div>
-                                    <div class="row" id="jenis_bayar_tunai">
-                                        <div class="col">
+                                        <x-input-with-icon label="Grand Total" name="grandtotal" id="grandtotal" icon="ti ti-shopping-cart"
+                                            align="right" disabled="true" />
+                                        <div id="jenis_bayar_tunai">
                                             <div class="form-group mb-3">
                                                 <select name="jenis_bayar" id="jenis_bayar" class="form-select">
                                                     <option value="">Jenis Bayar</option>
@@ -204,23 +138,15 @@
                                                 </select>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row" id="titipan">
-                                        <div class="col">
+                                        <div id="titipan">
                                             <x-input-with-icon icon="ti ti-moneybag" name="titipan" money="true" align="right"
                                                 label="Titipan" />
                                         </div>
-                                    </div>
-                                    <div class="row" id="voucher_tunai">
-                                        <div class="col">
+                                        <div id="voucher_tunai">
                                             <x-input-with-icon icon="ti ti-tag" name="voucher" money="true" align="right" label="Voucher" />
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="form-group mb-3">
-                                                <button class="btn btn-primary w-100" id="btnSimpan"><i class="ti ti-send me-1"></i>Submit</button>
-                                            </div>
+                                        <div class="form-group mb-3">
+                                            <button class="btn btn-primary w-100" id="btnSimpan"><i class="ti ti-send me-1"></i>Submit</button>
                                         </div>
                                     </div>
                                 </div>
@@ -496,11 +422,6 @@
             let isi_pcs_pack = $(this).attr('isi_pcs_pack');
 
             let kode_kategori_diskon = $(this).attr('kode_kategori_diskon');
-            if ($('#status_promosi').is(":checked")) {
-                harga_dus = 0;
-                harga_pack = 0;
-                harga_pcs = 0;
-            }
             $("#kode_harga").val(kode_harga);
             $("#kode_produk").val(kode_produk);
             $("#nama_produk").val(nama_produk);
@@ -583,13 +504,6 @@
             var isi_pcs_pack = $("#isi_pcs_pack").val();
             var kode_kategori_diskon = $("#kode_kategori_diskon").val();
 
-
-            if ($('#status_promosi').is(":checked")) {
-                var status_promosi = $("#status_promosi").val();
-            } else {
-                var status_promosi = 0;
-            }
-
             var jmldus = jml_dus != "" ? parseInt(jml_dus.replace(/\./g, '')) : 0;
             var jmlpack = jml_pack != "" ? parseInt(jml_pack.replace(/\./g, '')) : 0;
             var jmlpcs = jml_pcs != "" ? parseInt(jml_pcs.replace(/\./g, '')) : 0;
@@ -605,22 +519,9 @@
             let pack = data.pack;
             let pcs = data.pcs;
 
-            let index = kode_harga + status_promosi;
+            let index = kode_harga;
 
-            let bgcolor = "";
-            if (status_promosi == '1') {
-                bgcolor = "bg-warning text-white";
-                var hargadus = 0;
-                var hargapack = 0;
-                var hargapcs = 0;
-                var harga_dus = 0;
-                var harga_pack = 0;
-                var harga_pcs = 0;
-            } else {
-                bgcolor = bgcolor;
-            }
-            let subtotal = (parseInt(dus) * parseInt(hargadus)) + (parseInt(pack) * parseInt(hargapack)) + (
-                parseInt(pcs) * parseInt(hargapcs));
+            let subtotal = (parseInt(dus) * parseInt(hargadus));
 
 
             if (kode_harga == "") {
@@ -656,11 +557,11 @@
                 });
             } else {
                 let produk = `
-                    <tr id="index_${index}" class="${bgcolor}">
+                    <tr id="index_${index}">
                         <td>
                             <input type="hidden" name="kode_harga_produk[]" value="${kode_harga}" class="kode_harga"/>
                             <input type="hidden" name="kode_produk[]" value="${kode_produk}" class="kode_produk"/>
-                            <input type="hidden" name="status_promosi_produk[]" class="status_promosi" value="${status_promosi}"/>
+                            <input type="hidden" name="status_promosi_produk[]" value="0"/>
                             <input type="hidden" name="kode_kategori_diskon[]" class="kode_kategori_diskon" value="${kode_kategori_diskon}"/>
                             <input type="hidden" name="jumlah_produk[]" value="${jumlah}"/>
                             <input type="hidden" name="isi_pcs_dus_produk[]" value="${isi_pcs_dus}"/>
@@ -674,16 +575,6 @@
                         <td class="text-end">
                            ${harga_dus}
                            <input type="hidden" name="harga_dus_produk[]" value="${harga_dus}"/>
-                        </td>
-                        <td class="text-center">${pack===0 ? '' :pack}</td>
-                        <td class="text-end">
-                           ${harga_pack}
-                           <input type="hidden" name="harga_pack_produk[]" value="${harga_pack}"/>
-                        </td>
-                        <td class="text-center">${pcs===0 ? '' :pcs}</td>
-                        <td class="text-end">
-                           ${harga_pcs}
-                           <input type="hidden" name="harga_pcs_produk[]" value="${harga_pcs}"/>
                         </td>
                         <td class="text-end">
                             ${convertToRupiah(subtotal)}
@@ -717,7 +608,6 @@
                 $("#harga_dus_produk").val("");
                 $("#harga_pack_produk").val("");
                 $("#harga_pcs_produk").val("");
-                $("#status_promosi").prop('checked', false);
 
                 loadsubtotal();
 
@@ -726,20 +616,6 @@
 
         }
 
-        $("#status_promosi").change(function() {
-            let harga_dus = $("#harga_dus_produk").val();
-            let harga_pack = $("#harga_pack_produk").val();
-            let harga_pcs = $("#harga_pcs_produk").val();
-            if (this.checked) {
-                $("#harga_dus").val(0);
-                $("#harga_pack").val(0);
-                $("#harga_pcs").val(0);
-            } else {
-                $("#harga_dus").val(harga_dus);
-                $("#harga_pack").val(harga_pack);
-                $("#harga_pcs").val(harga_pcs);
-            }
-        });
         //Tambah Item Produk
         $("#tambahproduk").click(function(e) {
             e.preventDefault();
@@ -784,18 +660,9 @@
             let nama_produk = currentRow.find('td:eq(1)').text();
             let jml_dus = currentRow.find('td:eq(2)').text();
             let harga_dus = currentRow.find('td:eq(3)').text();
-            let jml_pack = currentRow.find('td:eq(4)').text();
-            let harga_pack = currentRow.find('td:eq(5)').text();
-            let jml_pcs = currentRow.find('td:eq(6)').text();
-            let harga_pcs = currentRow.find('td:eq(7)').text();
-            let subtotal = currentRow.find('td:eq(8)').text();
+            let subtotal = currentRow.find('td:eq(4)').text();
             let kode_supplier = $("#kode_supplier").val();
-            let status_promosi = currentRow.find('.status_promosi').val();
-            let index_old = kode_harga + "" + status_promosi;
-            console.log(kode_harga);
-            console.log(status_promosi);
-            console.log(index_old);
-            //alert(status_promosi);
+            let index_old = kode_harga;
             let dataProduk = {
                 'kode_supplier': kode_supplier,
                 'kode_harga': kode_harga,
@@ -803,11 +670,11 @@
                 'nama_produk': nama_produk,
                 'jml_dus': jml_dus,
                 'harga_dus': harga_dus,
-                'jml_pack': jml_pack,
-                'harga_pack': harga_pack,
-                'jml_pcs': jml_pcs,
-                'harga_pcs': harga_pcs,
-                'status_promosi': status_promosi,
+                'jml_pack': '',
+                'harga_pack': '',
+                'jml_pcs': '',
+                'harga_pcs': '',
+                'status_promosi': 0,
                 'index_old': index_old
             };
             $.ajax({
@@ -841,17 +708,7 @@
             let isi_pcs_pack = $(this).find("#isi_pcs_pack").val();
             let kode_kategori_diskon = $(this).find("#kode_kategori_diskon").val();
             let index_old = $(this).find("#index_old").val();
-            let status_promosi;
-            // if ($(this).find('#status_promosi_edit').is(":checked")) {
-            //     let status_promosi =
-            // } else {
-            //     let status_promosi = 0;
-            // }
-            if ($(this).find('#status_promosi_edit').is(':checked')) {
-                status_promosi = 1;
-            } else {
-                status_promosi = 0;
-            }
+            let status_promosi = 0;
 
 
 
@@ -872,31 +729,15 @@
             let pack = data.pack;
             let pcs = data.pcs;
 
-
-            let index = kode_harga + status_promosi;
-            console.log(index_old);
-            let bgcolor = "";
-            if (status_promosi == '1') {
-                bgcolor = "bg-warning text-white";
-                hargadus = 0;
-                hargapack = 0;
-                hargapcs = 0;
-                harga_dus = 0;
-                harga_pack = 0;
-                harga_pcs = 0;
-            } else {
-                bgcolor = bgcolor;
-            }
-            let subtotal = (parseInt(dus) * parseInt(hargadus)) + (parseInt(pack) * parseInt(
-                hargapack)) + (
-                parseInt(pcs) * parseInt(hargapcs));
+            let index = kode_harga;
+            let subtotal = (parseInt(dus) * parseInt(hargadus));
 
             let newRow = `
-                    <tr id="index_${index}" class="${bgcolor}">
+                    <tr id="index_${index}">
                         <td>
                             <input type="hidden" name="kode_harga_produk[]" value="${kode_harga}" class="kode_harga"/>
                             <input type="hidden" name="kode_produk[]" value="${kode_produk}" class="kode_produk"/>
-                            <input type="hidden" name="status_promosi_produk[]" value="${status_promosi}" class="status_promosi"/>
+                            <input type="hidden" name="status_promosi_produk[]" value="0"/>
                             <input type="hidden" name="kode_kategori_diskon[]" class="kode_kategori_diskon" value="${kode_kategori_diskon}"/>
                             <input type="hidden" name="jumlah_produk[]" value="${jumlah}"/>
                             <input type="hidden" name="isi_pcs_dus_produk[]" value="${isi_pcs_dus}"/>
@@ -910,16 +751,6 @@
                         <td class="text-end">
                            ${harga_dus}
                            <input type="hidden" name="harga_dus_produk[]" value="${harga_dus}"/>
-                        </td>
-                        <td class="text-center">${pack===0 ? '' :pack}</td>
-                        <td class="text-end">
-                           ${harga_pack}
-                           <input type="hidden" name="harga_pack_produk[]" value="${harga_pack}"/>
-                        </td>
-                        <td class="text-center">${pcs===0 ? '' :pcs}</td>
-                        <td class="text-end">
-                           ${harga_pcs}
-                           <input type="hidden" name="harga_pcs_produk[]" value="${harga_pcs}"/>
                         </td>
                         <td class="text-end">
                             <input type="hidden" name="subtotal[]" class="subtotal" value="${subtotal}"/>
@@ -1392,7 +1223,6 @@
             const max_kredit = $("#max_kredit").val();
             const jenis_transaksi = $("#jenis_transaksi").val();
             const jenis_bayar = $("#jenis_bayar").val();
-            const keterangan = $("#keterangan").val();
             const voucher = $("#voucher").val().replace(/\./g, '');
             if (no_faktur == '') {
                 SwalWarning('no_faktur', 'No. Faktur Tidak Boleh Kosong');
@@ -1428,9 +1258,6 @@
                 return false;
             } else if (voucher > saldo_voucher) {
                 SwalWarning('voucher', 'Melebihi Saldo Voucher !');
-                return false;
-            } else if (jenis_transaksi == "K" && sisa_piutang > 0 && keterangan == "") {
-                SwalWarning('keterangan', 'Keterangan Harus Diisi !');
                 return false;
             } else {
                 buttonDisable();
