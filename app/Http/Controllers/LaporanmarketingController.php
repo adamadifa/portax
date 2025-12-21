@@ -438,7 +438,8 @@ class LaporanmarketingController extends Controller
             'potongan',
             'ppn',
             'jenis_transaksi',
-            'status'
+            'status',
+            'status_batal'
         );
 
         //dd($subqueryDetailpenjualan->first());
