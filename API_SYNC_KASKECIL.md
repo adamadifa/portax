@@ -60,9 +60,54 @@ Accept: application/json
     "success": false,
     "message": "Validasi gagal",
     "errors": {
-        "no_bukti": ["The no bukti has already been taken."],
+        "id": ["The id field is required."],
         "debet_kredit": ["The debet kredit field must be D or K."]
     }
+}
+```
+
+**Error Response (404 - Endpoint Tidak Ditemukan):**
+```json
+{
+    "success": false,
+    "message": "Endpoint tidak ditemukan (404)",
+    "error": {
+        "method": "POST",
+        "path": "api/sync/kaskecils",
+        "requested_url": "http://your-domain/api/sync/kaskecils",
+        "cause": "Route tidak terdaftar atau endpoint salah",
+        "suggestions": [
+            "/api/sync/kaskecil",
+            "/api/sync/kaskecil/batch",
+            "/api/sync/kaskecil/check"
+        ],
+        "available_endpoints": {
+            "POST /api/sync/penjualan": "Sync single penjualan",
+            "POST /api/sync/penjualan/batch": "Sync batch penjualan",
+            "POST /api/sync/penjualan/check": "Check no_faktur penjualan",
+            "DELETE /api/sync/penjualan": "Delete single penjualan",
+            "DELETE /api/sync/penjualan/batch": "Delete batch penjualan",
+            "POST /api/sync/kaskecil": "Sync single kas kecil",
+            "POST /api/sync/kaskecil/batch": "Sync batch kas kecil",
+            "POST /api/sync/kaskecil/check": "Check id kas kecil",
+            "DELETE /api/sync/kaskecil": "Delete single kas kecil",
+            "DELETE /api/sync/kaskecil/batch": "Delete batch kas kecil",
+            "POST /api/sync/ledger": "Sync single ledger",
+            "POST /api/sync/ledger/batch": "Sync batch ledger",
+            "POST /api/sync/ledger/check": "Check no_bukti ledger",
+            "DELETE /api/sync/ledger": "Delete single ledger",
+            "DELETE /api/sync/ledger/batch": "Delete batch ledger"
+        }
+    }
+}
+```
+
+**Error Response (500 - Server Error):**
+```json
+{
+    "success": false,
+    "message": "Gagal sync data kas kecil",
+    "error": "SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row..."
 }
 ```
 
@@ -471,16 +516,95 @@ Semua tercatat sekaligus
 
 ---
 
+## ⚠️ **ERROR HANDLING**
+
+### **Error 404 - Endpoint Tidak Ditemukan**
+
+Jika endpoint yang dipanggil tidak terdaftar, API akan mengembalikan response 404 yang informatif:
+
+**Contoh Error:**
+```json
+{
+    "success": false,
+    "message": "Endpoint tidak ditemukan (404)",
+    "error": {
+        "method": "POST",
+        "path": "api/sync/kaskecils",
+        "requested_url": "http://your-domain/api/sync/kaskecils",
+        "cause": "Route tidak terdaftar atau endpoint salah",
+        "suggestions": [
+            "/api/sync/kaskecil",
+            "/api/sync/kaskecil/batch",
+            "/api/sync/kaskecil/check"
+        ],
+        "available_endpoints": {
+            "POST /api/sync/penjualan": "Sync single penjualan",
+            "POST /api/sync/penjualan/batch": "Sync batch penjualan",
+            "POST /api/sync/penjualan/check": "Check no_faktur penjualan",
+            "DELETE /api/sync/penjualan": "Delete single penjualan",
+            "DELETE /api/sync/penjualan/batch": "Delete batch penjualan",
+            "POST /api/sync/kaskecil": "Sync single kas kecil",
+            "POST /api/sync/kaskecil/batch": "Sync batch kas kecil",
+            "POST /api/sync/kaskecil/check": "Check id kas kecil",
+            "DELETE /api/sync/kaskecil": "Delete single kas kecil",
+            "DELETE /api/sync/kaskecil/batch": "Delete batch kas kecil",
+            "POST /api/sync/ledger": "Sync single ledger",
+            "POST /api/sync/ledger/batch": "Sync batch ledger",
+            "POST /api/sync/ledger/check": "Check no_bukti ledger",
+            "DELETE /api/sync/ledger": "Delete single ledger",
+            "DELETE /api/sync/ledger/batch": "Delete batch ledger"
+        }
+    }
+}
+```
+
+**Informasi yang Diberikan:**
+- ✅ **Method** yang digunakan (POST, DELETE, dll)
+- ✅ **Path** yang diminta
+- ✅ **Full URL** yang diakses
+- ✅ **Penyebab** error (Route tidak terdaftar)
+- ✅ **Suggestions** - endpoint yang mirip (jika ada)
+- ✅ **Daftar semua endpoint** yang tersedia
+
+**Tips:**
+- Periksa apakah endpoint yang dipanggil sudah benar (perhatikan typo)
+- Periksa method HTTP yang digunakan (POST vs DELETE)
+- Gunakan `suggestions` untuk menemukan endpoint yang benar
+- Lihat `available_endpoints` untuk daftar lengkap endpoint
+
+### **Error 422 - Validasi Gagal**
+
+Terjadi ketika data yang dikirim tidak memenuhi validasi:
+- Field required tidak diisi
+- Format data salah
+- Tipe data tidak sesuai
+- Duplikasi dalam satu request (batch)
+
+### **Error 500 - Server Error**
+
+Terjadi ketika ada error di server:
+- Database constraint violation
+- Foreign key tidak ditemukan
+- Error lainnya di server
+
+**Response akan menyertakan:**
+- `message`: Pesan error umum
+- `error`: Detail error dari server (untuk debugging)
+
+---
+
 ## 🚀 **READY TO USE!**
 
 API Kas Kecil siap digunakan dengan fitur lengkap:
-- ✅ **Create** (POST sync)
+- ✅ **Create/Update** (POST sync - otomatis detect)
 - ✅ **Delete** (DELETE)
 - ✅ **Check** duplicate
 - ✅ **Batch** operations
 - ✅ **Cost Ratio** support
+- ✅ **Error handling** yang informatif
 
 Dokumentasi lengkap tersedia! 📄
+
 
 
 

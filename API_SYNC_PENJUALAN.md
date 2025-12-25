@@ -106,12 +106,48 @@ Accept: application/json
 }
 ```
 
-**Error Response (500):**
+**Error Response (404 - Endpoint Tidak Ditemukan):**
+```json
+{
+    "success": false,
+    "message": "Endpoint tidak ditemukan (404)",
+    "error": {
+        "method": "POST",
+        "path": "api/sync/penjualans",
+        "requested_url": "http://your-domain/api/sync/penjualans",
+        "cause": "Route tidak terdaftar atau endpoint salah",
+        "suggestions": [
+            "/api/sync/penjualan",
+            "/api/sync/penjualan/batch",
+            "/api/sync/penjualan/check"
+        ],
+        "available_endpoints": {
+            "POST /api/sync/penjualan": "Sync single penjualan",
+            "POST /api/sync/penjualan/batch": "Sync batch penjualan",
+            "POST /api/sync/penjualan/check": "Check no_faktur penjualan",
+            "DELETE /api/sync/penjualan": "Delete single penjualan",
+            "DELETE /api/sync/penjualan/batch": "Delete batch penjualan",
+            "POST /api/sync/kaskecil": "Sync single kas kecil",
+            "POST /api/sync/kaskecil/batch": "Sync batch kas kecil",
+            "POST /api/sync/kaskecil/check": "Check id kas kecil",
+            "DELETE /api/sync/kaskecil": "Delete single kas kecil",
+            "DELETE /api/sync/kaskecil/batch": "Delete batch kas kecil",
+            "POST /api/sync/ledger": "Sync single ledger",
+            "POST /api/sync/ledger/batch": "Sync batch ledger",
+            "POST /api/sync/ledger/check": "Check no_bukti ledger",
+            "DELETE /api/sync/ledger": "Delete single ledger",
+            "DELETE /api/sync/ledger/batch": "Delete batch ledger"
+        }
+    }
+}
+```
+
+**Error Response (500 - Server Error):**
 ```json
 {
     "success": false,
     "message": "Gagal sync data penjualan",
-    "error": "Detail error message"
+    "error": "SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row..."
 }
 ```
 
@@ -657,6 +693,84 @@ Aplikasi A                          Aplikasi B (Target)
 - [ ] Delete single penjualan - not found (should fail)
 - [ ] Delete batch - all success
 - [ ] Delete batch - partial success
+
+---
+
+## ⚠️ **ERROR HANDLING**
+
+### **Error 404 - Endpoint Tidak Ditemukan**
+
+Jika endpoint yang dipanggil tidak terdaftar, API akan mengembalikan response 404 yang informatif:
+
+**Contoh Error:**
+```json
+{
+    "success": false,
+    "message": "Endpoint tidak ditemukan (404)",
+    "error": {
+        "method": "POST",
+        "path": "api/sync/penjualans",
+        "requested_url": "http://your-domain/api/sync/penjualans",
+        "cause": "Route tidak terdaftar atau endpoint salah",
+        "suggestions": [
+            "/api/sync/penjualan",
+            "/api/sync/penjualan/batch",
+            "/api/sync/penjualan/check"
+        ],
+        "available_endpoints": {
+            "POST /api/sync/penjualan": "Sync single penjualan",
+            "POST /api/sync/penjualan/batch": "Sync batch penjualan",
+            "POST /api/sync/penjualan/check": "Check no_faktur penjualan",
+            "DELETE /api/sync/penjualan": "Delete single penjualan",
+            "DELETE /api/sync/penjualan/batch": "Delete batch penjualan"
+        }
+    }
+}
+```
+
+**Informasi yang Diberikan:**
+- ✅ **Method** yang digunakan (POST, DELETE, dll)
+- ✅ **Path** yang diminta
+- ✅ **Full URL** yang diakses
+- ✅ **Penyebab** error (Route tidak terdaftar)
+- ✅ **Suggestions** - endpoint yang mirip (jika ada)
+- ✅ **Daftar semua endpoint** yang tersedia
+
+**Tips:**
+- Periksa apakah endpoint yang dipanggil sudah benar (perhatikan typo)
+- Periksa method HTTP yang digunakan (POST vs DELETE)
+- Gunakan `suggestions` untuk menemukan endpoint yang benar
+- Lihat `available_endpoints` untuk daftar lengkap endpoint
+
+### **Error 404 - Data Tidak Ditemukan**
+
+Terjadi ketika mencoba menghapus data yang tidak ada:
+```json
+{
+    "success": false,
+    "message": "No faktur tidak ditemukan",
+    "no_faktur": "2024120001"
+}
+```
+
+### **Error 422 - Validasi Gagal**
+
+Terjadi ketika data yang dikirim tidak memenuhi validasi:
+- Field required tidak diisi
+- Format data salah
+- Tipe data tidak sesuai
+- Duplikasi dalam satu request (batch)
+
+### **Error 500 - Server Error**
+
+Terjadi ketika ada error di server:
+- Database constraint violation
+- Foreign key tidak ditemukan
+- Error lainnya di server
+
+**Response akan menyertakan:**
+- `message`: Pesan error umum
+- `error`: Detail error dari server (untuk debugging)
 
 ---
 

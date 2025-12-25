@@ -1308,6 +1308,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/ledger/{no_bukti}/edit', 'edit')->name('ledger.edit')->can('ledger.edit');
         Route::put('/ledger/{no_bukti}/update', 'update')->name('ledger.update')->can('ledger.update');
         Route::delete('/ledger/{no_bukti}/delete', 'destroy')->name('ledger.delete')->can('ledger.delete');
+        Route::post('/ledger/updatestatuspajak', 'updatestatuspajakledger')->name('ledger.updatestatuspajak');
     });
 
     Route::controller(SaldoawalledgerController::class)->group(function () {

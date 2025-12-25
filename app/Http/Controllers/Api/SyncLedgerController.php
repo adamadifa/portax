@@ -3,17 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Kaskecil;
-use App\Models\Kaskecilcostratio;
+use App\Models\Bank;
+use App\Models\Coa;
+use App\Models\Ledger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Exception;
 
-class SyncKaskecilController extends Controller
+class SyncLedgerController extends Controller
 {
     /**
-     * Sync data kas kecil dari aplikasi lain
+     * Sync data ledger dari aplikasi lain
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -23,24 +24,19 @@ class SyncKaskecilController extends Controller
         try {
             // Validasi request
             $validator = Validator::make($request->all(), [
-                // ID sebagai key (required)
-                'id' => 'required|integer',
-                // Header kas kecil (required)
+                // no_bukti sebagai key (required)
                 'no_bukti' => 'required|string|max:12',
                 'tanggal' => 'required|date',
+                'pelanggan' => 'nullable|string|max:255',
+                'kode_bank' => 'required|string|max:5',
+                'kode_akun' => 'required|string|max:6',
+                'keterangan' => 'required|string|max:255',
                 'jumlah' => 'required|integer',
                 'debet_kredit' => 'required|string|max:1|in:D,K',
-                'kode_akun' => 'required|string|max:6',
-                'kode_cabang' => 'required|string|max:3',
 
                 // Optional fields
-                'keterangan' => 'nullable|string|max:255',
-                'status_pajak' => 'nullable|integer',
-                'kode_peruntukan' => 'nullable|string|max:3',
-
-                // Cost Ratio (optional array)
-                'cost_ratio' => 'nullable|array',
-                'cost_ratio.*' => 'string|max:10',
+                'kode_peruntukan' => 'nullable|string|max:2',
+                'keterangan_peruntukan' => 'nullable|string|max:255',
             ]);
 
             if ($validator->fails()) {
@@ -53,72 +49,111 @@ class SyncKaskecilController extends Controller
 
             DB::beginTransaction();
 
-            // Cek apakah data dengan id sudah ada
-            $kaskecil = Kaskecil::find($request->id);
-            $isUpdate = $kaskecil !== null;
+            // Validasi foreign key - cek kode_bank
+            $bankExists = Bank::where('kode_bank', $request->kode_bank)->exists();
+            if (!$bankExists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => [
+                        'kode_bank' => ['Kode bank tidak ditemukan di database']
+                    ]
+                ], 422);
+            }
 
-            // Prepare data kas kecil
-            $kaskecilData = [
+            // Validasi foreign key - cek kode_akun
+            $coaExists = Coa::where('kode_akun', $request->kode_akun)->exists();
+            if (!$coaExists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => [
+                        'kode_akun' => ['Kode akun tidak ditemukan di database']
+                    ]
+                ], 422);
+            }
+
+            // Cek apakah data dengan no_bukti sudah ada
+            $ledger = Ledger::find($request->no_bukti);
+            $isUpdate = $ledger !== null;
+
+            // Prepare data ledger
+            $ledgerData = [
                 'no_bukti' => $request->no_bukti,
                 'tanggal' => $request->tanggal,
+                'pelanggan' => $request->pelanggan,
+                'kode_bank' => $request->kode_bank,
+                'kode_akun' => $request->kode_akun,
                 'keterangan' => $request->keterangan,
                 'jumlah' => $request->jumlah,
                 'debet_kredit' => $request->debet_kredit,
-                'status_pajak' => $request->status_pajak ?? 0,
-                'kode_akun' => $request->kode_akun,
-                'kode_cabang' => $request->kode_cabang,
                 'kode_peruntukan' => $request->kode_peruntukan,
+                'keterangan_peruntukan' => $request->keterangan_peruntukan,
             ];
 
             if ($isUpdate) {
                 // Update data yang sudah ada
-                $kaskecil->update($kaskecilData);
-                // Hapus cost ratio lama
-                Kaskecilcostratio::where('id', $kaskecil->id)->delete();
+                $ledger->update($ledgerData);
             } else {
-                // Insert data baru dengan id yang dikirim
-                $kaskecilData['id'] = $request->id;
-                $kaskecil = Kaskecil::create($kaskecilData);
-            }
-
-            // Insert cost ratio jika ada
-            $costRatioCount = 0;
-            if ($request->has('cost_ratio') && is_array($request->cost_ratio)) {
-                foreach ($request->cost_ratio as $kodeCr) {
-                    Kaskecilcostratio::create([
-                        'kode_cr' => $kodeCr,
-                        'id' => $kaskecil->id,
-                    ]);
-                    $costRatioCount++;
-                }
+                // Insert data baru
+                $ledger = Ledger::create($ledgerData);
             }
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => $isUpdate ? 'Data kas kecil berhasil diupdate' : 'Data kas kecil berhasil disync',
+                'message' => $isUpdate ? 'Data ledger berhasil diupdate' : 'Data ledger berhasil disync',
                 'data' => [
-                    'id' => $kaskecil->id,
-                    'no_bukti' => $request->no_bukti,
-                    'total_cost_ratio' => $costRatioCount,
+                    'no_bukti' => $ledger->no_bukti,
                     'action' => $isUpdate ? 'updated' : 'created',
                     'created_at' => now()->toDateTimeString()
                 ]
             ], $isUpdate ? 200 : 201);
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+
+            // Handle foreign key constraint violation
+            if ($e->getCode() == 23000) {
+                $errorMessage = 'Foreign key constraint violation';
+
+                // Cek apakah kode_bank tidak ada
+                if (strpos($e->getMessage(), 'kode_bank') !== false) {
+                    $errorMessage = 'Kode bank tidak ditemukan di database';
+                }
+                // Cek apakah kode_akun tidak ada
+                elseif (strpos($e->getMessage(), 'kode_akun') !== false) {
+                    $errorMessage = 'Kode akun tidak ditemukan di database';
+                }
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal sync data ledger',
+                    'error' => $errorMessage,
+                    'details' => config('app.debug') ? $e->getMessage() : null
+                ], 422);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal sync data ledger',
+                'error' => 'Database error: ' . $e->getMessage(),
+                'details' => config('app.debug') ? $e->getTraceAsString() : null
+            ], 500);
         } catch (Exception $e) {
             DB::rollBack();
 
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal sync data kas kecil',
-                'error' => $e->getMessage()
+                'message' => 'Gagal sync data ledger',
+                'error' => $e->getMessage(),
+                'details' => config('app.debug') ? $e->getTraceAsString() : null
             ], 500);
         }
     }
 
     /**
-     * Cek apakah id sudah ada
+     * Cek apakah no_bukti sudah ada
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -126,7 +161,7 @@ class SyncKaskecilController extends Controller
     public function check(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'id' => 'required|integer'
+            'no_bukti' => 'required|string|max:12'
         ]);
 
         if ($validator->fails()) {
@@ -137,17 +172,17 @@ class SyncKaskecilController extends Controller
             ], 422);
         }
 
-        $exists = Kaskecil::where('id', $request->id)->exists();
+        $exists = Ledger::where('no_bukti', $request->no_bukti)->exists();
 
         return response()->json([
             'success' => true,
             'exists' => $exists,
-            'id' => $request->id
+            'no_bukti' => $request->no_bukti
         ]);
     }
 
     /**
-     * Sync multiple kas kecil sekaligus (batch)
+     * Sync multiple ledger sekaligus (batch)
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -157,13 +192,13 @@ class SyncKaskecilController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'data' => 'required|array|min:1',
-                'data.*.id' => 'required|integer',
                 'data.*.no_bukti' => 'required|string|max:12',
                 'data.*.tanggal' => 'required|date',
+                'data.*.kode_bank' => 'required|string|max:5',
+                'data.*.kode_akun' => 'required|string|max:6',
+                'data.*.keterangan' => 'required|string|max:255',
                 'data.*.jumlah' => 'required|integer',
                 'data.*.debet_kredit' => 'required|string|max:1',
-                'data.*.kode_akun' => 'required|string|max:6',
-                'data.*.kode_cabang' => 'required|string|max:3',
             ]);
 
             if ($validator->fails()) {
@@ -174,16 +209,16 @@ class SyncKaskecilController extends Controller
                 ], 422);
             }
 
-            // Validasi duplikasi id dalam satu request
-            $ids = array_column($request->data, 'id');
-            $duplicateIds = array_diff_assoc($ids, array_unique($ids));
+            // Validasi duplikasi no_bukti dalam satu request
+            $noBuktis = array_column($request->data, 'no_bukti');
+            $duplicateNoBuktis = array_diff_assoc($noBuktis, array_unique($noBuktis));
 
-            if (!empty($duplicateIds)) {
+            if (!empty($duplicateNoBuktis)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Validasi gagal: Terdapat duplikasi ID dalam request',
+                    'message' => 'Validasi gagal: Terdapat duplikasi No Bukti dalam request',
                     'errors' => [
-                        'duplicate_ids' => array_values(array_unique($duplicateIds))
+                        'duplicate_no_bukti' => array_values(array_unique($duplicateNoBuktis))
                     ]
                 ], 422);
             }
@@ -192,66 +227,49 @@ class SyncKaskecilController extends Controller
             $failedCount = 0;
             $results = [];
 
-            foreach ($request->data as $kaskecilData) {
+            foreach ($request->data as $ledgerData) {
                 try {
                     DB::beginTransaction();
 
-                    // Cek apakah data dengan id sudah ada
-                    $kaskecil = Kaskecil::find($kaskecilData['id']);
-                    $isUpdate = $kaskecil !== null;
+                    // Cek apakah data dengan no_bukti sudah ada
+                    $ledger = Ledger::find($ledgerData['no_bukti']);
+                    $isUpdate = $ledger !== null;
 
                     // Prepare header
                     $header = [
-                        'no_bukti' => $kaskecilData['no_bukti'],
-                        'tanggal' => $kaskecilData['tanggal'],
-                        'keterangan' => $kaskecilData['keterangan'] ?? null,
-                        'jumlah' => $kaskecilData['jumlah'],
-                        'debet_kredit' => $kaskecilData['debet_kredit'],
-                        'status_pajak' => $kaskecilData['status_pajak'] ?? 0,
-                        'kode_akun' => $kaskecilData['kode_akun'],
-                        'kode_cabang' => $kaskecilData['kode_cabang'],
-                        'kode_peruntukan' => $kaskecilData['kode_peruntukan'] ?? null,
+                        'no_bukti' => $ledgerData['no_bukti'],
+                        'tanggal' => $ledgerData['tanggal'],
+                        'pelanggan' => $ledgerData['pelanggan'] ?? null,
+                        'kode_bank' => $ledgerData['kode_bank'],
+                        'kode_akun' => $ledgerData['kode_akun'],
+                        'keterangan' => $ledgerData['keterangan'],
+                        'jumlah' => $ledgerData['jumlah'],
+                        'debet_kredit' => $ledgerData['debet_kredit'],
+                        'kode_peruntukan' => $ledgerData['kode_peruntukan'] ?? null,
+                        'keterangan_peruntukan' => $ledgerData['keterangan_peruntukan'] ?? null,
                     ];
 
                     if ($isUpdate) {
                         // Update data yang sudah ada
-                        $kaskecil->update($header);
-                        // Hapus cost ratio lama
-                        Kaskecilcostratio::where('id', $kaskecil->id)->delete();
+                        $ledger->update($header);
                     } else {
-                        // Insert data baru dengan id yang dikirim
-                        $header['id'] = $kaskecilData['id'];
-                        $kaskecil = Kaskecil::create($header);
-                    }
-
-                    // Insert cost ratio jika ada
-                    $costRatioCount = 0;
-                    if (isset($kaskecilData['cost_ratio']) && is_array($kaskecilData['cost_ratio'])) {
-                        foreach ($kaskecilData['cost_ratio'] as $kodeCr) {
-                            Kaskecilcostratio::create([
-                                'kode_cr' => $kodeCr,
-                                'id' => $kaskecil->id,
-                            ]);
-                            $costRatioCount++;
-                        }
+                        // Insert data baru
+                        $ledger = Ledger::create($header);
                     }
 
                     DB::commit();
                     $successCount++;
                     $results[] = [
-                        'id' => $kaskecilData['id'],
-                        'no_bukti' => $kaskecilData['no_bukti'],
+                        'no_bukti' => $ledgerData['no_bukti'],
                         'status' => 'success',
                         'message' => $isUpdate ? 'Berhasil diupdate' : 'Berhasil disync',
-                        'action' => $isUpdate ? 'updated' : 'created',
-                        'cost_ratio_count' => $costRatioCount
+                        'action' => $isUpdate ? 'updated' : 'created'
                     ];
                 } catch (Exception $e) {
                     DB::rollBack();
                     $failedCount++;
                     $results[] = [
-                        'id' => $kaskecilData['id'] ?? 'unknown',
-                        'no_bukti' => $kaskecilData['no_bukti'] ?? 'unknown',
+                        'no_bukti' => $ledgerData['no_bukti'] ?? 'unknown',
                         'status' => 'failed',
                         'message' => $e->getMessage()
                     ];
@@ -278,7 +296,7 @@ class SyncKaskecilController extends Controller
     }
 
     /**
-     * Hapus data kas kecil beserta cost ratio berdasarkan id
+     * Hapus data ledger berdasarkan no_bukti
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -287,7 +305,7 @@ class SyncKaskecilController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'id' => 'required|integer'
+                'no_bukti' => 'required|string|max:12'
             ]);
 
             if ($validator->fails()) {
@@ -300,35 +318,27 @@ class SyncKaskecilController extends Controller
 
             DB::beginTransaction();
 
-            // Cek apakah data dengan id ada
-            $kaskecil = Kaskecil::find($request->id);
+            // Cek apakah data dengan no_bukti ada
+            $ledger = Ledger::find($request->no_bukti);
 
-            if (!$kaskecil) {
+            if (!$ledger) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'ID tidak ditemukan',
-                    'id' => $request->id
+                    'message' => 'No bukti tidak ditemukan',
+                    'no_bukti' => $request->no_bukti
                 ], 404);
             }
 
-            // Hitung cost ratio sebelum dihapus
-            $costRatioCount = Kaskecilcostratio::where('id', $kaskecil->id)->count();
-
-            // Hapus cost ratio terlebih dahulu (karena ada foreign key)
-            Kaskecilcostratio::where('id', $kaskecil->id)->delete();
-
             // Hapus header
-            $kaskecil->delete();
+            $ledger->delete();
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Data kas kecil berhasil dihapus',
+                'message' => 'Data ledger berhasil dihapus',
                 'data' => [
-                    'id' => $request->id,
-                    'no_bukti' => $kaskecil->no_bukti,
-                    'deleted_cost_ratio_count' => $costRatioCount,
+                    'no_bukti' => $request->no_bukti,
                     'deleted_at' => now()->toDateTimeString()
                 ]
             ], 200);
@@ -337,14 +347,14 @@ class SyncKaskecilController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menghapus data kas kecil',
+                'message' => 'Gagal menghapus data ledger',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
     /**
-     * Hapus multiple kas kecil sekaligus (batch delete)
+     * Hapus multiple ledger sekaligus (batch delete)
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -353,8 +363,8 @@ class SyncKaskecilController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'id' => 'required|array|min:1',
-                'id.*' => 'required|integer'
+                'no_bukti' => 'required|array|min:1',
+                'no_bukti.*' => 'required|string|max:12'
             ]);
 
             if ($validator->fails()) {
@@ -365,15 +375,15 @@ class SyncKaskecilController extends Controller
                 ], 422);
             }
 
-            // Validasi duplikasi id dalam satu request
-            $duplicateIds = array_diff_assoc($request->id, array_unique($request->id));
+            // Validasi duplikasi no_bukti dalam satu request
+            $duplicateNoBuktis = array_diff_assoc($request->no_bukti, array_unique($request->no_bukti));
 
-            if (!empty($duplicateIds)) {
+            if (!empty($duplicateNoBuktis)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Validasi gagal: Terdapat duplikasi ID dalam request',
+                    'message' => 'Validasi gagal: Terdapat duplikasi No Bukti dalam request',
                     'errors' => [
-                        'duplicate_ids' => array_values(array_unique($duplicateIds))
+                        'duplicate_no_bukti' => array_values(array_unique($duplicateNoBuktis))
                     ]
                 ], 422);
             }
@@ -382,45 +392,39 @@ class SyncKaskecilController extends Controller
             $failedCount = 0;
             $results = [];
 
-            foreach ($request->id as $id) {
+            foreach ($request->no_bukti as $noBukti) {
                 try {
                     DB::beginTransaction();
 
-                    // Cek apakah data dengan id ada
-                    $kaskecil = Kaskecil::find($id);
+                    // Cek apakah data dengan no_bukti ada
+                    $ledger = Ledger::find($noBukti);
 
-                    if (!$kaskecil) {
+                    if (!$ledger) {
                         $failedCount++;
                         $results[] = [
-                            'id' => $id,
+                            'no_bukti' => $noBukti,
                             'status' => 'failed',
-                            'message' => 'ID tidak ditemukan'
+                            'message' => 'No bukti tidak ditemukan'
                         ];
                         DB::rollBack();
                         continue;
                     }
 
-                    // Hitung cost ratio
-                    $costRatioCount = Kaskecilcostratio::where('id', $kaskecil->id)->count();
-
-                    // Hapus cost ratio dan header
-                    Kaskecilcostratio::where('id', $kaskecil->id)->delete();
-                    $kaskecil->delete();
+                    // Hapus header
+                    $ledger->delete();
 
                     DB::commit();
                     $successCount++;
                     $results[] = [
-                        'id' => $id,
-                        'no_bukti' => $kaskecil->no_bukti,
+                        'no_bukti' => $noBukti,
                         'status' => 'success',
-                        'message' => 'Berhasil dihapus',
-                        'deleted_cost_ratio_count' => $costRatioCount
+                        'message' => 'Berhasil dihapus'
                     ];
                 } catch (Exception $e) {
                     DB::rollBack();
                     $failedCount++;
                     $results[] = [
-                        'id' => $id,
+                        'no_bukti' => $noBukti,
                         'status' => 'failed',
                         'message' => $e->getMessage()
                     ];
@@ -431,7 +435,7 @@ class SyncKaskecilController extends Controller
                 'success' => true,
                 'message' => "Hapus batch selesai. Sukses: {$successCount}, Gagal: {$failedCount}",
                 'summary' => [
-                    'total' => count($request->id),
+                    'total' => count($request->no_bukti),
                     'success' => $successCount,
                     'failed' => $failedCount
                 ],
