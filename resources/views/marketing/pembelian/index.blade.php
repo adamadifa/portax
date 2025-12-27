@@ -117,31 +117,17 @@
                                     datepicker="flatpickr-date" />
                             </div>
                         </div>
-                        <!-- Row 2: Cabang (jika ada) -->
-                        @hasanyrole($roles_show_cabang)
-                            <div class="row g-2 mb-2">
-                                <div class="col-12">
-                                    <x-select label="Semua Cabang" name="kode_cabang_search" :data="$cabang" key="kode_cabang" textShow="nama_cabang"
-                                        upperCase="true" selected="{{ Request('kode_cabang_search') }}" select2="select2Kodecabangsearch" />
-                                </div>
-                            </div>
-                        @endhasanyrole
-                        <!-- Row 3: Salesman, No. Bukti, Kode Supplier, Nama Supplier sejajar (full width dibagi 4) -->
+                        <!-- Row 2: No. Bukti, Kode Supplier, Nama Supplier sejajar (full width dibagi 3) -->
                         <div class="row g-2 mb-2">
-                            <div class="col-lg-3 col-sm-12 col-md-12">
-                                <select name="kode_salesman_search" id="kode_salesman_search" class="form-select select2Kodesalesmansearch">
-                                    <option value="">Semua Salesman</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-3 col-md-12 col-sm-12">
+                            <div class="col-lg-4 col-md-12 col-sm-12">
                                 <x-input-with-icon label="No. Bukti" value="{{ Request('no_bukti_search') }}" name="no_bukti_search"
                                     icon="ti ti-barcode" />
                             </div>
-                            <div class="col-lg-3 col-md-12 col-sm-12">
+                            <div class="col-lg-4 col-md-12 col-sm-12">
                                 <x-input-with-icon label="Kode Supplier" value="{{ Request('kode_supplier_search') }}" name="kode_supplier_search"
                                     icon="ti ti-barcode" />
                             </div>
-                            <div class="col-lg-3 col-md-12 col-sm-12">
+                            <div class="col-lg-4 col-md-12 col-sm-12">
                                 <x-input-with-icon label="Nama Supplier" value="{{ Request('nama_supplier_search') }}" name="nama_supplier_search"
                                     icon="ti ti-users" />
                             </div>
@@ -165,8 +151,6 @@
                                 <th>No. Bukti</th>
                                 <th>Tanggal</th>
                                 <th>Nama Supplier</th>
-                                <th>Nama Cabang</th>
-                                <th>Salesman</th>
                                 <th class="text-end">Total</th>
                                 <th class="text-center">JT</th>
                                 <th class="text-center">Status</th>
@@ -176,17 +160,10 @@
                         <tbody>
                             @forelse ($pembelian as $d)
                                 @php
-                                    $total_netto = $d->total_bruto - $d->potongan - $d->potongan_istimewa - $d->penyesuaian + $d->ppn;
-                                    if ($d->status_batal == '1') {
-                                        $color = '#ed9993';
-                                        $color_text = '#000';
-                                    } else {
-                                        $color = '';
-                                        $color_text = '';
-                                    }
+                                    $total_netto = $d->total_bruto ?? 0;
                                 @endphp
 
-                                <tr style="background-color: {{ $color }}; color:{{ $color_text }}">
+                                <tr>
                                     <td>
                                         <span class="code-badge">
                                             <i class="ti ti-file-invoice me-1"></i>{{ $d->no_bukti }}
@@ -200,12 +177,6 @@
                                             <i class="ti ti-building-store me-1" style="color: #6c757d;"></i>{{ $d->nama_supplier }}
                                         </div>
                                     </td>
-                                    <td>
-                                        <i class="ti ti-building me-1" style="color: #6c757d;"></i>{{ strtoupper($d->nama_cabang) }}
-                                    </td>
-                                    <td>
-                                        <i class="ti ti-user-circle me-1" style="color: #6c757d;"></i>{{ strtoupper($d->nama_salesman) }}
-                                    </td>
                                     <td class="text-end" style="font-weight: 600; color: #03204f;">
                                         {{ formatAngka($total_netto) }}
                                     </td>
@@ -217,10 +188,10 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        @if ($d->status_batal == 0)
+                                        @if ($d->status == '0')
                                             <span class="status-badge aktif">Aktif</span>
                                         @else
-                                            <span class="status-badge nonaktif">Batal</span>
+                                            <span class="status-badge nonaktif">Nonaktif</span>
                                         @endif
                                     </td>
                                     <td>
@@ -239,7 +210,7 @@
                                             @endcan
                                             @can('pembelianmarketing.delete')
                                                 <form method="POST" name="deleteform" class="deleteform d-inline"
-                                                    action="/pembelianmarketing/{{ Crypt::encrypt($d->no_bukti) }}/delete">
+                                                    action="{{ route('pembelianmarketing.delete', Crypt::encrypt($d->no_bukti)) }}">
                                                     @csrf
                                                     @method('DELETE')
                                                     <a href="#" class="action-btn delete delete-confirm" title="Hapus">
@@ -252,7 +223,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center py-4">
+                                    <td colspan="7" class="text-center py-4">
                                         <i class="ti ti-inbox" style="font-size: 40px; color: #d1d5db;"></i>
                                         <p class="mt-2" style="color: #9ca3af;">Tidak ada data pembelian</p>
                                     </td>
@@ -275,52 +246,7 @@
 @push('myscript')
 <script>
     $(function() {
-        const select2Kodecabangsearch = $('.select2Kodecabangsearch');
-        if (select2Kodecabangsearch.length) {
-            select2Kodecabangsearch.each(function() {
-                var $this = $(this);
-                $this.wrap('<div class="position-relative"></div>').select2({
-                    placeholder: 'Semua Cabang',
-                    allowClear: true,
-                    dropdownParent: $this.parent()
-                });
-            });
-        }
-
-        const select2Kodesalesmansearch = $('.select2Kodesalesmansearch');
-        if (select2Kodesalesmansearch.length) {
-            select2Kodesalesmansearch.each(function() {
-                var $this = $(this);
-                $this.wrap('<div class="position-relative"></div>').select2({
-                    placeholder: 'Semua Salesman',
-                    allowClear: true,
-                    dropdownParent: $this.parent()
-                });
-            });
-        }
-
-        function getsalesmanbyCabang() {
-            var kode_cabang = $("#kode_cabang_search").val();
-            var kode_salesman = "{{ Request('kode_salesman_search') }}";
-            $.ajax({
-                type: 'POST',
-                url: '/salesman/getsalesmanbycabang',
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    kode_cabang: kode_cabang,
-                    kode_salesman: kode_salesman
-                },
-                cache: false,
-                success: function(respond) {
-                    $("#kode_salesman_search").html(respond);
-                }
-            });
-        }
-
-        getsalesmanbyCabang();
-        $("#kode_cabang_search").change(function(e) {
-            getsalesmanbyCabang();
-        });
+        // Scripts jika diperlukan
     });
 </script>
 @endpush

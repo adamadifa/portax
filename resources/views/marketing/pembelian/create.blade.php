@@ -6,6 +6,303 @@
         .nonaktif {
             background-color: red;
         }
+
+        /* Modern Card Styling */
+        .modern-card {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+            background: #fff;
+        }
+
+        .modern-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .modern-card .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Info Card Styling */
+        .info-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-card .form-label {
+            color: #495057;
+            font-weight: 500;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card .form-control,
+        .info-card input {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            border-radius: 8px;
+            padding: 0.625rem 1rem;
+        }
+
+        .info-card .form-control::placeholder {
+            color: #adb5bd;
+        }
+
+        .info-card .form-control:focus {
+            background: #fff;
+            border-color: #03204f;
+            color: #495057;
+            box-shadow: 0 0 0 0.2rem rgba(3, 32, 79, 0.1);
+        }
+
+        /* Grand Total Card */
+        .grandtotal-card {
+            background: #fff;
+            border: 2px solid #03204f;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        .grandtotal-card .grandtotal-content {
+            position: relative;
+            z-index: 1;
+            color: #03204f;
+        }
+
+        .grandtotal-card .grandtotal-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+
+        .grandtotal-card .grandtotal-amount {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1;
+            margin: 0;
+            color: #03204f;
+        }
+
+        .grandtotal-card .grandtotal-icon {
+            font-size: 4rem;
+            opacity: 0.1;
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #03204f;
+        }
+
+        /* Detail Card Styling */
+        .detail-card {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .detail-card .card-header {
+            background: #03204f;
+            color: white;
+            border: none;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .detail-card .card-header .card-title {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.125rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .detail-card .card-header .card-title i {
+            font-size: 1.25rem;
+        }
+
+        .detail-card .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Form Input Styling */
+        .form-input-group {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .modern-btn-primary {
+            background: #03204f;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .modern-btn-primary:hover {
+            background: #021a3d;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(3, 32, 79, 0.2);
+        }
+
+        .modern-btn-primary i {
+            margin-right: 0.5rem;
+        }
+
+        /* Table Styling */
+        .modern-table {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+        }
+
+        .modern-table thead {
+            background: #03204f;
+            color: white;
+        }
+
+        .modern-table thead th {
+            border: none;
+            padding: 0.75rem 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modern-table tbody td {
+            padding: 0.5rem;
+            vertical-align: middle;
+            border-color: #e9ecef;
+        }
+
+        .modern-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .modern-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .modern-table tfoot {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .modern-table tfoot td {
+            border: none;
+            padding: 0.5rem;
+        }
+
+        .btn-action {
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Summary/Payment Card */
+        .summary-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-card .form-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card .form-select,
+        .summary-card .form-control {
+            border-radius: 10px;
+            border: 1.5px solid #dee2e6;
+            padding: 0.625rem 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .summary-card .form-select:focus,
+        .summary-card .form-control:focus {
+            border-color: #03204f;
+            box-shadow: 0 0 0 0.2rem rgba(3, 32, 79, 0.1);
+        }
+
+        .summary-card .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .btn-submit {
+            background: #03204f;
+            border: none;
+            border-radius: 8px;
+            padding: 0.875rem 1.5rem;
+            font-weight: 600;
+            color: white;
+            width: 100%;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .btn-submit:hover {
+            background: #021a3d;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(3, 32, 79, 0.2);
+            color: white;
+        }
+
+        .btn-submit i {
+            margin-right: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .grandtotal-card .grandtotal-amount {
+                font-size: 2.5rem;
+            }
+
+            .grandtotal-card .grandtotal-icon {
+                font-size: 4rem;
+            }
+
+            .info-card {
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .grandtotal-card {
+                padding: 1.5rem;
+            }
+
+            .grandtotal-card .grandtotal-amount {
+                font-size: 2rem;
+            }
+
+            .summary-card {
+                padding: 1.25rem;
+            }
+        }
     </style>
 @section('navigasi')
     <span class="text-muted">Pembelian</span> / <span>Input Pembelian</span>
@@ -18,46 +315,36 @@
     <input type="hidden" name="max_kredit" id="max_kredit">
 
     <div class="row">
-        <div class="col-lg-3 col-sm-12 col-xs-12">
-            <div class="row mb-3">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <x-input-with-icon label="No. Bukti" name="no_bukti" icon="ti ti-barcode" />
-                            <x-input-with-icon label="Tanggal" name="tanggal" icon="ti ti-calendar" datepicker="flatpickr-date" />
-                            <x-input-with-icon label="Supplier" name="nama_supplier" icon="ti ti-building-store" readonly="true" />
-                            <input type="hidden" id="kode_supplier" name="kode_supplier">
-                            <input type="hidden" id="kode_cabang_supplier" name="kode_cabang_supplier">
-                        </div>
-                    </div>
-                </div>
+        <div class="col-lg-4 col-md-12 col-sm-12 mb-3">
+            <div class="info-card">
+                <x-input-with-icon label="No. Bukti" name="no_bukti" icon="ti ti-barcode" />
+                <x-input-with-icon label="Tanggal" name="tanggal" icon="ti ti-calendar" datepicker="flatpickr-date" />
+                <x-input-with-icon label="Supplier" name="nama_supplier" icon="ti ti-building-store" readonly="true" />
+                <input type="hidden" id="kode_supplier" name="kode_supplier">
+                <input type="hidden" id="kode_cabang_supplier" name="kode_cabang_supplier">
             </div>
         </div>
-        <div class="col-lg-9 col-md-12 col-sm-12">
-            <div class="row mb-3">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div class="icon-cart mt-3">
-                                    <i class="ti ti-shopping-bag text-primary" style="font-size: 8rem"></i>
-                                </div>
-                                <div class="mt-2">
-                                    <h1 style="font-size: 6.5rem" id="grandtotal_text">0</h1>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="col-lg-8 col-md-12 col-sm-12 mb-3">
+            <div class="grandtotal-card">
+                <div class="grandtotal-content">
+                    <div class="grandtotal-label">Grand Total</div>
+                    <h1 class="grandtotal-amount" id="grandtotal_text">Rp 0</h1>
                 </div>
+                <i class="ti ti-shopping-bag grandtotal-icon"></i>
             </div>
-            <div class="row">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title">Detail Penjualan</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card detail-card">
+                    <div class="card-header">
+                        <h5 class="card-title" style="color: white !important">
+                            <i class="ti ti-list"></i>
+                            Detail Pembelian
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-input-group">
+                            <div class="row g-3">
                                 <div class="col-lg-5 col-md-12 col-sm-12">
                                     <x-input-with-icon label="Produk" name="nama_produk" icon="ti ti-barcode" readonly="true" />
                                     <input type="hidden" id="kode_harga" name="kode_harga">
@@ -70,46 +357,46 @@
                                     <x-input-with-icon label="Dus" name="jml_dus" icon="ti ti-box" align="right" money="true" />
                                 </div>
                                 <div class="col-lg-4 col-md-12 col-sm-12">
-                                    <x-input-with-icon label="Harga / Dus" name="harga_dus" icon="ti ti-moneybag" align="right"
-                                        money="true" />
+                                    <x-input-with-icon label="Harga / Dus" name="harga_dus" icon="ti ti-moneybag" align="right" money="true" />
                                     <input type="hidden" id="harga_dus_produk">
                                 </div>
                             </div>
-                            <div class="row mb-3">
-                                <div class="col">
-                                    <a href="#" id="tambahproduk" class="btn btn-primary w-100"><i class="ti ti-plus me-1"></i>Tambah
-                                        Produk</a>
+                        </div>
+                        <div class="mb-3">
+                            <a href="#" id="tambahproduk" class="btn modern-btn-primary w-100">
+                                <i class="ti ti-plus"></i>Tambah Produk
+                            </a>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="table-responsive">
+                                    <table class="table modern-table" id="tabelproduk">
+                                        <thead class="text-center">
+                                            <tr>
+                                                <th>Kode</th>
+                                                <th style="text-align: left !important">Nama Barang</th>
+                                                <th>Dus</th>
+                                                <th>Harga / Dus</th>
+                                                <th>Subtotal</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="loadproduk"></tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="4" class="text-end fw-bold">SUBTOTAL</td>
+                                                <td class="text-end fw-bold" id="subtotal">Rp 0</td>
+                                                <td></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered" id="tabelproduk">
-                                            <thead class="text-center table-dark">
-                                                <tr>
-                                                    <th>Kode</th>
-                                                    <th>Nama Barang</th>
-                                                    <th>Dus</th>
-                                                    <th>Harga / Dus</th>
-                                                    <th>Subtotal</th>
-                                                    <th>Aksi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="loadproduk"></tbody>
-                                            <tfoot class="table-dark">
-                                                <tr>
-                                                    <td colspan="4">SUBTOTAL</td>
-                                                    <td class="text-end" id="subtotal"></td>
-                                                    <td></td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col-12 d-flex justify-content-end">
-                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12 d-flex justify-content-end">
+                                <div class="col-lg-5 col-md-6 col-sm-12">
+                                    <div class="summary-card">
                                         <input type="hidden" id="potongan_aida" name="potongan_aida" value="0">
                                         <input type="hidden" id="potongan_swan" name="potongan_swan" value="0">
                                         <input type="hidden" id="potongan_stick" name="potongan_stick" value="0">
@@ -120,33 +407,44 @@
                                         <input type="hidden" id="peny_aida" name="peny_aida" value="0">
                                         <input type="hidden" id="peny_swan" name="peny_swan" value="0">
                                         <input type="hidden" id="peny_stick" name="peny_stick" value="0">
-                                        <div class="form-group mb-3">
+                                        <div class="form-group">
+                                            <label class="form-label">Jenis Transaksi</label>
                                             <select name="jenis_transaksi" id="jenis_transaksi" class="form-select">
-                                                <option value="">Jenis Transaksi</option>
+                                                <option value="">Pilih Jenis Transaksi</option>
                                                 <option value="T">TUNAI</option>
                                                 <option value="K">KREDIT</option>
                                             </select>
                                         </div>
-                                        <x-input-with-icon label="Grand Total" name="grandtotal" id="grandtotal" icon="ti ti-shopping-cart"
-                                            align="right" disabled="true" />
+                                        <div class="form-group">
+                                            <x-input-with-icon label="Grand Total" name="grandtotal" id="grandtotal" icon="ti ti-shopping-cart"
+                                                align="right" disabled="true" />
+                                        </div>
                                         <div id="jenis_bayar_tunai">
-                                            <div class="form-group mb-3">
+                                            <div class="form-group">
+                                                <label class="form-label">Jenis Bayar</label>
                                                 <select name="jenis_bayar" id="jenis_bayar" class="form-select">
-                                                    <option value="">Jenis Bayar</option>
+                                                    <option value="">Pilih Jenis Bayar</option>
                                                     <option value="TN">CASH</option>
                                                     <option value="TR">TRANSFER</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div id="titipan">
-                                            <x-input-with-icon icon="ti ti-moneybag" name="titipan" money="true" align="right"
-                                                label="Titipan" />
+                                            <div class="form-group">
+                                                <x-input-with-icon icon="ti ti-moneybag" name="titipan" money="true" align="right"
+                                                    label="Titipan" />
+                                            </div>
                                         </div>
                                         <div id="voucher_tunai">
-                                            <x-input-with-icon icon="ti ti-tag" name="voucher" money="true" align="right" label="Voucher" />
+                                            <div class="form-group">
+                                                <x-input-with-icon icon="ti ti-tag" name="voucher" money="true" align="right"
+                                                    label="Voucher" />
+                                            </div>
                                         </div>
-                                        <div class="form-group mb-3">
-                                            <button class="btn btn-primary w-100" id="btnSimpan"><i class="ti ti-send me-1"></i>Submit</button>
+                                        <div class="form-group mb-0">
+                                            <button class="btn btn-submit" id="btnSimpan">
+                                                <i class="ti ti-send"></i>Submit Pembelian
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -156,6 +454,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </form>
 
@@ -347,7 +646,6 @@
                         kode_cabang_supplier = response.data.kode_cabang;
                         $('#nama_supplier').val(response.data.nama_supplier);
 
-                        generatenofaktur();
                         $('#modalSupplier').modal('hide');
                         buttonEnable();
                     }
@@ -371,10 +669,10 @@
 
 
         //GetProduk
-        function getHarga(kode_supplier) {
+        function getHarga() {
             buttonDisable();
             $.ajax({
-                url: `/harga/${kode_supplier}/gethargabysupplier`,
+                url: `/produk/getproduk`,
                 type: 'GET',
                 cache: false,
                 success: function(response) {
@@ -400,66 +698,45 @@
             } else {
                 $("#modal").modal("show");
                 $("#modal").find(".modal-title").text('Data Produk');
-                getHarga(kode_supplier);
+                getHarga();
             }
         });
 
         $(document).on('click', '.pilihProduk', function(e) {
             e.preventDefault();
-            let kode_harga = $(this).attr('kode_harga');
             let kode_produk = $(this).attr('kode_produk');
-            let nama_supplier = $("#nama_supplier").val();
             let nama_produk = $(this).attr('nama_produk');
-            let harga_dus = $(this).attr('harga_dus');
-            let harga_pack = $(this).attr('harga_pack');
-            let harga_pcs = $(this).attr('harga_pcs');
-
-            let harga_dus_produk = $(this).attr('harga_dus');
-            let harga_pack_produk = $(this).attr('harga_pack');
-            let harga_pcs_produk = $(this).attr('harga_pcs');
-
             let isi_pcs_dus = $(this).attr('isi_pcs_dus');
             let isi_pcs_pack = $(this).attr('isi_pcs_pack');
 
-            let kode_kategori_diskon = $(this).attr('kode_kategori_diskon');
-            $("#kode_harga").val(kode_harga);
+            // Hanya set kode_produk dan nama_produk ke form
             $("#kode_produk").val(kode_produk);
             $("#nama_produk").val(nama_produk);
-            $("#harga_dus").val(harga_dus);
-            $("#harga_pack").val(harga_pack);
-            $("#harga_pcs").val(harga_pcs);
 
-            $("#harga_dus_produk").val(harga_dus_produk);
-            $("#harga_pack_produk").val(harga_pack_produk);
-            $("#harga_pcs_produk").val(harga_pcs_produk);
-
-
+            // Set isi_pcs_dus dan isi_pcs_pack untuk perhitungan (hidden field)
             $("#isi_pcs_dus").val(isi_pcs_dus);
             $("#isi_pcs_pack").val(isi_pcs_pack);
 
-            $("#kode_kategori_diskon").val(kode_kategori_diskon);
+            // Clear harga fields (user will input manually)
+            $("#harga_dus").val('');
+            $("#harga_pack").val('');
+            $("#harga_pcs").val('');
+            $("#harga_dus_produk").val('');
+            $("#harga_pack_produk").val('');
+            $("#harga_pcs_produk").val('');
+            $("#kode_harga").val('');
+            $("#kode_kategori_diskon").val('');
 
-
-            //Disabled Harga
+            // Enable harga fields untuk input manual
+            $("#harga_dus").prop('disabled', false);
             if (isi_pcs_pack == "" || isi_pcs_pack === '0') {
+                $("#harga_pack").prop('disabled', true);
                 $("#jml_pack").prop('disabled', true);
             } else {
+                $("#harga_pack").prop('disabled', false);
                 $("#jml_pack").prop('disabled', false);
             }
-            if (nama_supplier.includes('KPBN') || nama_supplier.includes('RSB') || kode_cabang_user ==
-                'PST') {
-                $("#harga_dus").prop('disabled', false);
-                if (isi_pcs_pack == "" || isi_pcs_pack === '0') {
-                    $("#harga_pack").prop('disabled', true);
-                } else {
-                    $("#harga_pack").prop('disabled', false);
-                }
-                $("#harga_pcs").prop('disabled', false);
-            } else {
-                $("#harga_dus").prop('disabled', true);
-                $("#harga_pack").prop('disabled', true);
-                $("#harga_pcs").prop('disabled', true);
-            }
+            $("#harga_pcs").prop('disabled', false);
 
             $("#modal").modal("hide");
         });
@@ -491,40 +768,42 @@
 
 
         function addProduk() {
-            var kode_harga = $("#kode_harga").val();
             var kode_produk = $("#kode_produk").val();
             var nama_produk = $("#nama_produk").val();
-            var jml_dus = $("#jml_dus").val();
-            var jml_pack = $("#jml_pack").val();
-            var jml_pcs = $("#jml_pcs").val();
-            var harga_dus = $("#harga_dus").val();
-            var harga_pack = $("#harga_pack").val();
-            var harga_pcs = $("#harga_pcs").val();
-            var isi_pcs_dus = $("#isi_pcs_dus").val();
-            var isi_pcs_pack = $("#isi_pcs_pack").val();
-            var kode_kategori_diskon = $("#kode_kategori_diskon").val();
+            var jml_dus = $("#jml_dus").val() || "";
+            var jml_pack = $("#jml_pack").val() || "";
+            var jml_pcs = $("#jml_pcs").val() || "";
+            var harga_dus = $("#harga_dus").val() || "";
+            var harga_pack = $("#harga_pack").val() || "";
+            var harga_pcs = $("#harga_pcs").val() || "";
+            var isi_pcs_dus = $("#isi_pcs_dus").val() || "0";
+            var isi_pcs_pack = $("#isi_pcs_pack").val() || "0";
+            var kode_kategori_diskon = $("#kode_kategori_diskon").val() || "";
 
-            var jmldus = jml_dus != "" ? parseInt(jml_dus.replace(/\./g, '')) : 0;
-            var jmlpack = jml_pack != "" ? parseInt(jml_pack.replace(/\./g, '')) : 0;
-            var jmlpcs = jml_pcs != "" ? parseInt(jml_pcs.replace(/\./g, '')) : 0;
+            var jmldus = (jml_dus != "" && jml_dus != null) ? parseInt(jml_dus.toString().replace(/\./g, '')) : 0;
+            var jmlpack = (jml_pack != "" && jml_pack != null) ? parseInt(jml_pack.toString().replace(/\./g, '')) : 0;
+            var jmlpcs = (jml_pcs != "" && jml_pcs != null) ? parseInt(jml_pcs.toString().replace(/\./g, '')) : 0;
 
-            var hargadus = harga_dus != "" ? parseInt(harga_dus.replace(/\./g, '')) : 0;
-            var hargapack = harga_pack != "" ? parseInt(harga_pack.replace(/\./g, '')) : 0;
-            var hargapcs = harga_pcs != "" ? parseInt(harga_pcs.replace(/\./g, '')) : 0;
+            var hargadus = (harga_dus != "" && harga_dus != null) ? parseInt(harga_dus.toString().replace(/\./g, '')) : 0;
+            var hargapack = (harga_pack != "" && harga_pack != null) ? parseInt(harga_pack.toString().replace(/\./g, '')) : 0;
+            var hargapcs = (harga_pcs != "" && harga_pcs != null) ? parseInt(harga_pcs.toString().replace(/\./g, '')) : 0;
 
-            var jumlah = (jmldus * parseInt(isi_pcs_dus)) + (jmlpack * (parseInt(isi_pcs_pack))) + jmlpcs;
+            var isi_pcs_dus_num = parseInt(isi_pcs_dus) || 0;
+            var isi_pcs_pack_num = parseInt(isi_pcs_pack) || 0;
 
-            let data = convertoduspackpcs(isi_pcs_dus, isi_pcs_pack, jumlah);
+            var jumlah = (jmldus * isi_pcs_dus_num) + (jmlpack * isi_pcs_pack_num) + jmlpcs;
+
+            let data = convertoduspackpcs(isi_pcs_dus_num, isi_pcs_pack_num, jumlah);
             let dus = data.dus;
             let pack = data.pack;
             let pcs = data.pcs;
 
-            let index = kode_harga;
+            let index = kode_produk;
 
             let subtotal = (parseInt(dus) * parseInt(hargadus));
 
 
-            if (kode_harga == "") {
+            if (kode_produk == "" || kode_produk == null) {
                 Swal.fire({
                     title: "Oops!",
                     text: "Silahkan Pilih dulu Produk !",
@@ -534,7 +813,17 @@
                         $("#nama_produk").focus();
                     },
                 });
-            } else if (jumlah == "" || jumlah === '0') {
+            } else if (harga_dus == "" || hargadus == 0) {
+                Swal.fire({
+                    title: "Oops!",
+                    text: "Harga / Dus Tidak Boleh Kosong !",
+                    icon: "warning",
+                    showConfirmButton: true,
+                    didClose: (e) => {
+                        $("#harga_dus").focus();
+                    },
+                });
+            } else if (jumlah == "" || jumlah === '0' || jumlah == 0) {
                 Swal.fire({
                     title: "Oops!",
                     text: "Jumlah Tidak Boleh Kosong !",
@@ -559,22 +848,21 @@
                 let produk = `
                     <tr id="index_${index}">
                         <td>
-                            <input type="hidden" name="kode_harga_produk[]" value="${kode_harga}" class="kode_harga"/>
                             <input type="hidden" name="kode_produk[]" value="${kode_produk}" class="kode_produk"/>
                             <input type="hidden" name="status_promosi_produk[]" value="0"/>
                             <input type="hidden" name="kode_kategori_diskon[]" class="kode_kategori_diskon" value="${kode_kategori_diskon}"/>
                             <input type="hidden" name="jumlah_produk[]" value="${jumlah}"/>
                             <input type="hidden" name="isi_pcs_dus_produk[]" value="${isi_pcs_dus}"/>
                             <input type="hidden" name="isi_pcs_pack_produk[]" value="${isi_pcs_pack}"/>
-                            ${kode_harga}
+                            ${kode_produk}
                         </td>
                         <td>${nama_produk}</td>
                         <td class="text-center">
                            ${dus===0 ? '' : dus}
                         </td>
                         <td class="text-end">
-                           ${harga_dus}
-                           <input type="hidden" name="harga_dus_produk[]" value="${harga_dus}"/>
+                           ${convertToRupiah(hargadus)}
+                           <input type="hidden" name="harga_dus_produk[]" value="${hargadus}"/>
                         </td>
                         <td class="text-end">
                             ${convertToRupiah(subtotal)}
@@ -596,7 +884,7 @@
 
                 //append to table
                 $('#loadproduk').append(produk);
-                $("#kode_harga").val("");
+                $("#kode_produk").val("");
                 $("#nama_produk").val("");
                 $("#jml_dus").val("");
                 $("#jml_pack").val("");
@@ -608,6 +896,9 @@
                 $("#harga_dus_produk").val("");
                 $("#harga_pack_produk").val("");
                 $("#harga_pcs_produk").val("");
+                $("#isi_pcs_dus").val("");
+                $("#isi_pcs_pack").val("");
+                $("#kode_kategori_diskon").val("");
 
                 loadsubtotal();
 
@@ -735,22 +1026,21 @@
             let newRow = `
                     <tr id="index_${index}">
                         <td>
-                            <input type="hidden" name="kode_harga_produk[]" value="${kode_harga}" class="kode_harga"/>
                             <input type="hidden" name="kode_produk[]" value="${kode_produk}" class="kode_produk"/>
                             <input type="hidden" name="status_promosi_produk[]" value="0"/>
                             <input type="hidden" name="kode_kategori_diskon[]" class="kode_kategori_diskon" value="${kode_kategori_diskon}"/>
                             <input type="hidden" name="jumlah_produk[]" value="${jumlah}"/>
                             <input type="hidden" name="isi_pcs_dus_produk[]" value="${isi_pcs_dus}"/>
                             <input type="hidden" name="isi_pcs_pack_produk[]" value="${isi_pcs_pack}"/>
-                            ${kode_harga}
+                            ${kode_produk}
                         </td>
                         <td>${nama_produk}</td>
                         <td class="text-center">
                            ${dus===0 ? '' : dus}
                         </td>
                         <td class="text-end">
-                           ${harga_dus}
-                           <input type="hidden" name="harga_dus_produk[]" value="${harga_dus}"/>
+                           ${convertToRupiah(hargadus)}
+                           <input type="hidden" name="harga_dus_produk[]" value="${hargadus}"/>
                         </td>
                         <td class="text-end">
                             <input type="hidden" name="subtotal[]" class="subtotal" value="${subtotal}"/>
@@ -1207,12 +1497,11 @@
 
 
 
-        $("#formPenjualan").submit(function(e) {
+        $("#formPembelian").submit(function(e) {
             // e.preventDefault();
-            const no_faktur = $("#no_faktur").val();
+            const no_bukti = $("#no_bukti").val();
             const tanggal = $("#tanggal").val();
             const kode_supplier = $("#kode_supplier").val();
-            const kode_salesman = $("#kode_salesman").val();
             const sisa_piutang = $("#sisa_piutang").val();
             const gt = $("#grandtotal").val();
             const grandtotal = gt != "" ? parseInt(gt.replace(/\./g, '')) : 0;
@@ -1224,17 +1513,14 @@
             const jenis_transaksi = $("#jenis_transaksi").val();
             const jenis_bayar = $("#jenis_bayar").val();
             const voucher = $("#voucher").val().replace(/\./g, '');
-            if (no_faktur == '') {
-                SwalWarning('no_faktur', 'No. Faktur Tidak Boleh Kosong');
+            if (no_bukti == '') {
+                SwalWarning('no_bukti', 'No. Bukti Tidak Boleh Kosong');
                 return false;
             } else if (tanggal == '') {
                 SwalWarning('tanggal', 'Tanggal Tidak Boleh Kosong');
                 return false;
             } else if (kode_supplier == "") {
                 SwalWarning('nama_supplier', 'Supplier Tidak Boleh Kosong');
-                return false;
-            } else if (kode_salesman == "") {
-                SwalWarning('nama_salesman', 'Salesman Tidak Boleh Kosong');
                 return false;
             } else if ($('#loadproduk tr').length == 0) {
                 SwalWarning('nama_produk', 'Detail Produk Tidak Boleh Kosong');
@@ -1253,9 +1539,6 @@
                 parseInt(limit_supplier)) {
                 SwalWarning('nama_produk', 'Melebihi Limit, Silahkan Ajukan Penambahan Limit !');
                 return false;
-            } else if (jenis_transaksi == "K" && jmlfakturbelumlunas >= jmlfakturmax) {
-                SwalWarning('keterangan', 'Melebihi Batas Jumlah Faktur Kredit !');
-                return false;
             } else if (voucher > saldo_voucher) {
                 SwalWarning('voucher', 'Melebihi Saldo Voucher !');
                 return false;
@@ -1264,34 +1547,6 @@
             }
         });
 
-        function generatenofaktur() {
-            var tanggal = $("#tanggal").val();
-            var kode_salesman = $("#kode_salesman").val();
-            buttonDisable();
-            $.ajax({
-                type: 'POST',
-                url: '/penjualan/generatenofaktur',
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    tanggal: tanggal,
-                    kode_salesman: kode_salesman
-                },
-                cache: false,
-                success: function(respond) {
-                    buttonEnable();
-                    if (respond !== '0') {
-                        $("#no_faktur").val(respond);
-                        // $("#no_faktur").prop('readonly', true);
-                        console.log(respond);
-                    }
-
-                }
-            });
-        }
-
-        $("#tanggal,#kode_salesman").change(function() {
-            generatenofaktur();
-        });
     });
 </script>
 @endpush

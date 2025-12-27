@@ -169,11 +169,28 @@
          }
      }
 
-     /* Hide overlay on desktop - always hidden */
-     @media (min-width: 1200px) {
-         .layout-overlay.layout-menu-toggle {
-             display: none !important;
-             pointer-events: none !important;
-         }
-     }
- </style>
+    /* Hide overlay on desktop - always hidden */
+    @media (min-width: 1200px) {
+        .layout-overlay.layout-menu-toggle {
+            display: none !important;
+            pointer-events: none !important;
+        }
+    }
+
+    /* Reduce top padding/margin for content when navbar is hidden */
+    .content-wrapper {
+        padding-top: 0 !important;
+    }
+
+    .content-wrapper .container-fluid.container-p-y {
+        padding-top: 0.5rem !important;
+        padding-bottom: 1.5rem !important;
+    }
+
+    .content-wrapper .container-fluid h4 {
+        margin-top: 0 !important;
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+</style>

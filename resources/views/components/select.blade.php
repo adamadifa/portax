@@ -17,9 +17,13 @@
     <select name="{{ $name }}" id="{{ $name }}" class="form-select {{ $select2 }}" {{ $disabled ? 'disabled' : '' }}>
         <option value="">{{ $label }}</option>
         @foreach ($data as $d)
-            <option {{ $d->$key == $selected ? 'selected' : '' }} value="{{ $d->$key }}">
-                {{ $showKey ? $d->$key . ' | ' : '' }}
-                {{ $upperCase ? strtoupper(strtolower($d->$textShow)) : ucwords(strtolower($d->$textShow)) }}
+            @php
+                $dKey = is_array($d) ? $d[$key] : $d->$key;
+                $dTextShow = is_array($d) ? $d[$textShow] : $d->$textShow;
+            @endphp
+            <option {{ $dKey == $selected ? 'selected' : '' }} value="{{ $dKey }}">
+                {{ $showKey ? $dKey . ' | ' : '' }}
+                {{ $upperCase ? strtoupper(strtolower($dTextShow)) : ucwords(strtolower($dTextShow)) }}
             </option>
         @endforeach
     </select>

@@ -126,4 +126,15 @@ class ProdukController extends Controller
             return Redirect::back()->with(messageError($e->getMessage()));
         }
     }
+
+    public function getproduk()
+    {
+        // Ambil semua produk aktif tanpa relasi dengan tabel lain
+        $produk = Produk::select('kode_produk', 'nama_produk', 'satuan', 'isi_pcs_dus', 'isi_pack_dus', 'isi_pcs_pack')
+            ->where('status_aktif_produk', 1)
+            ->orderBy('nama_produk')
+            ->get();
+
+        return view('datamaster.produk.getproduk', compact('produk'));
+    }
 }

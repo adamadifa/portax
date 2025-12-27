@@ -102,6 +102,7 @@ use App\Http\Controllers\PelunasanreturController;
 use App\Http\Controllers\PembayarangiroController;
 use App\Http\Controllers\PembayarankasbonController;
 use App\Http\Controllers\PembayaranpenjualanController;
+use App\Http\Controllers\PembayaranpembelianmarketingController;
 use App\Http\Controllers\PembayaranpiutangkaryawanController;
 use App\Http\Controllers\PembayaranpjpController;
 use App\Http\Controllers\PembayarantransferController;
@@ -341,6 +342,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/produk/{kode_produk}/edit', 'edit')->name('produk.edit')->can('produk.edit');
         Route::put('/produk/{kode_produk}', 'update')->name('produk.update')->can('produk.update');
         Route::delete('/produk/{kode_produk}', 'destroy')->name('produk.delete')->can('produk.delete');
+        
+        //Ajax Request
+        Route::get('/produk/getproduk', 'getproduk')->name('produk.getproduk');
     });
 
     Route::controller(HargaController::class)->group(function () {
@@ -1108,6 +1112,14 @@ Route::middleware('auth')->group(function () {
         Route::put('/pembelianmarketing/{no_bukti}/update', 'update')->name('pembelianmarketing.update')->can('pembelianmarketing.update');
         Route::delete('/pembelianmarketing/{no_bukti}/delete', 'destroy')->name('pembelianmarketing.delete')->can('pembelianmarketing.delete');
         Route::get('/pembelianmarketing/{no_bukti}/show', 'show')->name('pembelianmarketing.show')->can('pembelianmarketing.show');
+    });
+
+    Route::controller(PembayaranpembelianmarketingController::class)->group(function () {
+        Route::get('/pembayaranpembelianmarketing/{no_bukti}/create', 'create')->name('pembayaranpembelianmarketing.create')->can('pembayaranpembelianmarketing.create');
+        Route::post('/pembayaranpembelianmarketing/{no_bukti}/store', 'store')->name('pembayaranpembelianmarketing.store')->can('pembayaranpembelianmarketing.store');
+        Route::get('/pembayaranpembelianmarketing/{no_bukti}/edit', 'edit')->name('pembayaranpembelianmarketing.edit')->can('pembayaranpembelianmarketing.edit');
+        Route::put('/pembayaranpembelianmarketing/{no_bukti}/update', 'update')->name('pembayaranpembelianmarketing.update')->can('pembayaranpembelianmarketing.update');
+        Route::delete('/pembayaranpembelianmarketing/{no_bukti}/delete', 'destroy')->name('pembayaranpembelianmarketing.delete')->can('pembayaranpembelianmarketing.delete');
     });
 
     Route::controller(ReturController::class)->group(function () {

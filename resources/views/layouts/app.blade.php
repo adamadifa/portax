@@ -37,7 +37,7 @@
             <!-- Layout container -->
             <div class="layout-page">
                 <!-- Navbar -->
-                @include('layouts.navbar')
+                {{-- @include('layouts.navbar') --}}
 
                 <!-- / Navbar -->
 
@@ -71,7 +71,7 @@
     </div>
     <!-- / Layout wrapper -->
     <!-- BEGIN: Customizer-->
-    <div class="customizer d-none d-md-block"><a class="customizer-toggle d-flex align-items-center justify-content-center" href="#"><i
+    {{-- <div class="customizer d-none d-md-block"><a class="customizer-toggle d-flex align-items-center justify-content-center" href="#"><i
                 class="spinner-grow white"></i></a>
         <div class="customizer-content">
             <!-- Customizer header -->
@@ -119,7 +119,7 @@
                 </div>
             @endforeach
         </div>
-    </div>
+    </div> --}}
     <!-- Bottom Navigation -->
     @hasanyrole(['gm marketing', 'regional sales manager', 'sales marketing manager'])
         <nav class="navbar fixed-bottom navbar-light bg-white shadow d-md-none">

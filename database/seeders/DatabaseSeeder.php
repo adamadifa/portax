@@ -61,6 +61,7 @@ class DatabaseSeeder extends Seeder
             Jenisvoucherseeder::class,
             Pembayarangiropermissionseeder::class,
             Pembayarantransferpermissionseeder::class,
+            Pembayaranpembelianmarketingpermissionseeder::class,
             Returpermissionseeder::class,
             Ajuanlimitkreditpermissionseeder::class,
             Ajuanfakturpermissionseeder::class,
