@@ -26,14 +26,14 @@
                         </button>
                     </li>
                 @endcan
-                @can('akt.costratio')
+                {{-- @can('akt.costratio')
                     <li class="nav-item" role="presentation">
                         <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#costratio" aria-controls="costratio"
                             aria-selected="false" tabindex="-1">
                             Cost Ratio
                         </button>
                     </li>
-                @endcan
+                @endcan --}}
                 @can('akt.jurnalumum')
                     <li class="nav-item" role="presentation">
                         <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#jurnalumum"

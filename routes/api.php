@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\SyncPenjualanController;
 use App\Http\Controllers\Api\SyncKaskecilController;
 use App\Http\Controllers\Api\SyncLedgerController;
+use App\Http\Controllers\Api\SyncJurnalumumController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +47,13 @@ Route::prefix('sync')->group(function () {
     Route::post('/ledger/check', [SyncLedgerController::class, 'check']);
     Route::delete('/ledger', [SyncLedgerController::class, 'delete']);
     Route::delete('/ledger/batch', [SyncLedgerController::class, 'deleteBatch']);
+
+    // Jurnal Umum
+    Route::post('/jurnalumum', [SyncJurnalumumController::class, 'sync']);
+    Route::post('/jurnalumum/batch', [SyncJurnalumumController::class, 'syncBatch']);
+    Route::post('/jurnalumum/check', [SyncJurnalumumController::class, 'check']);
+    Route::delete('/jurnalumum', [SyncJurnalumumController::class, 'delete']);
+    Route::delete('/jurnalumum/batch', [SyncJurnalumumController::class, 'deleteBatch']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -69,6 +77,9 @@ Route::fallback(function (Request $request) {
                 '/api/sync/ledger',
                 '/api/sync/ledger/batch',
                 '/api/sync/ledger/check',
+                '/api/sync/jurnalumum',
+                '/api/sync/jurnalumum/batch',
+                '/api/sync/jurnalumum/check',
             ],
             'DELETE' => [
                 '/api/sync/penjualan',
@@ -77,6 +88,8 @@ Route::fallback(function (Request $request) {
                 '/api/sync/kaskecil/batch',
                 '/api/sync/ledger',
                 '/api/sync/ledger/batch',
+                '/api/sync/jurnalumum',
+                '/api/sync/jurnalumum/batch',
             ],
         ];
 
@@ -114,6 +127,11 @@ Route::fallback(function (Request $request) {
                     'POST /api/sync/ledger/check' => 'Check no_bukti ledger',
                     'DELETE /api/sync/ledger' => 'Delete single ledger',
                     'DELETE /api/sync/ledger/batch' => 'Delete batch ledger',
+                    'POST /api/sync/jurnalumum' => 'Sync single jurnal umum',
+                    'POST /api/sync/jurnalumum/batch' => 'Sync batch jurnal umum',
+                    'POST /api/sync/jurnalumum/check' => 'Check kode_ju jurnal umum',
+                    'DELETE /api/sync/jurnalumum' => 'Delete single jurnal umum',
+                    'DELETE /api/sync/jurnalumum/batch' => 'Delete batch jurnal umum',
                 ]
             ]
         ], 404);
