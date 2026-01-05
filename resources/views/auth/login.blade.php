@@ -17,6 +17,7 @@
         'pangansemarangsejahtera.portax.site' => 'PT. PANGAN SEMARANG SEJAHTERA',
         'makmuranugrahdistribusindo.portax.site' => 'PT. MAKMUR ANUGRAH DISTRIBUSINDO',
         'cahayarianggalunggung.portax.site' => 'PT. CAHAYA RIANG GALUNGGUNG',
+        'makmurpermata.portax.site' => 'CV. MAKMUR PERMATA',
     ];
     $companyName = $companies[$domain] ?? null;
 @endphp
