@@ -811,8 +811,6 @@
             let subtotal = (parseInt(dus) * parseInt(hargadus));
 
 
-            if (kode_produk == "" || kode_produk == null) {
-=======
             var kode_harga = $("#kode_harga").val() || "";
             var kode_produk = $("#kode_produk").val();
             var nama_produk = $("#nama_produk").val();
@@ -835,7 +833,7 @@
 
 
             if (kode_produk == "") {
->>>>>>> 6f0569c (update)
+
                 Swal.fire({
                     title: "Oops!",
                     text: "Silahkan Pilih dulu Produk !",
@@ -845,21 +843,7 @@
                         $("#nama_produk").focus();
                     },
                 });
-<<<<<<< HEAD
-            } else if (harga_dus == "" || hargadus == 0) {
-                Swal.fire({
-                    title: "Oops!",
-                    text: "Harga / Dus Tidak Boleh Kosong !",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    didClose: (e) => {
-                        $("#harga_dus").focus();
-                    },
-                });
-            } else if (jumlah == "" || jumlah === '0' || jumlah == 0) {
-=======
             } else if (jmldus == 0 || jml_dus == "") {
->>>>>>> 6f0569c (update)
                 Swal.fire({
                     title: "Oops!",
                     text: "Jumlah Dus Tidak Boleh Kosong !",
@@ -930,22 +914,13 @@
 
                 //append to table
                 $('#loadproduk').append(produk);
-<<<<<<< HEAD
-=======
-                
                 // Reset form
                 $("#kode_harga").val("");
->>>>>>> 6f0569c (update)
                 $("#kode_produk").val("");
                 $("#nama_produk").val("");
                 $("#jml_dus").val("");
                 $("#harga_dus").val("");
                 $("#harga_dus_produk").val("");
-<<<<<<< HEAD
-                $("#harga_pack_produk").val("");
-                $("#harga_pcs_produk").val("");
-=======
->>>>>>> 6f0569c (update)
                 $("#isi_pcs_dus").val("");
                 $("#isi_pcs_pack").val("");
                 $("#kode_kategori_diskon").val("");
@@ -1545,24 +1520,13 @@
             const no_bukti = $("#no_bukti").val();
             const tanggal = $("#tanggal").val();
             const kode_supplier = $("#kode_supplier").val();
-<<<<<<< HEAD
             const sisa_piutang = $("#sisa_piutang").val();
-=======
-            const kode_salesman = $("#kode_salesman").val();
->>>>>>> 6f0569c (update)
             const gt = $("#grandtotal").val();
             const grandtotal = gt != "" ? parseInt(gt.replace(/\./g, '')) : 0;
             const jenis_transaksi = $("#jenis_transaksi").val();
             const jenis_bayar = $("#jenis_bayar").val();
-<<<<<<< HEAD
-            const voucher = $("#voucher").val().replace(/\./g, '');
             if (no_bukti == '') {
                 SwalWarning('no_bukti', 'No. Bukti Tidak Boleh Kosong');
-=======
-
-            if (no_faktur == '') {
-                SwalWarning('no_faktur', 'No. Faktur Tidak Boleh Kosong');
->>>>>>> 6f0569c (update)
                 return false;
             } else if (tanggal == '') {
                 SwalWarning('tanggal', 'Tanggal Tidak Boleh Kosong');
@@ -1579,23 +1543,10 @@
             } else if (jenis_transaksi == "T" && jenis_bayar == "") {
                 SwalWarning('jenis_bayar', 'Jenis Bayar Tidak Boleh Kosong');
                 return false;
-<<<<<<< HEAD
-            } else if (jenis_transaksi == "K" && siklus_pembayaran === '0' && parseInt(totalPiutang) >
-                parseInt(limit_supplier)) {
-                SwalWarning('nama_produk', 'Melebihi Limit, Silahkan Ajukan Penambahan Limit !');
-                return false;
-            } else if (jenis_transaksi == "K" && siklus_pembayaran === '1' && parseInt(grandtotal) >
-                parseInt(limit_supplier)) {
-                SwalWarning('nama_produk', 'Melebihi Limit, Silahkan Ajukan Penambahan Limit !');
-                return false;
-            } else if (voucher > saldo_voucher) {
-                SwalWarning('voucher', 'Melebihi Saldo Voucher !');
-=======
             } else if (jenis_transaksi == "K" && jmlfakturbelumlunas >= jmlfakturmax) {
                 SwalWarning('keterangan', 'Melebihi Batas Jumlah Faktur Kredit !');
                 return false;
 
->>>>>>> 6f0569c (update)
                 return false;
             } else {
                 buttonDisable();

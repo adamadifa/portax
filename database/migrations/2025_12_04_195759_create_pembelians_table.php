@@ -15,7 +15,7 @@ return new class extends Migration
             $table->char('no_bukti', 13)->primary();
             $table->date('tanggal');
             $table->char('kode_supplier', 13);
-            $table->char('kode_salesman', 7);
+            $table->char('kode_salesman', 7)->nullable();
             $table->char('kode_akun', 6)->default('1-1401');
             $table->char('kode_akun_potongan', 6)->default('4-2201');
             $table->char('kode_akun_penyesuaian', 6)->default('4-2202');
