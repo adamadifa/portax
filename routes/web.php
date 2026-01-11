@@ -342,9 +342,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/produk/{kode_produk}/edit', 'edit')->name('produk.edit')->can('produk.edit');
         Route::put('/produk/{kode_produk}', 'update')->name('produk.update')->can('produk.update');
         Route::delete('/produk/{kode_produk}', 'destroy')->name('produk.delete')->can('produk.delete');
-        
-        //Ajax Request
-        Route::get('/produk/getproduk', 'getproduk')->name('produk.getproduk');
+
+        Route::get('/produk/getproduk', 'getProduk')->name('produk.getproduk');
+
     });
 
     Route::controller(HargaController::class)->group(function () {

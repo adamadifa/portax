@@ -127,14 +127,15 @@ class ProdukController extends Controller
         }
     }
 
-    public function getproduk()
-    {
-        // Ambil semua produk aktif tanpa relasi dengan tabel lain
-        $produk = Produk::select('kode_produk', 'nama_produk', 'satuan', 'isi_pcs_dus', 'isi_pack_dus', 'isi_pcs_pack')
-            ->where('status_aktif_produk', 1)
-            ->orderBy('nama_produk')
-            ->get();
+    public function getProduk(){
+        $produk = Produk::orderBy('kode_produk')
+        ->join('produk_kategori', 'produk.kode_kategori_produk', '=', 'produk_kategori.kode_kategori_produk')
+        ->join('produk_jenis', 'produk.kode_jenis_produk', '=', 'produk_jenis.kode_jenis_produk')
+        ->select('produk.*', 'produk_kategori.nama_kategori_produk', 'produk_jenis.nama_jenis_produk')
+        ->where('status_aktif_produk', 1)
+        ->get();
 
         return view('datamaster.produk.getproduk', compact('produk'));
     }
 }
+

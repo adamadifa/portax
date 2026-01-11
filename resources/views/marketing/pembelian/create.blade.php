@@ -309,10 +309,7 @@
 @endsection
 <form action="{{ route('pembelianmarketing.store') }}" method="POST" id="formPembelian">
     @csrf
-    <input type="hidden" name="limit_supplier" id="limit_supplier">
-    <input type="hidden" name="sisa_piutang" id="sisa_piutang">
-    <input type="hidden" name="siklus_pembayaran" id="siklus_pembayaran">
-    <input type="hidden" name="max_kredit" id="max_kredit">
+    
 
     <div class="row">
         <div class="col-lg-4 col-md-12 col-sm-12 mb-3">
@@ -435,16 +432,11 @@
                                                     label="Titipan" />
                                             </div>
                                         </div>
-                                        <div id="voucher_tunai">
-                                            <div class="form-group">
-                                                <x-input-with-icon icon="ti ti-tag" name="voucher" money="true" align="right"
-                                                    label="Voucher" />
-                                            </div>
+
+                                        <div class="form-group mb-3">
+                                            <button class="btn btn-primary w-100" id="btnSimpan"><i class="ti ti-send me-1"></i>Submit</button>
                                         </div>
-                                        <div class="form-group mb-0">
-                                            <button class="btn btn-submit" id="btnSimpan">
-                                                <i class="ti ti-send"></i>Submit Pembelian
-                                            </button>
+
                                         </div>
                                     </div>
                                 </div>
@@ -509,7 +501,7 @@
         // alert(kode_cabang_user);
         let jmlfakturbelumlunas = 0;
         let jmlfakturmax = 0;
-        let saldo_voucher = 0;
+
 
         function convertToRupiah(number) {
             if (number) {
@@ -671,64 +663,70 @@
         //GetProduk
         function getHarga() {
             buttonDisable();
+            // Jika kode_supplier kosong, gunakan 'all' atau biarkan backend handle
+            let supplierParam = kode_supplier || 'all';
             $.ajax({
-                url: `/produk/getproduk`,
+                url: '{{ route("produk.getproduk") }}',
+
                 type: 'GET',
                 cache: false,
                 success: function(response) {
                     buttonEnable();
                     $("#loadmodal").html(response);
+                },
+                error: function() {
+                    buttonEnable();
                 }
             });
         }
         //Pilih Produk
         $("#nama_produk").on('click', function(e) {
             e.preventDefault();
-            let kode_supplier = $("#kode_supplier").val();
-            if (kode_supplier == "") {
-                Swal.fire({
-                    title: "Oops!",
-                    text: "Silahkan Pilih dulu Supplier !",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    didClose: (e) => {
-                        $("#nama_supplier").focus();
-                    },
-                });
-            } else {
-                $("#modal").modal("show");
-                $("#modal").find(".modal-title").text('Data Produk');
-                getHarga();
-            }
+            $("#modal").modal("show");
+            $("#modal").find(".modal-title").text('Data Produk');
+            buttonDisable();
+            $.ajax({
+                url: '{{ route("produk.getproduk") }}',
+                type: 'GET',
+                cache: false,
+                success: function(response) {
+                    buttonEnable();
+                    $("#loadmodal").html(response);
+                },
+                error: function() {
+                    buttonEnable();
+                }
+            });
+
         });
 
         $(document).on('click', '.pilihProduk', function(e) {
             e.preventDefault();
             let kode_produk = $(this).attr('kode_produk');
+            let nama_supplier = $("#nama_supplier").val() || "";
             let nama_produk = $(this).attr('nama_produk');
             let isi_pcs_dus = $(this).attr('isi_pcs_dus');
             let isi_pcs_pack = $(this).attr('isi_pcs_pack');
+            let kode_kategori_diskon = $(this).attr('kode_kategori_diskon');
 
-            // Hanya set kode_produk dan nama_produk ke form
+            // Set nilai produk
+            $("#kode_harga").val(""); // Kosongkan karena tidak ada dari getproduk
             $("#kode_produk").val(kode_produk);
             $("#nama_produk").val(nama_produk);
+            $("#harga_dus").val("");
+            $("#harga_pack").val("");
+            $("#harga_pcs").val("");
+
+            $("#harga_dus_produk").val("");
+            $("#harga_pack_produk").val("");
+            $("#harga_pcs_produk").val("");
 
             // Set isi_pcs_dus dan isi_pcs_pack untuk perhitungan (hidden field)
             $("#isi_pcs_dus").val(isi_pcs_dus);
             $("#isi_pcs_pack").val(isi_pcs_pack);
+            $("#kode_kategori_diskon").val(kode_kategori_diskon);
 
-            // Clear harga fields (user will input manually)
-            $("#harga_dus").val('');
-            $("#harga_pack").val('');
-            $("#harga_pcs").val('');
-            $("#harga_dus_produk").val('');
-            $("#harga_pack_produk").val('');
-            $("#harga_pcs_produk").val('');
-            $("#kode_harga").val('');
-            $("#kode_kategori_diskon").val('');
-
-            // Enable harga fields untuk input manual
-            $("#harga_dus").prop('disabled', false);
+            //Disabled Harga
             if (isi_pcs_pack == "" || isi_pcs_pack === '0') {
                 $("#harga_pack").prop('disabled', true);
                 $("#jml_pack").prop('disabled', true);
@@ -736,6 +734,15 @@
                 $("#harga_pack").prop('disabled', false);
                 $("#jml_pack").prop('disabled', false);
             }
+            
+            // Harga bisa diinput manual untuk semua supplier
+            $("#harga_dus").prop('disabled', false);
+            if (isi_pcs_pack == "" || isi_pcs_pack === '0') {
+                $("#harga_pack").prop('disabled', true);
+            } else {
+                $("#harga_pack").prop('disabled', false);
+            }
+>>>>>>> 6f0569c (update)
             $("#harga_pcs").prop('disabled', false);
 
             $("#modal").modal("hide");
@@ -768,6 +775,7 @@
 
 
         function addProduk() {
+<<<<<<< HEAD
             var kode_produk = $("#kode_produk").val();
             var nama_produk = $("#nama_produk").val();
             var jml_dus = $("#jml_dus").val() || "";
@@ -804,6 +812,30 @@
 
 
             if (kode_produk == "" || kode_produk == null) {
+=======
+            var kode_harga = $("#kode_harga").val() || "";
+            var kode_produk = $("#kode_produk").val();
+            var nama_produk = $("#nama_produk").val();
+            var jml_dus = $("#jml_dus").val();
+            var harga_dus = $("#harga_dus").val();
+            var isi_pcs_dus = $("#isi_pcs_dus").val();
+            var isi_pcs_pack = $("#isi_pcs_pack").val();
+            var kode_kategori_diskon = $("#kode_kategori_diskon").val();
+
+            var jmldus = jml_dus != "" ? parseInt(jml_dus.replace(/\./g, '')) : 0;
+            var hargadus = harga_dus != "" ? parseInt(harga_dus.replace(/\./g, '')) : 0;
+
+            // Hitung jumlah total dalam pcs
+            var jumlah = jmldus * parseInt(isi_pcs_dus);
+
+            // Gunakan kode_produk sebagai index jika kode_harga kosong
+            let index = kode_harga || kode_produk;
+
+            let subtotal = (parseInt(jmldus) * parseInt(hargadus));
+
+
+            if (kode_produk == "") {
+>>>>>>> 6f0569c (update)
                 Swal.fire({
                     title: "Oops!",
                     text: "Silahkan Pilih dulu Produk !",
@@ -813,6 +845,7 @@
                         $("#nama_produk").focus();
                     },
                 });
+<<<<<<< HEAD
             } else if (harga_dus == "" || hargadus == 0) {
                 Swal.fire({
                     title: "Oops!",
@@ -824,13 +857,26 @@
                     },
                 });
             } else if (jumlah == "" || jumlah === '0' || jumlah == 0) {
+=======
+            } else if (jmldus == 0 || jml_dus == "") {
+>>>>>>> 6f0569c (update)
                 Swal.fire({
                     title: "Oops!",
-                    text: "Jumlah Tidak Boleh Kosong !",
+                    text: "Jumlah Dus Tidak Boleh Kosong !",
                     icon: "warning",
                     showConfirmButton: true,
                     didClose: (e) => {
-                        $("#nama_produk").focus();
+                        $("#jml_dus").focus();
+                    },
+                });
+            } else if (hargadus == 0 || harga_dus == "") {
+                Swal.fire({
+                    title: "Oops!",
+                    text: "Harga Dus Tidak Boleh Kosong !",
+                    icon: "warning",
+                    showConfirmButton: true,
+                    didClose: (e) => {
+                        $("#harga_dus").focus();
                     },
                 });
             } else if ($('#tabelproduk').find('#index_' + index).length > 0) {
@@ -858,7 +904,7 @@
                         </td>
                         <td>${nama_produk}</td>
                         <td class="text-center">
-                           ${dus===0 ? '' : dus}
+                           ${jmldus}
                         </td>
                         <td class="text-end">
                            ${convertToRupiah(hargadus)}
@@ -884,18 +930,22 @@
 
                 //append to table
                 $('#loadproduk').append(produk);
+<<<<<<< HEAD
+=======
+                
+                // Reset form
+                $("#kode_harga").val("");
+>>>>>>> 6f0569c (update)
                 $("#kode_produk").val("");
                 $("#nama_produk").val("");
                 $("#jml_dus").val("");
-                $("#jml_pack").val("");
-                $("#jml_pcs").val("");
                 $("#harga_dus").val("");
-                $("#harga_pack").val("");
-                $("#harga_pcs").val("");
-
                 $("#harga_dus_produk").val("");
+<<<<<<< HEAD
                 $("#harga_pack_produk").val("");
                 $("#harga_pcs_produk").val("");
+=======
+>>>>>>> 6f0569c (update)
                 $("#isi_pcs_dus").val("");
                 $("#isi_pcs_pack").val("");
                 $("#kode_kategori_diskon").val("");
@@ -986,42 +1036,25 @@
 
         $(document).on('submit', '#formEditproduk', function(event) {
             event.preventDefault();
-            let kode_harga = $(this).find("#kode_harga").val();
+            let kode_harga = $(this).find("#kode_harga").val() || "";
             let kode_produk = $(this).find("#kode_produk").val();
-            let nama_produk = $(this).find("#kode_harga").find(':selected').text();
+            let nama_produk = $(this).find("#kode_produk").val() ? $(this).find("#kode_produk").find(':selected').text() : $(this).find("#nama_produk").val();
             let jml_dus = $(this).find("#jml_dus").val();
-            let jml_pack = $(this).find("#jml_pack").val();
-            let jml_pcs = $(this).find("#jml_pcs").val();
             let harga_dus = $(this).find("#harga_dus").val();
-            let harga_pack = $(this).find("#harga_pack").val();
-            let harga_pcs = $(this).find("#harga_pcs").val();
             let isi_pcs_dus = $(this).find("#isi_pcs_dus").val();
             let isi_pcs_pack = $(this).find("#isi_pcs_pack").val();
             let kode_kategori_diskon = $(this).find("#kode_kategori_diskon").val();
             let index_old = $(this).find("#index_old").val();
-            let status_promosi = 0;
-
-
-
 
             let jmldus = jml_dus != "" ? parseInt(jml_dus.replace(/\./g, '')) : 0;
-            let jmlpack = jml_pack != "" ? parseInt(jml_pack.replace(/\./g, '')) : 0;
-            let jmlpcs = jml_pcs != "" ? parseInt(jml_pcs.replace(/\./g, '')) : 0;
-
             let hargadus = harga_dus != "" ? parseInt(harga_dus.replace(/\./g, '')) : 0;
-            let hargapack = harga_pack != "" ? parseInt(harga_pack.replace(/\./g, '')) : 0;
-            let hargapcs = harga_pcs != "" ? parseInt(harga_pcs.replace(/\./g, '')) : 0;
 
-            let jumlah = (jmldus * parseInt(isi_pcs_dus)) + (jmlpack * (parseInt(isi_pcs_pack))) +
-                jmlpcs;
+            // Hitung jumlah total dalam pcs
+            let jumlah = jmldus * parseInt(isi_pcs_dus);
 
-            let data = convertoduspackpcs(isi_pcs_dus, isi_pcs_pack, jumlah);
-            let dus = data.dus;
-            let pack = data.pack;
-            let pcs = data.pcs;
-
-            let index = kode_harga;
-            let subtotal = (parseInt(dus) * parseInt(hargadus));
+            // Gunakan kode_produk sebagai index jika kode_harga kosong
+            let index = kode_harga || kode_produk;
+            let subtotal = (parseInt(jmldus) * parseInt(hargadus));
 
             let newRow = `
                     <tr id="index_${index}">
@@ -1036,7 +1069,7 @@
                         </td>
                         <td>${nama_produk}</td>
                         <td class="text-center">
-                           ${dus===0 ? '' : dus}
+                           ${jmldus}
                         </td>
                         <td class="text-end">
                            ${convertToRupiah(hargadus)}
@@ -1059,24 +1092,34 @@
                         </td>
                     </tr>
                 `;
-            if (kode_harga == "") {
+            if (kode_produk == "") {
                 Swal.fire({
                     title: "Oops!",
                     text: "Silahkan Pilih dulu Produk !",
                     icon: "warning",
                     showConfirmButton: true,
                     didClose: (e) => {
-                        $(this).find("#kode_harga").focus();
+                        $(this).find("#kode_produk").focus();
                     },
                 });
-            } else if (jumlah == "" || jumlah === '0') {
+            } else if (jmldus == 0 || jml_dus == "") {
                 Swal.fire({
                     title: "Oops!",
-                    text: "Jumlah Tidak Boleh Kosong !",
+                    text: "Jumlah Dus Tidak Boleh Kosong !",
                     icon: "warning",
                     showConfirmButton: true,
                     didClose: (e) => {
                         $(this).find("#jml_dus").focus();
+                    },
+                });
+            } else if (hargadus == 0 || harga_dus == "") {
+                Swal.fire({
+                    title: "Oops!",
+                    text: "Harga Dus Tidak Boleh Kosong !",
+                    icon: "warning",
+                    showConfirmButton: true,
+                    didClose: (e) => {
+                        $(this).find("#harga_dus").focus();
                     },
                 });
             } else if (index != index_old && $('#tabelproduk').find('#index_' + index).length > 0) {
@@ -1476,10 +1519,10 @@
             const jenis_transaksi = $("#jenis_transaksi").val();
             if (jenis_transaksi == 'T') {
                 $("#jenis_bayar_tunai").show();
-                $("#voucher_tunai").show();
+
             } else {
                 $("#jenis_bayar_tunai").hide();
-                $("#voucher_tunai").hide();
+
             }
         }
 
@@ -1502,19 +1545,24 @@
             const no_bukti = $("#no_bukti").val();
             const tanggal = $("#tanggal").val();
             const kode_supplier = $("#kode_supplier").val();
+<<<<<<< HEAD
             const sisa_piutang = $("#sisa_piutang").val();
+=======
+            const kode_salesman = $("#kode_salesman").val();
+>>>>>>> 6f0569c (update)
             const gt = $("#grandtotal").val();
             const grandtotal = gt != "" ? parseInt(gt.replace(/\./g, '')) : 0;
-            const totalPiutang = parseInt(sisa_piutang) + parseInt(grandtotal);
-            let limit_supplier = $("#limit_supplier").val() == "" ? 0 : $("#limit_supplier").val();
-            // alert(limit_supplier);
-            const siklus_pembayaran = $("#siklus_pembayaran").val();
-            const max_kredit = $("#max_kredit").val();
             const jenis_transaksi = $("#jenis_transaksi").val();
             const jenis_bayar = $("#jenis_bayar").val();
+<<<<<<< HEAD
             const voucher = $("#voucher").val().replace(/\./g, '');
             if (no_bukti == '') {
                 SwalWarning('no_bukti', 'No. Bukti Tidak Boleh Kosong');
+=======
+
+            if (no_faktur == '') {
+                SwalWarning('no_faktur', 'No. Faktur Tidak Boleh Kosong');
+>>>>>>> 6f0569c (update)
                 return false;
             } else if (tanggal == '') {
                 SwalWarning('tanggal', 'Tanggal Tidak Boleh Kosong');
@@ -1531,6 +1579,7 @@
             } else if (jenis_transaksi == "T" && jenis_bayar == "") {
                 SwalWarning('jenis_bayar', 'Jenis Bayar Tidak Boleh Kosong');
                 return false;
+<<<<<<< HEAD
             } else if (jenis_transaksi == "K" && siklus_pembayaran === '0' && parseInt(totalPiutang) >
                 parseInt(limit_supplier)) {
                 SwalWarning('nama_produk', 'Melebihi Limit, Silahkan Ajukan Penambahan Limit !');
@@ -1541,6 +1590,12 @@
                 return false;
             } else if (voucher > saldo_voucher) {
                 SwalWarning('voucher', 'Melebihi Saldo Voucher !');
+=======
+            } else if (jenis_transaksi == "K" && jmlfakturbelumlunas >= jmlfakturmax) {
+                SwalWarning('keterangan', 'Melebihi Batas Jumlah Faktur Kredit !');
+                return false;
+
+>>>>>>> 6f0569c (update)
                 return false;
             } else {
                 buttonDisable();

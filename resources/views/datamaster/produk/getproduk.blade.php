@@ -1,13 +1,11 @@
-<table class="table table-bordered  table-striped table-hover" id="tabelproduk">
+<table class="table table-bordered table-striped table-hover" id="tabelproduk">
     <thead class="table-dark">
         <tr>
-            <th>Kode</th>
+            <th>Kode Produk</th>
             <th>Nama Produk</th>
             <th>Satuan</th>
-            <th>Isi Pcs/Dus</th>
-            <th>Isi Pack/Dus</th>
-            <th>Isi Pcs/Pack</th>
-            <th>#</th>
+            <th>Kategori</th>
+            <th>Aksi</th>
         </tr>
     </thead>
     <tbody>
@@ -16,13 +14,17 @@
                 <td>{{ $d->kode_produk }}</td>
                 <td>{{ $d->nama_produk }}</td>
                 <td>{{ $d->satuan }}</td>
-                <td class="text-end">{{ $d->isi_pcs_dus }}</td>
-                <td class="text-end">{{ $d->isi_pack_dus }}</td>
-                <td class="text-end">{{ $d->isi_pcs_pack }}</td>
+                <td>{{ $d->nama_kategori_produk }}</td>
                 <td>
-                    <a href="#" class="pilihProduk" kode_produk="{{ $d->kode_produk }}" nama_produk="{{ $d->nama_produk }}"
-                        isi_pcs_dus="{{ $d->isi_pcs_dus }}" isi_pcs_pack="{{ $d->isi_pcs_pack }}">
-                        <i class="ti ti-external-link"></i>
+                    <a href="#" class="pilihProduk" 
+                       kode_produk="{{ $d->kode_produk }}" 
+                       nama_produk="{{ $d->nama_produk }}" 
+                       satuan="{{ $d->satuan }}" 
+                       kategori="{{ $d->nama_kategori_produk }}"
+                       isi_pcs_dus="{{ $d->isi_pcs_dus }}"
+                       isi_pcs_pack="{{ $d->isi_pcs_pack }}"
+                       kode_kategori_diskon="{{ $d->kode_kategori_diskon }}">
+                        <i class="ti ti-plus"></i> Pilih
                     </a>
                 </td>
             </tr>
