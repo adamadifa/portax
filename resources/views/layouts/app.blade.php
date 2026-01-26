@@ -44,11 +44,13 @@
                 <!-- Content wrapper -->
                 <div class="content-wrapper">
                     <!-- Content -->
-                    <div class="container-fluid flex-grow-1 container-p-y">
-                        @php
-                            $agent = new Jenssegers\Agent\Agent();
-                        @endphp
-                        <h4 class="{{ !$agent->isMobile() ? 'py-3 mb-2' : '' }}">@yield('navigasi')</h4>
+                    <div class="container-fluid flex-grow-1 pt-1 pb-4">
+                        @hasSection('navigasi')
+                            @php
+                                $agent = new Jenssegers\Agent\Agent();
+                            @endphp
+                            <h4 class="{{ !$agent->isMobile() ? 'py-3 mb-2' : '' }}">@yield('navigasi')</h4>
+                        @endif
                         @yield('content')
                     </div>
                     <!-- / Content -->

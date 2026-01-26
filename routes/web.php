@@ -2017,6 +2017,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/laporanmarketing/cetakroutingsalesman', 'cetakroutingsalesman')->name('laporanmarketing.cetakroutingsalesman')->can('mkt.routingsalesman');
         Route::post('/laporanmarketing/cetakinsentifom', 'cetakinsentifom')->name('laporanmarketing.cetakinsentifom')->can('worksheetom.insentifom');
         Route::post('/laporanmarketing/cetakratiobs', 'cetakratiobs')->name('laporanmarketing.cetakratiobs')->can('worksheetom.ratiobs');
+        Route::post('/laporanmarketing/cetakpembelian', 'cetakpembelian')->name('laporanmarketing.cetakpembelian')->can('mkt.pembelian');
     });
 
     Route::controller(LaporanaccountingController::class)->group(function () {

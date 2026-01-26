@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Penjualan;
 use App\Models\Detailpenjualan;
+use App\Models\Salesman;
+use App\Models\Pelanggan;
+use App\Models\User;
+use App\Models\Kategorisalesman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -56,10 +60,16 @@ class SyncPenjualanController extends Controller
                 'signature' => 'nullable|string|max:255',
                 'tanggal_pelunasan' => 'nullable|date',
                 'print' => 'nullable|integer',
-                'id_user' => 'required|integer',
+                // 'id_user' => 'required|integer', // Auto set to 1
                 'keterangan' => 'nullable|string|max:255',
                 'status_batal' => 'nullable|string|max:1',
                 'lock_print' => 'nullable|string|max:1',
+
+                // Data Master Optional (Salesman)
+                'salesman' => 'nullable|array',
+
+                // Data Master Optional (Pelanggan)
+                'pelanggan' => 'nullable|array',
 
                 // Detail penjualan (array)
                 'detail' => 'required|array|min:1',
@@ -81,6 +91,50 @@ class SyncPenjualanController extends Controller
             }
 
             DB::beginTransaction();
+
+            $id_user = 1; // Default Super Admin
+            $user = User::find($id_user);
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Super Admin (ID 1) tidak ditemukan'
+                ], 404);
+            }
+            $kode_cabang = $user->kode_cabang;
+
+            // Check & Create Salesman
+            $cekSalesman = Salesman::where('kode_salesman', $request->kode_salesman)->first();
+            if (!$cekSalesman && $request->has('salesman')) {
+                $salesmanData = $request->salesman;
+                if (!isset($salesmanData['kode_cabang'])) {
+                    $salesmanData['kode_cabang'] = $kode_cabang;
+                }
+                
+                // Filter columns to prevent "Column not found" error
+                $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('salesman');
+                $filteredData = array_intersect_key($salesmanData, array_flip($tableColumns));
+
+                Salesman::create($filteredData);
+            }
+
+            // Check & Create Pelanggan
+            $cekPelanggan = Pelanggan::where('kode_pelanggan', $request->kode_pelanggan)->first();
+            if (!$cekPelanggan && $request->has('pelanggan')) {
+                $pelangganData = $request->pelanggan;
+                if (!isset($pelangganData['kode_cabang'])) {
+                    $pelangganData['kode_cabang'] = $kode_cabang;
+                }
+                if (!isset($pelangganData['kode_salesman'])) {
+                    $pelangganData['kode_salesman'] = $request->kode_salesman;
+                }
+
+                // Filter columns
+                $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('pelanggan');
+                $filteredData = array_intersect_key($pelangganData, array_flip($tableColumns));
+
+                Pelanggan::create($filteredData);
+            }
+
 
             // Prepare data penjualan
             $penjualanData = [
@@ -114,7 +168,7 @@ class SyncPenjualanController extends Controller
                 'signature' => $request->signature,
                 'tanggal_pelunasan' => $request->tanggal_pelunasan,
                 'print' => $request->print ?? 0,
-                'id_user' => $request->id_user,
+                'id_user' => 1, // Force Super Admin
                 'keterangan' => $request->keterangan,
                 'status_batal' => $request->status_batal ?? '0',
                 'lock_print' => $request->lock_print ?? '0',
@@ -152,6 +206,8 @@ class SyncPenjualanController extends Controller
             ], 201);
         } catch (Exception $e) {
             DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('Sync Penjualan Error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Trace: ' . $e->getTraceAsString());
 
             return response()->json([
                 'success' => false,
@@ -208,7 +264,12 @@ class SyncPenjualanController extends Controller
                 'data.*.jenis_transaksi' => 'required|string|max:1',
                 'data.*.jenis_bayar' => 'required|string|max:2',
                 'data.*.status' => 'required|string|max:1',
-                'data.*.id_user' => 'required|integer',
+                // 'data.*.id_user' => 'required|integer',
+                
+                // Data Master Optional Batch
+                'data.*.salesman' => 'nullable|array',
+                'data.*.pelanggan' => 'nullable|array',
+
                 'data.*.detail' => 'required|array|min:1',
             ]);
 
@@ -224,6 +285,17 @@ class SyncPenjualanController extends Controller
             $failedCount = 0;
             $results = [];
 
+            // Get User once (Super Admin ID 1)
+            $id_user = 1;
+            $user = User::find($id_user);
+            if(!$user) {
+                 return response()->json([
+                    'success' => false,
+                    'message' => 'Super Admin (ID 1) tidak ditemukan'
+                ], 404);
+            }
+            $kode_cabang = $user->kode_cabang;
+
             foreach ($request->data as $penjualanData) {
                 try {
                     DB::beginTransaction();
@@ -238,6 +310,42 @@ class SyncPenjualanController extends Controller
                         ];
                         DB::rollBack();
                         continue;
+                    }
+
+                    // Force User ID
+                    $penjualanData['id_user'] = $id_user;
+                    
+                    // $user = User::find($penjualanData['id_user']); // Removed logic, using global user
+
+                    // Check & Create Salesman
+                    $cekSalesman = Salesman::where('kode_salesman', $penjualanData['kode_salesman'])->first();
+                    if (!$cekSalesman && isset($penjualanData['salesman'])) {
+                        $salesmanData = $penjualanData['salesman'];
+                        if (!isset($salesmanData['kode_cabang'])) {
+                            $salesmanData['kode_cabang'] = $kode_cabang;
+                        }
+                        
+                        $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('salesman');
+                        $filteredData = array_intersect_key($salesmanData, array_flip($tableColumns));
+
+                        Salesman::create($filteredData);
+                    }
+
+                    // Check & Create Pelanggan
+                    $cekPelanggan = Pelanggan::where('kode_pelanggan', $penjualanData['kode_pelanggan'])->first();
+                    if (!$cekPelanggan && isset($penjualanData['pelanggan'])) {
+                        $pelangganData = $penjualanData['pelanggan'];
+                        if (!isset($pelangganData['kode_cabang'])) {
+                            $pelangganData['kode_cabang'] = $kode_cabang;
+                        }
+                        if (!isset($pelangganData['kode_salesman'])) {
+                            $pelangganData['kode_salesman'] = $penjualanData['kode_salesman'];
+                        }
+
+                        $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('pelanggan');
+                        $filteredData = array_intersect_key($pelangganData, array_flip($tableColumns));
+
+                        Pelanggan::create($filteredData);
                     }
 
                     // Insert header

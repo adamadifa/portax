@@ -58,6 +58,14 @@
                         </button>
                     </li>
                 @endcan
+                @can('mkt.pembelian')
+                    <li class="nav-item" role="pembelian">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#pembelian"
+                            aria-controls="pembelian" aria-selected="false" tabindex="-1">
+                            Pembelian
+                        </button>
+                    </li>
+                @endcan
             </ul>
             <div class="tab-content">
                 @can('mkt.penjualan')
@@ -128,6 +136,11 @@
                 @can('mkt.kartupiutang')
                     <div class="tab-pane fade" id="kartupiutang" role="tabpanel">
                         @include('marketing.laporan.kartupiutang')
+                    </div>
+                @endcan
+                @can('mkt.pembelian')
+                    <div class="tab-pane fade" id="pembelian" role="tabpanel">
+                        @include('marketing.laporan.pembelian')
                     </div>
                 @endcan
             </div>

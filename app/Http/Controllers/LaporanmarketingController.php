@@ -41,8 +41,162 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 
+
+use App\Models\Pembelianmarketing;
+
 class LaporanmarketingController extends Controller
 {
+    public function cetakpembelian(Request $request)
+    {
+        if ($request->formatlaporan == '1') {
+            return $this->cetakpembelianformatstandar($request);
+        } else if ($request->formatlaporan == '2') {
+            return $this->cetakpembelianformatsatubaris($request);
+        }
+    }
+
+    public function cetakpembelianformatstandar(Request $request)
+    {
+        $query = Pembelianmarketing::query();
+        $query->select(
+            'marketing_pembelian.no_bukti',
+            'marketing_pembelian.tanggal',
+            'marketing_pembelian.kode_supplier',
+            'supplier.nama_supplier',
+            'marketing_pembelian.jenis_transaksi',
+            'marketing_pembelian.status',
+            'marketing_pembelian.created_at',
+            'marketing_pembelian.updated_at',
+            'users.name as nama_user'
+        );
+        $query->addSelect(DB::raw('(SELECT SUM(subtotal) FROM marketing_pembelian_detail WHERE no_bukti = marketing_pembelian.no_bukti) as total_bruto'));
+        $query->addSelect(DB::raw('(SELECT SUM(jumlah) FROM marketing_pembelian_historibayar WHERE no_bukti_pembelian = marketing_pembelian.no_bukti) as total_bayar'));
+
+        $query->leftJoin('supplier', 'marketing_pembelian.kode_supplier', '=', 'supplier.kode_supplier');
+        $query->leftJoin('users', 'marketing_pembelian.id_user', '=', 'users.id');
+        
+        $query->whereBetween('marketing_pembelian.tanggal', [$request->dari, $request->sampai]);
+        
+        if (!empty($request->jenis_transaksi)) {
+            $query->where('marketing_pembelian.jenis_transaksi', $request->jenis_transaksi);
+        }
+
+        $query->orderBy('marketing_pembelian.tanggal');
+        $query->orderBy('marketing_pembelian.no_bukti');
+
+        $pembelian = $query->get();
+
+        // Get details for standard format (one row per transaction, showing details in table not technically "standar" in code but implied by current implementation)
+        // Wait, standard sales report usually has details.
+        // Let's modify the query to join details if we want details in standard view like sales formatstandar
+        // Sales format standar joins details.
+
+        $qdetail = Pembelianmarketing::query();
+        $qdetail->select(
+            'marketing_pembelian.no_bukti',
+            'marketing_pembelian.tanggal',
+            'marketing_pembelian.kode_supplier',
+            'supplier.nama_supplier',
+            'marketing_pembelian_detail.kode_produk',
+            'produk.nama_produk',
+            'marketing_pembelian_detail.harga_dus',
+            'marketing_pembelian_detail.jumlah',
+            'marketing_pembelian_detail.subtotal',
+            'marketing_pembelian.jenis_transaksi',
+            'marketing_pembelian.status',
+            'users.name as nama_user'
+        );
+        $qdetail->join('marketing_pembelian_detail', 'marketing_pembelian.no_bukti', '=', 'marketing_pembelian_detail.no_bukti');
+        $qdetail->join('produk', 'marketing_pembelian_detail.kode_produk', '=', 'produk.kode_produk');
+        $qdetail->leftJoin('supplier', 'marketing_pembelian.kode_supplier', '=', 'supplier.kode_supplier');
+        $qdetail->leftJoin('users', 'marketing_pembelian.id_user', '=', 'users.id');
+        
+        $qdetail->whereBetween('marketing_pembelian.tanggal', [$request->dari, $request->sampai]);
+        
+        if (!empty($request->jenis_transaksi)) {
+            $qdetail->where('marketing_pembelian.jenis_transaksi', $request->jenis_transaksi);
+        }
+        
+        $qdetail->orderBy('marketing_pembelian.tanggal');
+        $qdetail->orderBy('marketing_pembelian.no_bukti');
+        
+        $pembelian = $qdetail->get();
+
+        $data['pembelian'] = $pembelian;
+        $data['dari'] = $request->dari;
+        $data['sampai'] = $request->sampai;
+        $data['jenis_transaksi'] = $request->jenis_transaksi;
+
+        if (isset($_POST['exportButton'])) {
+            header("Content-type: application/vnd-ms-excel");
+            header("Content-Disposition: attachment; filename=Laporan Pembelian Standar $request->dari-$request->sampai.xls");
+        }
+        
+        return view('marketing.laporan.pembelian_formatstandar_cetak', $data);
+    }
+
+    public function cetakpembelianformatsatubaris(Request $request)
+    {
+        $query = Pembelianmarketing::query();
+        $query->select(
+            'marketing_pembelian.no_bukti',
+            'marketing_pembelian.tanggal',
+            'marketing_pembelian.kode_supplier',
+            'supplier.nama_supplier',
+            'marketing_pembelian.jenis_transaksi',
+            'marketing_pembelian.status',
+            'marketing_pembelian_detail.kode_produk',
+            'marketing_pembelian_detail.jumlah',
+            'marketing_pembelian_detail.harga_dus',
+            'marketing_pembelian_detail.subtotal',
+            'users.name as nama_user'
+        );
+        
+        $query->addSelect(DB::raw('(SELECT SUM(subtotal) FROM marketing_pembelian_detail WHERE no_bukti = marketing_pembelian.no_bukti) as total_bruto'));
+        $query->addSelect(DB::raw('(SELECT SUM(jumlah) FROM marketing_pembelian_historibayar WHERE no_bukti_pembelian = marketing_pembelian.no_bukti) as total_bayar'));
+
+        $query->join('marketing_pembelian_detail', 'marketing_pembelian.no_bukti', '=', 'marketing_pembelian_detail.no_bukti');
+        $query->leftJoin('supplier', 'marketing_pembelian.kode_supplier', '=', 'supplier.kode_supplier');
+        $query->leftJoin('users', 'marketing_pembelian.id_user', '=', 'users.id');
+        
+        $query->whereBetween('marketing_pembelian.tanggal', [$request->dari, $request->sampai]);
+        
+        if (!empty($request->jenis_transaksi)) {
+            $query->where('marketing_pembelian.jenis_transaksi', $request->jenis_transaksi);
+        }
+
+        $query->orderBy('marketing_pembelian.tanggal');
+        $query->orderBy('marketing_pembelian.no_bukti');
+
+        $pembelian = $query->get();
+
+        // Get distinct products for columns
+        //$produk = Produk::whereIn('kode_produk', $pembelian->pluck('kode_produk')->unique())->orderBy('kode_produk')->get();
+        // Better to get products used in the filtered transaction
+        $produk = DB::table('marketing_pembelian_detail')
+            ->join('marketing_pembelian', 'marketing_pembelian_detail.no_bukti', '=', 'marketing_pembelian.no_bukti')
+            ->join('produk', 'marketing_pembelian_detail.kode_produk', '=', 'produk.kode_produk')
+            ->whereBetween('marketing_pembelian.tanggal', [$request->dari, $request->sampai])
+            ->distinct()
+            ->select('produk.kode_produk', 'produk.nama_produk', 'produk.isi_pcs_dus')
+            ->orderBy('produk.kode_produk')
+            ->get();
+
+
+        $data['pembelian'] = $pembelian;
+        $data['produk'] = $produk;
+        $data['dari'] = $request->dari;
+        $data['sampai'] = $request->sampai;
+        $data['jenis_transaksi'] = $request->jenis_transaksi;
+
+        if (isset($_POST['exportButton'])) {
+            header("Content-type: application/vnd-ms-excel");
+            header("Content-Disposition: attachment; filename=Laporan Pembelian Satu Baris $request->dari-$request->sampai.xls");
+        }
+        
+        return view('marketing.laporan.pembelian_formatsatubaris_cetak', $data);
+    }
+
     public function index()
     {
         $data['list_bulan'] = config('global.list_bulan');

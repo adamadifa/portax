@@ -132,7 +132,7 @@ class PembelianmarketingController extends Controller
         $tanggal = $request->tanggal;
         $kode_supplier = $request->kode_supplier;
         $jenis_transaksi = $request->jenis_transaksi;
-        $jenis_bayar = $request->jenis_bayar;
+        $jenis_bayar = $jenis_transaksi == 'T' ? $request->jenis_bayar : 'TP';
         $kode_akun = $request->kode_akun ?? '1-1401';
         
         // Detail produk
@@ -220,7 +220,7 @@ class PembelianmarketingController extends Controller
             }
 
             DB::commit();
-            return Redirect::back()->with(messageSuccess('Data Berhasil Disimpan'));
+            return Redirect::route('pembelianmarketing.show', Crypt::encrypt($no_bukti))->with(messageSuccess('Data Berhasil Disimpan'));
         } catch (\Exception $e) {
             DB::rollBack();
             return Redirect::back()->with(messageError($e->getMessage()));

@@ -2,71 +2,43 @@
 
 namespace Database\Seeders;
 
+
 use App\Models\Permission_group;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class Pembelianmarketingpermissionseeder extends Seeder
+class PembelianMarketingPermissionSeeder extends Seeder
+
 {
     /**
      * Run the database seeds.
+     *
+     * @return void
      */
-    public function run(): void
+    public function run()
     {
-        $permissiongroup = Permission_group::create([
-            'name' => 'Pembelian Marketing'
+        // Get Permission Group
+        $permissionGroup = Permission_group::where('name', 'Laporan Marketing')->first();
+        
+        if (!$permissionGroup) {
+            $permissionGroup = Permission_group::create(['name' => 'Laporan Marketing']);
+        }
+
+        // Create permission
+        $permission = Permission::firstOrCreate([
+            'name' => 'mkt.pembelian',
+            'id_permission_group' => $permissionGroup->id
         ]);
 
-        Permission::create([
-            'name' => 'pembelianmarketing.index',
-            'id_permission_group' => $permissiongroup->id
-        ]);
+        // Assign to roles
+        $roles = ['super admin', 'operation manager'];
 
-        Permission::create([
-            'name' => 'pembelianmarketing.create',
-            'id_permission_group' => $permissiongroup->id
-        ]);
-
-        Permission::create([
-            'name' => 'pembelianmarketing.edit',
-            'id_permission_group' => $permissiongroup->id
-        ]);
-
-        Permission::create([
-            'name' => 'pembelianmarketing.store',
-            'id_permission_group' => $permissiongroup->id
-        ]);
-
-        Permission::create([
-            'name' => 'pembelianmarketing.update',
-            'id_permission_group' => $permissiongroup->id
-        ]);
-
-        Permission::create([
-            'name' => 'pembelianmarketing.show',
-            'id_permission_group' => $permissiongroup->id
-        ]);
-
-        Permission::create([
-            'name' => 'pembelianmarketing.delete',
-            'id_permission_group' => $permissiongroup->id
-        ]);
-
-        Permission::create([
-            'name' => 'pembelianmarketing.cetakbukti',
-            'id_permission_group' => $permissiongroup->id
-        ]);
-
-        Permission::create([
-            'name' => 'pembelianmarketing.batalbukti',
-            'id_permission_group' => $permissiongroup->id
-        ]);
-
-        $permissions = Permission::where('id_permission_group', $permissiongroup->id)->get();
-        $roleID = 1;
-        $role = Role::findById($roleID);
-        $role->givePermissionTo($permissions);
+        foreach ($roles as $roleName) {
+            $role = Role::where('name', $roleName)->first();
+            if ($role) {
+                $role->givePermissionTo($permission);
+            }
+        }
     }
 }

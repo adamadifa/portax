@@ -188,20 +188,15 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        @if ($d->status == '0')
-                                            <span class="status-badge aktif">Aktif</span>
+                                        @if ($d->status == '1')
+                                            <span class="status-badge aktif">Lunas</span>
                                         @else
-                                            <span class="status-badge nonaktif">Nonaktif</span>
+                                            <span class="status-badge nonaktif">Belum Lunas</span>
                                         @endif
                                     </td>
                                     <td>
                                         <div class="action-buttons">
-                                            @can('pembelianmarketing.edit')
-                                                <a href="/pembelianmarketing/{{ \Crypt::encrypt($d->no_bukti) }}/edit" class="action-btn edit"
-                                                    title="Edit">
-                                                    <i class="ti ti-edit"></i>
-                                                </a>
-                                            @endcan
+
                                             @can('pembelianmarketing.show')
                                                 <a href="{{ route('pembelianmarketing.show', Crypt::encrypt($d->no_bukti)) }}"
                                                     class="action-btn detail" title="Detail">

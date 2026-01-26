@@ -2,335 +2,340 @@
 @section('titlepage', 'Detail Pembelian Marketing')
 
 @section('content')
-@section('navigasi')
-    <span class="text-muted">Pembelian/</span> Detail
-@endsection
 
 <style>
-    .detail-header {
-        background: linear-gradient(135deg, #03204f 0%, #1e3a8a 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 12px 12px 0 0;
-    }
-
-    .detail-card {
+    .card-detail {
         border: none;
-        border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    .info-table td {
-        padding: 0.75rem;
-        vertical-align: middle;
-    }
-
-    .info-table th {
-        width: 200px;
-        font-weight: 600;
-        color: #495057;
-    }
-
-    .grandtotal-display {
-        text-align: center;
-        padding: 2rem;
-        background: #f8f9fa;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         border-radius: 12px;
     }
 
-    .grandtotal-display h1 {
-        font-size: 3rem;
-        font-weight: 700;
-        color: #03204f;
-        margin: 0;
-    }
-
-    .detail-table thead {
-        background: #03204f;
-        color: white !important;
-    }
-
-    .detail-table thead th {
-        padding: 0.75rem;
+    .section-title {
+        font-size: 0.9rem;
         font-weight: 600;
+        color: #6b7280;
         text-transform: uppercase;
-        font-size: 0.875rem;
-        color: white !important;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 0.5rem;
     }
 
-    .detail-table tbody td {
-        padding: 0.75rem;
-        vertical-align: middle;
+    .info-group {
+        margin-bottom: 1rem;
     }
 
-    .detail-table tfoot {
-        background: #f8f9fa;
+    .info-label {
+        font-size: 0.825rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+        font-weight: 500;
+    }
+
+    .info-value {
+        font-size: 0.95rem;
+        color: #111827;
         font-weight: 600;
     }
 
-    .detail-table tfoot td {
-        padding: 0.75rem;
+    .table-compact thead th {
+        background-color: #f9fafb;
+        color: #374151;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .table-compact tbody td {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        color: #4b5563;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .table-compact tfoot td {
+        padding: 0.75rem 1rem;
+        background-color: #f9fafb;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .grand-total-card {
+        background: linear-gradient(145deg, #1e3a8a, #1effaa00);
+        background-color: #1e3a8a;
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .grand-total-card::after {
+        content: "";
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
     }
 
     .status-badge {
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
         font-weight: 600;
-        font-size: 0.875rem;
     }
 
-    .status-aktif {
-        background: #d1f2eb;
-        color: #0c5460;
+    .status-badge.success {
+        background-color: #d1fae5;
+        color: #065f46;
     }
 
-    .status-nonaktif {
-        background: #f8d7da;
-        color: #721c24;
+    .status-badge.danger {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+     .status-badge.warning {
+        background-color: #fef3c7;
+         color: #92400e;
+    }
+     .status-badge.info {
+        background-color: #dbeafe;
+         color: #1e40af;
     }
 
-    .btn-action {
-        padding: 0.5rem 1rem;
+
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         border-radius: 8px;
-        text-decoration: none;
-        font-weight: 600;
         transition: all 0.2s;
     }
 
-    .btn-back {
-        background: #6c757d;
-        color: white;
-    }
-
-    .btn-back:hover {
-        background: #5a6268;
-        color: white;
-        transform: translateY(-2px);
+    .btn-icon:hover {
+        background-color: #f3f4f6;
     }
 </style>
 
 <div class="row">
     <div class="col-12">
-        <div class="card detail-card mb-4">
-            <div class="detail-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="mb-2">
-                            <i class="ti ti-shopping-bag me-2"></i>Detail Pembelian Marketing
-                        </h4>
-                        <p class="mb-0 opacity-75">No. Bukti: {{ $pembelian->no_bukti }}</p>
-                    </div>
-                    <div>
-                        <a href="{{ route('pembelianmarketing.index') }}" class="btn btn-action btn-back">
-                            <i class="ti ti-arrow-left me-2"></i>Kembali
-                        </a>
-                    </div>
-                </div>
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1 fw-bold text-dark">Detail Pembelian</h4>
+                <p class="text-muted mb-0 small"><i class="ti ti-hash me-1"></i>{{ $pembelian->no_bukti }}</p>
             </div>
+            <div>
+                 <a href="{{ route('pembelianmarketing.index') }}" class="btn btn-outline-secondary btn-sm shadow-sm rounded-pill px-3">
+                    <i class="ti ti-arrow-left me-1"></i>Kembali
+                </a>
+            </div>
+        </div>
 
-            <div class="card-body">
-                <div class="row">
-                    <!-- Informasi Pembelian -->
-                    <div class="col-lg-6 col-md-12 mb-4">
-                        <h5 class="mb-3">
-                            <i class="ti ti-info-circle me-2"></i>Informasi Pembelian
-                        </h5>
-                        <table class="table info-table">
-                            <tr>
-                                <th>No. Bukti</th>
-                                <td><strong>{{ $pembelian->no_bukti }}</strong></td>
-                            </tr>
-                            <tr>
-                                <th>Tanggal</th>
-                                <td>{{ date('d-m-Y', strtotime($pembelian->tanggal)) }}</td>
-                            </tr>
-                            <tr>
-                                <th>Supplier</th>
-                                <td>
-                                    <i class="ti ti-building-store me-2"></i>{{ $pembelian->nama_supplier }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Kode Supplier</th>
-                                <td>{{ $pembelian->kode_supplier }}</td>
-                            </tr>
-                            <tr>
-                                <th>Kode Akun</th>
-                                <td>{{ $pembelian->kode_akun }}</td>
-                            </tr>
-                            <tr>
-                                <th>Jenis Transaksi</th>
-                                <td>
-                                    @if ($pembelian->jenis_transaksi == 'T')
-                                        <span class="status-badge status-aktif">TUNAI</span>
-                                    @else
-                                        <span class="status-badge status-nonaktif">KREDIT</span>
-                                    @endif
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Jenis Bayar</th>
-                                <td>
-                                    {{ $jenis_bayar[$pembelian->jenis_bayar] ?? $pembelian->jenis_bayar }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Status</th>
-                                <td>
-                                    @if ($pembelian->status == '0')
-                                        <span class="status-badge status-aktif">Aktif</span>
-                                    @else
-                                        <span class="status-badge status-nonaktif">Nonaktif</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <!-- Grand Total -->
-                    <div class="col-lg-6 col-md-12 mb-4">
-                        <div class="grandtotal-display">
-                            <i class="ti ti-shopping-cart" style="font-size: 5rem; color: #03204f; opacity: 0.2;"></i>
-                            <p class="text-muted mb-2">GRAND TOTAL</p>
-                            <h1>{{ formatAngka($total_bruto) }}</h1>
+        <div class="row g-4">
+            <!-- Left Column: Information -->
+            <div class="col-lg-8">
+                <!-- Main Info Card -->
+                <div class="card card-detail mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                            <h5 class="section-title mb-0 border-0 p-0 text-primary"><i class="ti ti-file-invoice me-2"></i>Informasi Transaksi</h5>
+                            <span class="status-badge {{ $pembelian->status == '1' ? 'success' : 'danger' }}">
+                                <i class="ti ti-circle-check me-1"></i> {{ $pembelian->status == '1' ? 'Lunas' : 'Belum Lunas' }}
+                            </span>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-group">
+                                    <div class="info-label">Tanggal</div>
+                                    <div class="info-value"><i class="ti ti-calendar me-1 text-muted"></i>{{ date('d-m-Y', strtotime($pembelian->tanggal)) }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-group">
+                                    <div class="info-label">Supplier</div>
+                                    <div class="info-value"><i class="ti ti-building me-1 text-muted"></i>{{ $pembelian->nama_supplier }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <div class="info-group">
+                                    <div class="info-label">Jenis Transaksi</div>
+                                    <div class="info-value">
+                                         @if ($pembelian->jenis_transaksi == 'T')
+                                            <span class="text-success fw-bold">TUNAI</span>
+                                        @else
+                                            <span class="text-danger fw-bold">KREDIT</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                 <div class="info-group">
+                                    <div class="info-label">Jenis Bayar</div>
+                                    <div class="info-value">{{ $jenis_bayar[$pembelian->jenis_bayar] ?? $pembelian->jenis_bayar }}</div>
+                                </div>
+                            </div>
+                             <div class="col-md-6 mt-3">
+                                 <div class="info-group">
+                                    <div class="info-label">Kode Akun</div>
+                                    <div class="info-value font-monospace text-muted">{{ $pembelian->kode_akun }}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Detail Produk -->
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <h5 class="mb-3">
-                            <i class="ti ti-list me-2"></i>Detail Produk
-                        </h5>
+                <!-- Product Details -->
+                <div class="card card-detail mb-4">
+                    <div class="card-body p-4">
+                         <h5 class="section-title text-primary"><i class="ti ti-box me-2"></i>Produk</h5>
                         <div class="table-responsive">
-                            <table class="table table-bordered detail-table">
+                            <table class="table table-compact table-hover mb-0 w-100">
                                 <thead>
                                     <tr>
                                         <th>Kode</th>
                                         <th>Nama Produk</th>
                                         <th class="text-end">Jumlah</th>
-                                        <th class="text-end">Harga / Dus</th>
+                                        <th class="text-end">Harga/Dus</th>
                                         <th class="text-end">Subtotal</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php
-                                        $subtotal = 0;
-                                    @endphp
+                                    @php $subtotal = 0; @endphp
                                     @foreach ($detail as $d)
-                                        @php
-                                            $subtotal += $d->subtotal;
-                                        @endphp
+                                        @php $subtotal += $d->subtotal; @endphp
                                         <tr>
-                                            <td>{{ $d->kode_produk }}</td>
+                                            <td class="font-monospace text-muted small">{{ $d->kode_produk }}</td>
                                             <td>{{ $d->nama_produk }}</td>
-                                            <td class="text-end">{{ formatAngka($d->jumlah) }}</td>
-                                            <td class="text-end">{{ formatAngka($d->harga_dus) }}</td>
-                                            <td class="text-end">{{ formatAngka($d->subtotal) }}</td>
+                                            <td class="text-end fw-bold">{{ formatAngka($d->jumlah) }}</td>
+                                            <td class="text-end text-muted">{{ formatAngka($d->harga_dus) }}</td>
+                                            <td class="text-end fw-bold text-dark">{{ formatAngka($d->subtotal) }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="4" class="text-end"><strong>GRAND TOTAL</strong></td>
-                                        <td class="text-end"><strong>{{ formatAngka($subtotal) }}</strong></td>
+                                        <td colspan="4" class="text-end text-uppercase text-muted small">Total Pembelian</td>
+                                        <td class="text-end fs-6 text-primary">{{ formatAngka($subtotal) }}</td>
                                     </tr>
                                 </tfoot>
                             </table>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Histori Pembayaran -->
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0">
-                                <i class="ti ti-cash me-2"></i>Histori Pembayaran
-                            </h5>
-                            @can('pembayaranpembelianmarketing.create')
-                                @if ($pembelian->status == '0')
-                                    <a href="#" class="btn btn-primary btn-sm" id="btnCreateBayar">
-                                        <i class="ti ti-plus me-1"></i>Input Pembayaran
+            <!-- Right Column: Summary & Payments -->
+            <div class="col-lg-4">
+                 <!-- Grand Total Card -->
+                <div class="grand-total-card mb-4 shadow-sm">
+                    <div class="position-relative z-1 text-white">
+                        <small class="opacity-75 text-uppercase fw-bold letter-spacing-1 d-block mb-1 text-white">Grand Total</small>
+                        <h2 class="mb-0 fw-bold text-white">Rp {{ formatAngka($total_bruto) }}</h2>
+                    </div>
+                </div>
+
+                <!-- Payment History -->
+                <div class="card card-detail">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+                            <h5 class="section-title mb-0 border-0 p-0 text-primary"><i class="ti ti-history me-2"></i>Pembayaran</h5>
+                             @can('pembayaranpembelianmarketing.create')
+                                @if ($pembelian->status == '0' && ($total_bruto - $historibayar->sum('jumlah')) > 0 )
+                                    <a href="#" class="btn btn-primary btn-sm rounded-pill px-3 py-1" id="btnCreateBayar" style="font-size: 0.75rem;">
+                                        <i class="ti ti-plus me-1"></i>Baru
                                     </a>
                                 @endif
                             @endcan
                         </div>
-                        <div class="table-responsive">
-                            <table class="table table-bordered detail-table">
+
+                         <div class="table-responsive">
+                            <table class="table table-compact table-sm table-borderless mb-0">
                                 <thead>
                                     <tr>
-                                        <th>No. Bukti</th>
-                                        <th>Tanggal</th>
-                                        <th>Jenis Bayar</th>
+                                        <th>Info</th>
                                         <th class="text-end">Jumlah</th>
-                                        <th>#</th>
+                                        <th class="text-end">#</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php
-                                        $total_bayar = 0;
-                                    @endphp
+                                     @php $total_bayar = 0; @endphp
                                     @foreach ($historibayar as $d)
-                                        @php
-                                            $total_bayar += $d->jumlah;
-                                        @endphp
+                                        @php $total_bayar += $d->jumlah; @endphp
                                         <tr>
-                                            <td>{{ $d->no_bukti }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($d->tanggal)) }}</td>
-                                            <td>{{ $jenis_bayar[$d->jenis_bayar] ?? $d->jenis_bayar }}</td>
-                                            <td class="text-end">{{ formatAngka($d->jumlah) }}</td>
                                             <td>
-                                                <div class="d-flex gap-2">
-                                                    @can('pembayaranpembelianmarketing.edit')
-                                                        <a href="#" class="btnEditBayar" no_bukti="{{ Crypt::encrypt($d->no_bukti) }}">
-                                                            <i class="ti ti-edit text-success"></i>
-                                                        </a>
-                                                    @endcan
-                                                    @can('pembayaranpembelianmarketing.delete')
-                                                        <form method="POST" name="deleteform" class="deleteform d-inline"
-                                                            action="{{ route('pembayaranpembelianmarketing.delete', Crypt::encrypt($d->no_bukti)) }}">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <a href="#" class="delete-confirm">
-                                                                <i class="ti ti-trash text-danger"></i>
+                                                <div class="text-dark fw-bold small">{{ $d->no_bukti }}</div>
+                                                <div class="text-muted smaller" style="font-size: 0.7rem;">{{ date('d/m/y', strtotime($d->tanggal)) }} • {{ $jenis_bayar[$d->jenis_bayar] ?? $d->jenis_bayar }}</div>
+                                            </td>
+                                            <td class="text-end fw-bold align-middle">{{ formatAngka($d->jumlah) }}</td>
+                                            <td class="text-end align-middle">
+                                                 <div class="dropdown">
+                                                    <a href="#" class="btn btn-icon btn-sm text-muted" data-bs-toggle="dropdown">
+                                                        <i class="ti ti-dots-vertical"></i>
+                                                    </a>
+                                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                                         @can('pembayaranpembelianmarketing.edit')
+                                                        <li>
+                                                            <a class="dropdown-item btnEditBayar" href="#" no_bukti="{{ Crypt::encrypt($d->no_bukti) }}">
+                                                                <i class="ti ti-edit me-2 text-warning"></i> Edit
                                                             </a>
-                                                        </form>
-                                                    @endcan
+                                                        </li>
+                                                        @endcan
+                                                         @can('pembayaranpembelianmarketing.delete')
+                                                        <li>
+                                                             <form method="POST" action="{{ route('pembayaranpembelianmarketing.delete', Crypt::encrypt($d->no_bukti)) }}">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="dropdown-item delete-confirm text-danger">
+                                                                     <i class="ti ti-trash me-2"></i> Hapus
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                        @endcan
+                                                    </ul>
                                                 </div>
                                             </td>
                                         </tr>
                                     @endforeach
                                     @if ($historibayar->count() == 0)
                                         <tr>
-                                            <td colspan="5" class="text-center">Tidak ada data pembayaran</td>
+                                            <td colspan="3" class="text-center text-muted py-3 small fst-italic">Belum ada pembayaran</td>
                                         </tr>
                                     @endif
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="3" class="text-end"><strong>TOTAL BAYAR</strong></td>
-                                        <td class="text-end"><strong>{{ formatAngka($total_bayar) }}</strong></td>
-                                        <td></td>
+                                <tfoot class="border-top">
+                                     <tr>
+                                        <td class="text-muted small">Total Bayar</td>
+                                        <td colspan="2" class="text-end fw-bold text-success">{{ formatAngka($total_bayar) }}</td>
+                                    </tr>
+                                    @php
+                                        $sisa_bayar = $total_bruto - $total_bayar;
+                                        $status_color = $sisa_bayar <= 0 ? 'text-success' : 'text-danger';
+                                        $status_bg = $sisa_bayar <= 0 ? 'success' : 'warning';
+                                        $status_text = $sisa_bayar <= 0 ? 'LUNAS' : 'BELUM LUNAS';
+                                        if($sisa_bayar < 0) $status_text = 'LEBIH BAYAR';
+                                    @endphp
+                                     <tr>
+                                        <td class="text-muted small">Sisa Bayar</td>
+                                        <td colspan="2" class="text-end fw-bold {{ $status_color }}">
+                                            {{ formatAngka($sisa_bayar) }}
+                                        </td>
                                     </tr>
                                     <tr>
-                                        @php
-                                            $sisa_bayar = $total_bruto - $total_bayar;
-                                            if ($sisa_bayar == 0) {
-                                                $color = 'success';
-                                                $ket = 'LUNAS';
-                                            } elseif ($sisa_bayar < 0) {
-                                                $color = 'info';
-                                                $ket = 'LEBIH BAYAR';
-                                            } else {
-                                                $color = 'warning';
-                                                $ket = 'BELUM LUNAS';
-                                            }
-                                        @endphp
-                                        <td colspan="3" class="text-end"><strong>SISA BAYAR</strong></td>
-                                        <td class="text-end" id="sisabayar"><strong>{{ formatAngka($sisa_bayar) }}</strong></td>
-                                        <td class="bg-{{ $color }} text-center text-white"><strong>{{ $ket }}</strong></td>
+                                        <td colspan="3" class="pt-3 text-center">
+                                            <span class="status-badge {{ $status_bg }} w-100 justify-content-center py-2">{{ $status_text }}</span>
+                                        </td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -344,10 +349,10 @@
 
 <!-- Modal -->
 <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel"></h5>
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold" id="modalLabel"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="loadmodal">
@@ -361,12 +366,10 @@
 <script>
     $(document).ready(function() {
         function loading() {
-            $("#loadmodal").html(`<div class="sk-wave sk-primary" style="margin:auto">
-            <div class="sk-wave-rect"></div>
-            <div class="sk-wave-rect"></div>
-            <div class="sk-wave-rect"></div>
-            <div class="sk-wave-rect"></div>
-            <div class="sk-wave-rect"></div>
+            $("#loadmodal").html(`<div class="d-flex justify-content-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
             </div>`);
         }
 
@@ -379,13 +382,32 @@
             $("#loadmodal").load(`/pembayaranpembelianmarketing/${no_bukti}/create`);
         });
 
-        $(".btnEditBayar").click(function(e) {
-            e.preventDefault();
+        $(document).on('click', '.btnEditBayar', function(e) {
+             e.preventDefault();
             loading();
             const no_bukti = $(this).attr('no_bukti');
             $("#modal").modal("show");
             $(".modal-title").text("Edit Pembayaran");
             $("#loadmodal").load(`/pembayaranpembelianmarketing/${no_bukti}/edit`);
+        });
+        
+         $(".delete-confirm").click(function(e) {
+            var form = $(this).closest("form");
+            e.preventDefault();
+            Swal.fire({
+                title: 'Apakah Anda Yakin?',
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            })
         });
     });
 </script>

@@ -742,7 +742,6 @@
             } else {
                 $("#harga_pack").prop('disabled', false);
             }
->>>>>>> 6f0569c (update)
             $("#harga_pcs").prop('disabled', false);
 
             $("#modal").modal("hide");
@@ -775,42 +774,6 @@
 
 
         function addProduk() {
-<<<<<<< HEAD
-            var kode_produk = $("#kode_produk").val();
-            var nama_produk = $("#nama_produk").val();
-            var jml_dus = $("#jml_dus").val() || "";
-            var jml_pack = $("#jml_pack").val() || "";
-            var jml_pcs = $("#jml_pcs").val() || "";
-            var harga_dus = $("#harga_dus").val() || "";
-            var harga_pack = $("#harga_pack").val() || "";
-            var harga_pcs = $("#harga_pcs").val() || "";
-            var isi_pcs_dus = $("#isi_pcs_dus").val() || "0";
-            var isi_pcs_pack = $("#isi_pcs_pack").val() || "0";
-            var kode_kategori_diskon = $("#kode_kategori_diskon").val() || "";
-
-            var jmldus = (jml_dus != "" && jml_dus != null) ? parseInt(jml_dus.toString().replace(/\./g, '')) : 0;
-            var jmlpack = (jml_pack != "" && jml_pack != null) ? parseInt(jml_pack.toString().replace(/\./g, '')) : 0;
-            var jmlpcs = (jml_pcs != "" && jml_pcs != null) ? parseInt(jml_pcs.toString().replace(/\./g, '')) : 0;
-
-            var hargadus = (harga_dus != "" && harga_dus != null) ? parseInt(harga_dus.toString().replace(/\./g, '')) : 0;
-            var hargapack = (harga_pack != "" && harga_pack != null) ? parseInt(harga_pack.toString().replace(/\./g, '')) : 0;
-            var hargapcs = (harga_pcs != "" && harga_pcs != null) ? parseInt(harga_pcs.toString().replace(/\./g, '')) : 0;
-
-            var isi_pcs_dus_num = parseInt(isi_pcs_dus) || 0;
-            var isi_pcs_pack_num = parseInt(isi_pcs_pack) || 0;
-
-            var jumlah = (jmldus * isi_pcs_dus_num) + (jmlpack * isi_pcs_pack_num) + jmlpcs;
-
-            let data = convertoduspackpcs(isi_pcs_dus_num, isi_pcs_pack_num, jumlah);
-            let dus = data.dus;
-            let pack = data.pack;
-            let pcs = data.pcs;
-
-            let index = kode_produk;
-
-            let subtotal = (parseInt(dus) * parseInt(hargadus));
-
-
             var kode_harga = $("#kode_harga").val() || "";
             var kode_produk = $("#kode_produk").val();
             var nama_produk = $("#nama_produk").val();
@@ -1542,11 +1505,6 @@
                 return false;
             } else if (jenis_transaksi == "T" && jenis_bayar == "") {
                 SwalWarning('jenis_bayar', 'Jenis Bayar Tidak Boleh Kosong');
-                return false;
-            } else if (jenis_transaksi == "K" && jmlfakturbelumlunas >= jmlfakturmax) {
-                SwalWarning('keterangan', 'Melebihi Batas Jumlah Faktur Kredit !');
-                return false;
-
                 return false;
             } else {
                 buttonDisable();

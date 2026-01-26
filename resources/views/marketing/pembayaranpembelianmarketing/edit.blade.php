@@ -3,6 +3,14 @@
     @method('PUT')
     <x-input-with-icon icon="ti ti-calendar" label="Tanggal Pembayaran" name="tanggal" datepicker="flatpickr-date" value="{{ $historibayar->tanggal }}" />
     <x-input-with-icon icon="ti ti-moneybag" label="Jumlah Bayar" name="jumlah" align="right" value="{{ formatAngka($historibayar->jumlah) }}" />
+    <div class="d-flex justify-content-between align-items-center mb-3 mt-2 p-3 rounded" style="background-color: #ecfdf5; border: 1px dashed #10b981;">
+        <div class="d-flex align-items-center">
+            <i class="ti ti-wallet text-success me-2 fs-5"></i>
+            <span class="text-success fw-bold small text-uppercase">Sisa Bayar</span>
+        </div>
+        <span class="fw-bold text-success fs-5">{{ formatAngka($sisa_bayar) }}</span>
+    </div>
+    <input type="hidden" id="sisa_bayar" value="{{ $sisa_bayar }}">
     
     <x-select label="Jenis Bayar" name="jenis_bayar" :data="[['value' => 'TN', 'text' => 'CASH'], ['value' => 'TR', 'text' => 'TRANSFER']]" key="value" textShow="text" upperCase="true" select2="select2Jenisbayar" selected="{{ $historibayar->jenis_bayar }}" />
     
@@ -54,6 +62,7 @@
             const jml = $(this).find("#jumlah").val();
             const jumlah = parseInt(jml.replace(/\./g, ''));
             const jenis_bayar = $(this).find("#jenis_bayar").val();
+            const sisa_bayar = parseInt($("#sisa_bayar").val());
 
             if (tanggal == "") {
                 Swal.fire({
@@ -70,6 +79,17 @@
                 Swal.fire({
                     title: "Oops!",
                     text: "Jumlah Harus Diisi !",
+                    icon: "warning",
+                    showConfirmButton: true,
+                    didClose: (e) => {
+                        form.find("#jumlah").focus();
+                    },
+                });
+                return false;
+            } else if (jumlah > sisa_bayar) {
+                 Swal.fire({
+                    title: "Oops!",
+                    text: "Jumlah Bayar Melebihi Sisa Bayar !",
                     icon: "warning",
                     showConfirmButton: true,
                     didClose: (e) => {

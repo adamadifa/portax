@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Historibayarpembelianmarketing;
 use App\Models\Pembelianmarketing;
+use App\Models\Detailpembelianmarketing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -16,8 +17,13 @@ class PembayaranpembelianmarketingController extends Controller
         $no_bukti = Crypt::decrypt($no_bukti);
         $pembelian = Pembelianmarketing::where('no_bukti', $no_bukti)->first();
         
+        $total_bruto = Detailpembelianmarketing::where('no_bukti', $no_bukti)->sum('subtotal');
+        $total_bayar = Historibayarpembelianmarketing::where('no_bukti_pembelian', $no_bukti)->sum('jumlah');
+        $sisa_bayar = $total_bruto - $total_bayar;
+
         $data['pembelian'] = $pembelian;
         $data['no_bukti'] = $no_bukti;
+        $data['sisa_bayar'] = $sisa_bayar;
         return view('marketing.pembayaranpembelianmarketing.create', $data);
     }
 
@@ -77,8 +83,15 @@ class PembayaranpembelianmarketingController extends Controller
         
         $pembelian = Pembelianmarketing::where('no_bukti', $historibayar->no_bukti_pembelian)->first();
         
+        $total_bruto = Detailpembelianmarketing::where('no_bukti', $historibayar->no_bukti_pembelian)->sum('subtotal');
+        $total_bayar = Historibayarpembelianmarketing::where('no_bukti_pembelian', $historibayar->no_bukti_pembelian)
+            ->where('no_bukti', '!=', $historibayar->no_bukti)
+            ->sum('jumlah');
+        $sisa_bayar = $total_bruto - $total_bayar;
+
         $data['historibayar'] = $historibayar;
         $data['pembelian'] = $pembelian;
+        $data['sisa_bayar'] = $sisa_bayar;
         return view('marketing.pembayaranpembelianmarketing.edit', $data);
     }
 

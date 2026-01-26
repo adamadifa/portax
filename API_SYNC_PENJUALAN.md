@@ -7,7 +7,21 @@ API untuk sync/transfer data penjualan dari aplikasi lain ke sistem ini.
 http://your-domain/api/sync
 ```
 
+
 ---
+
+## ℹ️ **INFO PENTING: Auto-Create Data Master**
+
+Sistem ini memiliki fitur **Auto-Create** untuk data master. Client dapat mengirimkan data lengkap Salesman dan Pelanggan di dalam payload penjualan.
+
+### **Mekanisme:**
+1. Sistem cek apakah kode (salesman/pelanggan) sudah ada.
+2. Jika **sudah ada**, data yang dikirim di payload salesman/pelanggan **diabaikan**.
+3. Jika **belum ada**, sistem membuat data baru menggunakan informasi detail yang dikirim.
+4. Jika data detail tidak dikirim, sistem menggunakan default value.
+
+---
+
 
 ## 📋 **ENDPOINTS**
 
@@ -373,9 +387,47 @@ Accept: application/json
 - `jenis_transaksi` - String, 1 karakter (T/K)
 - `jenis_bayar` - String, max 2 karakter
 - `status` - String, 1 karakter
-- `id_user` - Integer
+- `status` - String, 1 karakter
+- `id_user` - Integer (Optional - Sistem akan memaksa menggunakan ID: 1)
 
 ### **Optional Fields (Header) - Dengan Default Value:**
+- `salesman` - Object (Raw Database Columns)
+    - `salesman.kode_salesman`
+    - `salesman.nama_salesman`
+    - `salesman.alamat_salesman`
+    - `salesman.no_hp_salesman`
+    - `salesman.kode_kategori_salesman`
+    - `salesman.status_komisi_salesman`
+    - `salesman.status_aktif_salesman`
+    
+- `pelanggan` - Object (Raw Database Columns)
+    - `pelanggan.kode_pelanggan`
+    - `pelanggan.nik`
+    - `pelanggan.no_kk`
+    - `pelanggan.nama_pelanggan`
+    - `pelanggan.tanggal_lahir`
+    - `pelanggan.alamat_pelanggan`
+    - `pelanggan.alamat_toko`
+    - `pelanggan.no_hp_pelanggan`
+    - `pelanggan.kode_wilayah`
+    - `pelanggan.hari`
+    - `pelanggan.latitude`
+    - `pelanggan.longitude`
+    - `pelanggan.status_lokasi`
+    - `pelanggan.ljt`
+    - `pelanggan.status_outlet`
+    - `pelanggan.type_outlet`
+    - `pelanggan.cara_pembayaran`
+    - `pelanggan.kepemilikan`
+    - `pelanggan.lama_berjualan`
+    - `pelanggan.jaminan`
+    - `pelanggan.omset_toko`
+    - `pelanggan.foto`
+    - `pelanggan.limit_pelanggan`
+    - `pelanggan.kode_salesman`
+    - `pelanggan.status_aktif_pelanggan`
+    - `pelanggan.foto_owner`
+
 - `kode_akun` - Default: '1-1401'
 - `kode_akun_potongan` - Default: '4-2201'
 - `kode_akun_penyesuaian` - Default: '4-2202'
