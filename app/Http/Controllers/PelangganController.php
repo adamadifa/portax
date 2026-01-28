@@ -110,7 +110,8 @@ class PelangganController extends Controller
         $cbg = new Cabang();
         $cabang = $cbg->getCabang();
         $klasifikasi_outlet = Klasifikasioutlet::orderBy('kode_klasifikasi')->get();
-        return view('datamaster.pelanggan.create', compact('cabang', 'klasifikasi_outlet'));
+        $lama_langganan = config('pelanggan.lama_langganan');
+        return view('datamaster.pelanggan.create', compact('cabang', 'klasifikasi_outlet', 'lama_langganan'));
     }
 
 
@@ -231,7 +232,8 @@ class PelangganController extends Controller
         $cabang = $cbg->getCabang();
         $cabang_pkp = Cabang::orderBy('kode_cabang')->get();
         $klasifikasi_outlet = Klasifikasioutlet::orderBy('kode_klasifikasi')->get();
-        return view('datamaster.pelanggan.edit', compact('cabang', 'pelanggan', 'klasifikasi_outlet', 'cabang_pkp'));
+        $lama_langganan = config('pelanggan.lama_langganan');
+        return view('datamaster.pelanggan.edit', compact('cabang', 'pelanggan', 'klasifikasi_outlet', 'cabang_pkp', 'lama_langganan'));
     }
 
     public function update(Request $request, $kode_pelanggan)

@@ -13,7 +13,7 @@
     <li
         class="menu-item {{ request()->is(['coa', 'costratio', 'jurnalumum', 'hpp', 'hargaawalhpp', 'laporanaccounting', 'saldoawalbukubesar', 'saldoawalbukubesar/*']) ? 'open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ti ti-scale"></i>
+            <i class="menu-icon ti ti-scale"></i>
             <div>Accounting</div>
         </a>
         <ul class="menu-sub">

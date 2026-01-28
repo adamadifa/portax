@@ -1,7 +1,7 @@
  <li class="menu-item {{ request()->is($datamaster_request) ? 'open' : '' }}">
      @if (auth()->user()->hasAnyPermission($datamaster_permission))
          <a href="javascript:void(0);" class="menu-link menu-toggle">
-             <i class="menu-icon tf-icons ti ti-database"></i>
+             <i class="menu-icon ti ti-database"></i>
              <div>Data Master</div>
          </a>
          <ul class="menu-sub">

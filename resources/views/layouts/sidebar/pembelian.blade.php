@@ -16,7 +16,7 @@
     <li
         class="menu-item {{ request()->is(['pembelian', 'pembelian/*', 'jurnalkoreksi', 'kontrabonpembelian', 'kontrabonpembelian/*', 'laporanpembelian']) ? 'open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ti ti-shopping-cart"></i>
+            <i class="menu-icon ti ti-shopping-cart"></i>
             <div>Pembelian</div>
         </a>
         <ul class="menu-sub">

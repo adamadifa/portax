@@ -3,7 +3,7 @@
         class="menu-item {{ request()->is(['mutasikendaraan', 'servicekendaraan', 'servicekendaraan/*', 'badstokga', 'laporanga', 'laporanga/*']) ? 'open' : '' }}">
 
         <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ti ti-radioactive"></i>
+            <i class="menu-icon ti ti-radioactive"></i>
             <div>General Afffair</div>
         </a>
         <ul class="menu-sub">

@@ -2,7 +2,7 @@
     <li class="menu-item {{ request()->is(['barangmasukmaintenance', 'barangkeluarmaintenance', 'laporanmtc']) ? 'open' : '' }}">
 
         <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ti ti-tools-kitchen-2"></i>
+            <i class="menu-icon ti ti-tools-kitchen-2"></i>
             <div>Maintenance</div>
         </a>
         <ul class="menu-sub">

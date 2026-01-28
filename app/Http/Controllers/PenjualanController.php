@@ -118,7 +118,7 @@ class PenjualanController extends Controller
 
         $query->orderBy('marketing_penjualan.tanggal', 'desc');
         $query->orderBy('marketing_penjualan.no_faktur', 'desc');
-        $penjualan = $query->cursorPaginate();
+        $penjualan = $query->paginate(15);
         $penjualan->appends(request()->all());
         $data['penjualan'] = $penjualan;
         $cbg = new Cabang();

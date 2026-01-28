@@ -50,7 +50,7 @@
             : '' }}">
 
         <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ti ti-users-group"></i>
+            <i class="menu-icon ti ti-users-group"></i>
             <div>HRD</div>
             @if (!empty($notifikasi_hrd))
                 <div class="badge bg-danger rounded-pill ms-auto">{{ $notifikasi_hrd }}</div>

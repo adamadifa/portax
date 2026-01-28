@@ -64,7 +64,7 @@
             : '' }}">
 
         <a href="javascript:void(0);" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons ti ti-moneybag"></i>
+            <i class="menu-icon ti ti-moneybag"></i>
             <div>Keuangan</div>
         </a>
         <ul class="menu-sub">
