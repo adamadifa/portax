@@ -1,39 +1,42 @@
-<form action="{{ route('laporanmarketing.cetakomsetpelanggan') }}" method="POST" target="_blank" id="formomsetpelanggan">
+<form action="{{ route('laporanmarketing.cetakomsetpelanggan') }}" method="POST" target="_blank" id="formomsetpelanggan" class="space-y-3">
     @csrf
-    @hasanyrole($roles_show_cabang)
-        <div class="form-group mb-3">
-            <select name="kode_cabang" id="kode_cabang_omsetpelanggan" class="form-select select2Kodecabangomsetpelanggan">
+    
+    <div class="space-y-4">
+        @hasanyrole($roles_show_cabang)
+        <div class="relative">
+            <select name="kode_cabang" id="kode_cabang_omsetpelanggan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodecabangomsetpelanggan">
                 <option value="">Semua Cabang</option>
                 @foreach ($cabang as $d)
                     <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
                 @endforeach
             </select>
         </div>
-    @endrole
-    <div class="form-group mb-3">
-        <select name="format_laporan" id="format_laporan" class="form-select">
-            <option value="">Pilih Format Laporan</option>
-            <option value="1">Rekap</option>
-            <option value="2">Tampilkan per Bulan</option>
-        </select>
-    </div>
-    <div class="form-group mb-3">
-        <select name="kode_salesman" id="kode_salesman_omsetpelanggan" class="select2Kodesalesmanomsetpelanggan form-select">
-        </select>
-    </div>
-
-
-    <div class="row">
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Dari" name="dari" datepicker="flatpickr-date" />
+        @endrole
+        <div class="relative">
+            <select name="format_laporan" id="format_laporan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none form-select">
+                <option value="">Pilih Format Laporan</option>
+                <option value="1">Rekap</option>
+                <option value="2">Tampilkan per Bulan</option>
+            </select>
         </div>
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Sampai" name="sampai" datepicker="flatpickr-date" />
+        <div class="relative">
+            <select name="kode_salesman" id="kode_salesman_omsetpelanggan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodesalesmanomsetpelanggan">
+            </select>
+        </div>
+    
+        <div class="grid grid-cols-2 gap-4">
+            <div class="relative">
+                <input type="text" name="dari" id="dari" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Dari Tanggal">
+            </div>
+            <div class="relative">
+                <input type="text" name="sampai" id="sampai" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Sampai Tanggal">
+            </div>
         </div>
     </div>
-    <div class="row">
+    
+    <div class="row mt-3">
         <div class="col-lg-10 col-md-12 col-sm-12">
-            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButtonomsetpelanggan">
+            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButtonomsetpelanggan" style="background-color: #003d9e; border-color: #003d9e;">
                 <i class="ti ti-printer me-1"></i> Cetak
             </button>
         </div>

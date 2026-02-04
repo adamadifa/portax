@@ -145,7 +145,7 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ formatIndo($d->tanggal) }}</td>
-                            <td>{{ $d->no_faktur }}</td>
+                            <td>{{ !empty($d->no_fak_new) ? $d->no_fak_new : $d->no_faktur }}</td>
                             <td>{{ $d->kode_pelanggan }}</td>
                             <td>{{ textupperCase($d->nama_pelanggan) }}</td>
                             <td>{{ formatName($d->nama_salesman) }}</td>

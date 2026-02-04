@@ -2,456 +2,226 @@
 @section('titlepage', 'Input Pembelian Marketing')
 @section('content')
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
     <style>
+        .font-public-sans {
+            font-family: 'Public Sans', sans-serif !important;
+        }
         .nonaktif {
             background-color: red;
         }
-
-        /* Modern Card Styling */
-        .modern-card {
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-            transition: all 0.2s ease;
-            background: #fff;
-        }
-
-        .modern-card:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .modern-card .card-body {
-            padding: 1.5rem;
-        }
-
-        /* Info Card Styling */
-        .info-card {
-            background: #fff;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .info-card .form-label {
-            color: #495057;
-            font-weight: 500;
-            font-size: 0.875rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .info-card .form-control,
-        .info-card input {
-            background: #fff;
-            border: 1px solid #dee2e6;
-            color: #495057;
-            border-radius: 8px;
-            padding: 0.625rem 1rem;
-        }
-
-        .info-card .form-control::placeholder {
-            color: #adb5bd;
-        }
-
-        .info-card .form-control:focus {
-            background: #fff;
-            border-color: #03204f;
-            color: #495057;
-            box-shadow: 0 0 0 0.2rem rgba(3, 32, 79, 0.1);
-        }
-
-        /* Grand Total Card */
-        .grandtotal-card {
-            background: #fff;
-            border: 2px solid #03204f;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            position: relative;
-        }
-
-        .grandtotal-card .grandtotal-content {
-            position: relative;
-            z-index: 1;
-            color: #03204f;
-        }
-
-        .grandtotal-card .grandtotal-label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #6c757d;
-            margin-bottom: 0.5rem;
-        }
-
-        .grandtotal-card .grandtotal-amount {
-            font-size: 3rem;
-            font-weight: 700;
-            line-height: 1;
-            margin: 0;
-            color: #03204f;
-        }
-
-        .grandtotal-card .grandtotal-icon {
-            font-size: 4rem;
-            opacity: 0.1;
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #03204f;
-        }
-
-        /* Detail Card Styling */
-        .detail-card {
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-        }
-
-        .detail-card .card-header {
-            background: #03204f;
-            color: white;
-            border: none;
-            padding: 1.25rem 1.5rem;
-        }
-
-        .detail-card .card-header .card-title {
-            margin: 0;
-            font-weight: 600;
-            font-size: 1.125rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .detail-card .card-header .card-title i {
-            font-size: 1.25rem;
-        }
-
-        .detail-card .card-body {
-            padding: 1.5rem;
-        }
-
-        /* Form Input Styling */
-        .form-input-group {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-        }
-
-        .modern-btn-primary {
-            background: #03204f;
-            border: none;
-            border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            color: white;
-            transition: all 0.2s ease;
-        }
-
-        .modern-btn-primary:hover {
-            background: #021a3d;
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(3, 32, 79, 0.2);
-        }
-
-        .modern-btn-primary i {
-            margin-right: 0.5rem;
-        }
-
-        /* Table Styling */
-        .modern-table {
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #e9ecef;
-        }
-
-        .modern-table thead {
-            background: #03204f;
-            color: white;
-        }
-
-        .modern-table thead th {
-            border: none;
-            padding: 0.75rem 0.5rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .modern-table tbody td {
-            padding: 0.5rem;
-            vertical-align: middle;
-            border-color: #e9ecef;
-        }
-
-        .modern-table tbody tr {
-            transition: all 0.2s ease;
-        }
-
-        .modern-table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .modern-table tfoot {
-            background: #f8f9fa;
-            font-weight: 600;
-        }
-
-        .modern-table tfoot td {
-            border: none;
-            padding: 0.5rem;
-        }
-
-        .btn-action {
-            padding: 0.375rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn-action:hover {
-            transform: translateY(-1px);
-        }
-
-        /* Summary/Payment Card */
-        .summary-card {
-            background: #fff;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .summary-card .form-label {
-            font-weight: 600;
-            color: #495057;
-            font-size: 0.875rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .summary-card .form-select,
-        .summary-card .form-control {
-            border-radius: 10px;
-            border: 1.5px solid #dee2e6;
-            padding: 0.625rem 1rem;
-            transition: all 0.2s ease;
-        }
-
-        .summary-card .form-select:focus,
-        .summary-card .form-control:focus {
-            border-color: #03204f;
-            box-shadow: 0 0 0 0.2rem rgba(3, 32, 79, 0.1);
-        }
-
-        .summary-card .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .btn-submit {
-            background: #03204f;
-            border: none;
-            border-radius: 8px;
-            padding: 0.875rem 1.5rem;
-            font-weight: 600;
-            color: white;
-            width: 100%;
-            transition: all 0.2s ease;
-            font-size: 1rem;
-        }
-
-        .btn-submit:hover {
-            background: #021a3d;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(3, 32, 79, 0.2);
-            color: white;
-        }
-
-        .btn-submit i {
-            margin-right: 0.5rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 991px) {
-            .grandtotal-card .grandtotal-amount {
-                font-size: 2.5rem;
-            }
-
-            .grandtotal-card .grandtotal-icon {
-                font-size: 4rem;
-            }
-
-            .info-card {
-                margin-bottom: 1rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .grandtotal-card {
-                padding: 1.5rem;
-            }
-
-            .grandtotal-card .grandtotal-amount {
-                font-size: 2rem;
-            }
-
-            .summary-card {
-                padding: 1.25rem;
-            }
-        }
     </style>
+
 @section('navigasi')
     <span class="text-muted">Pembelian</span> / <span>Input Pembelian</span>
 @endsection
-<form action="{{ route('pembelianmarketing.store') }}" method="POST" id="formPembelian">
+
+<form action="{{ route('pembelianmarketing.store') }}" method="POST" id="formPembelian" class="mt-4 font-public-sans">
     @csrf
     
-
-    <div class="row">
-        <div class="col-lg-4 col-md-12 col-sm-12 mb-3">
-            <div class="info-card">
-                <x-input-with-icon label="No. Bukti" name="no_bukti" icon="ti ti-barcode" />
-                <x-input-with-icon label="Tanggal" name="tanggal" icon="ti ti-calendar" datepicker="flatpickr-date" />
-                <x-input-with-icon label="Supplier" name="nama_supplier" icon="ti ti-building-store" readonly="true" />
-                <input type="hidden" id="kode_supplier" name="kode_supplier">
-                <input type="hidden" id="kode_cabang_supplier" name="kode_cabang_supplier">
-            </div>
-        </div>
-        <div class="col-lg-8 col-md-12 col-sm-12 mb-3">
-            <div class="grandtotal-card">
-                <div class="grandtotal-content">
-                    <div class="grandtotal-label">Grand Total</div>
-                    <h1 class="grandtotal-amount" id="grandtotal_text">Rp 0</h1>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- LEFT COLUMN: Workspace (Input + Table) - span 9 -->
+        <div class="col-span-12 lg:col-span-9 space-y-6">
+            
+             <!-- Grand Total -->
+             <div class="bg-[#003d9e] rounded-xl shadow-lg p-6 relative overflow-hidden text-center group flex flex-col justify-center min-h-[140px]">
+                <div class="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-colors"></div>
+                 <div class="absolute -right-6 -top-6 text-white/10 rotate-12">
+                    <i class="ti ti-shopping-bag text-[12rem]"></i>
                 </div>
-                <i class="ti ti-shopping-bag grandtotal-icon"></i>
+                 <p class="text-blue-100 text-sm uppercase tracking-wider mb-2 relative z-10">Grand Total</p>
+                 <h1 class="text-5xl font-black text-white tracking-tight relative z-10" id="grandtotal_text">Rp 0</h1>
             </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="card detail-card">
-                    <div class="card-header">
-                        <h5 class="card-title" style="color: white !important">
-                            <i class="ti ti-list"></i>
-                            Detail Pembelian
-                        </h5>
+
+            <!-- Input Produk -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 space-y-2">
+                
+                <!-- Row 1: Inputs -->
+                <div class="flex flex-col lg:flex-row gap-2 items-start">
+                    <!-- Product Selector (Left - Grow) -->
+                    <div class="flex-1 w-full lg:w-auto">
+                        <div class="relative h-full">
+                            <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e] h-[45px]"> 
+                                <span class="pl-3 text-slate-400"><i class="ti ti-scan"></i></span>
+                                <input type="text" name="nama_produk" id="nama_produk" class="w-full px-3 py-2 text-sm border-0 focus:ring-0 bg-transparent placeholder-slate-400 cursor-pointer h-full" placeholder="Pilih Produk..." readonly>
+                            </div>
+                         </div>
+                        <input type="hidden" id="kode_harga" name="kode_harga">
+                        <input type="hidden" id="kode_produk" name="kode_produk">
+                        <input type="hidden" id="isi_pcs_dus" name="isi_pcs_dus">
+                        <input type="hidden" id="isi_pcs_pack" name="isi_pcs_pack">
+                        <input type="hidden" id="kode_kategori_diskon" name="kode_kategori_diskon">
                     </div>
-                    <div class="card-body">
-                        <div class="form-input-group">
-                            <div class="row g-3">
-                                <div class="col-lg-5 col-md-12 col-sm-12">
-                                    <x-input-with-icon label="Produk" name="nama_produk" icon="ti ti-barcode" readonly="true" />
-                                    <input type="hidden" id="kode_harga" name="kode_harga">
-                                    <input type="hidden" id="kode_produk" name="kode_produk">
-                                    <input type="hidden" id="isi_pcs_dus" name="isi_pcs_dus">
-                                    <input type="hidden" id="isi_pcs_pack" name="isi_pcs_pack">
-                                    <input type="hidden" id="kode_kategori_diskon" name="kode_kategori_diskon">
-                                </div>
-                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                    <x-input-with-icon label="Dus" name="jml_dus" icon="ti ti-box" align="right" money="true" />
-                                </div>
-                                <div class="col-lg-4 col-md-12 col-sm-12">
-                                    <x-input-with-icon label="Harga / Dus" name="harga_dus" icon="ti ti-moneybag" align="right" money="true" />
-                                    <input type="hidden" id="harga_dus_produk">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <a href="#" id="tambahproduk" class="btn modern-btn-primary w-100">
-                                <i class="ti ti-plus"></i>Tambah Produk
-                            </a>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="table-responsive">
-                                    <table class="table modern-table" id="tabelproduk">
-                                        <thead class="text-center">
-                                            <tr>
-                                                <th>Kode</th>
-                                                <th style="text-align: left !important">Nama Barang</th>
-                                                <th>Dus</th>
-                                                <th>Harga / Dus</th>
-                                                <th>Subtotal</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="loadproduk"></tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <td colspan="4" class="text-end fw-bold">SUBTOTAL</td>
-                                                <td class="text-end fw-bold" id="subtotal">Rp 0</td>
-                                                <td></td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mt-4">
-                            <div class="col-12 d-flex justify-content-end">
-                                <div class="col-lg-5 col-md-6 col-sm-12">
-                                    <div class="summary-card">
-                                        <input type="hidden" id="potongan_aida" name="potongan_aida" value="0">
-                                        <input type="hidden" id="potongan_swan" name="potongan_swan" value="0">
-                                        <input type="hidden" id="potongan_stick" name="potongan_stick" value="0">
-                                        <input type="hidden" id="potongan_sambal" name="potongan_sambal" value="0">
-                                        <input type="hidden" id="potis_aida" name="potis_aida" value="0">
-                                        <input type="hidden" id="potis_swan" name="potis_swan" value="0">
-                                        <input type="hidden" id="potis_stick" name="potis_stick" value="0">
-                                        <input type="hidden" id="peny_aida" name="peny_aida" value="0">
-                                        <input type="hidden" id="peny_swan" name="peny_swan" value="0">
-                                        <input type="hidden" id="peny_stick" name="peny_stick" value="0">
-                                        <div class="form-group">
-                                            <label class="form-label">Jenis Transaksi</label>
-                                            <select name="jenis_transaksi" id="jenis_transaksi" class="form-select">
-                                                <option value="">Pilih Jenis Transaksi</option>
-                                                <option value="T">TUNAI</option>
-                                                <option value="K">KREDIT</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <x-input-with-icon label="Grand Total" name="grandtotal" id="grandtotal" icon="ti ti-shopping-cart"
-                                                align="right" disabled="true" />
-                                        </div>
-                                        <div id="jenis_bayar_tunai">
-                                            <div class="form-group">
-                                                <label class="form-label">Jenis Bayar</label>
-                                                <select name="jenis_bayar" id="jenis_bayar" class="form-select">
-                                                    <option value="">Pilih Jenis Bayar</option>
-                                                    <option value="TN">CASH</option>
-                                                    <option value="TR">TRANSFER</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div id="titipan">
-                                            <div class="form-group">
-                                                <x-input-with-icon icon="ti ti-moneybag" name="titipan" money="true" align="right"
-                                                    label="Titipan" />
-                                            </div>
-                                        </div>
 
-                                        <div class="form-group mb-3">
-                                            <button class="btn btn-primary w-100" id="btnSimpan"><i class="ti ti-send me-1"></i>Submit</button>
-                                        </div>
-
-                                        </div>
-                                    </div>
-                                </div>
+                    <!-- Unit Inputs (Right - Fixed Widths) -->
+                    <div class="flex items-start gap-2 flex-wrap lg:flex-nowrap">
+                        
+                        <!-- Dus -->
+                        <div class="w-[120px] space-y-2">
+                             <!-- Qty -->
+                            <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e] h-[45px]">
+                                <span class="pl-2 text-slate-400 text-sm"><i class="ti ti-box"></i></span>
+                                <input type="text" name="jml_dus" id="jml_dus" class="money w-full px-2 py-1 text-right text-sm border-0 focus:ring-0 placeholder-slate-300" placeholder="Dus">
                             </div>
                         </div>
+
+                         <!-- Harga/Dus -->
+                         <div class="w-[150px] space-y-2">
+                             <!-- Price -->
+                             <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e] h-[45px]">
+                                <span class="pl-2 text-slate-400 text-sm"><i class="ti ti-tag"></i></span>
+                                <input type="text" name="harga_dus" id="harga_dus" class="money w-full px-2 py-1 text-right text-sm border-0 focus:ring-0 placeholder-slate-300" placeholder="Harga / Dus">
+                                <input type="hidden" id="harga_dus_produk">
+                            </div>
+                        </div>
+                        
+                         <!-- Button Add -->
+                         <div class="w-auto h-[45px]">
+                            <button type="button" id="tambahproduk" class="h-full px-4 bg-[#003d9e] hover:bg-blue-800 text-white text-sm font-bold rounded-lg shadow-sm transition-all active:scale-95 flex items-center gap-2">
+                                <i class="ti ti-plus"></i>
+                            </button>
+                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Table -->
+            <div class="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm h-[calc(100vh-300px)] flex flex-col">
+                 <div class="overflow-auto flex-1">
+                    <table class="w-full text-sm text-left text-slate-600 relative" id="tabelproduk">
+                        <thead class="text-xs text-white uppercase bg-[#003d9e] sticky top-0 z-10">
+                             <tr>
+                                <th class="px-4 py-3 font-medium border-r border-blue-500 text-center">Kode</th>
+                                <th class="px-4 py-3 font-medium border-r border-blue-500 w-[30%]">Nama Barang</th>
+                                <th class="px-3 py-3 font-medium border-r border-blue-500 text-center">Dus</th>
+                                <th class="px-3 py-3 font-medium border-r border-blue-500 text-right">Harga / Dus</th>
+                                <th class="px-4 py-3 font-medium border-r border-blue-500 text-right">Subtotal</th>
+                                <th class="px-3 py-3 text-center">Aksi</th>
+                             </tr>
+                        </thead>
+                        <tbody id="loadproduk" class="divide-y divide-slate-100 bg-white">
+                             <!-- Rows by JS -->
+                        </tbody>
+                        <tfoot class="bg-slate-50 border-t border-slate-200 sticky bottom-0 z-10">
+                            <tr>
+                                <td colspan="4" class="px-4 py-3 text-right font-bold text-slate-700">SUBTOTAL</td>
+                                <td class="px-4 py-3 text-right font-bold text-slate-800" id="subtotal">Rp 0</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                 </div>
+            </div>
+
         </div>
-    </div>
+
+        <!-- RIGHT COLUMN: Sidebar (Info + Total + Payment) - span 3 -->
+        <div class="col-span-12 lg:col-span-3 space-y-4">
+            
+            <!-- Header Info -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                <div class="space-y-4">
+                    <!-- No Bukti -->
+                    <div class="relative">
+                        <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">No. Bukti</label>
+                        <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e]">
+                            <span class="pl-3 text-slate-400"><i class="ti ti-barcode"></i></span>
+                            <input type="text" name="no_bukti" id="no_bukti" class="w-full px-2 py-2.5 text-sm border-0 focus:ring-0 placeholder-slate-400" placeholder="No. Bukti">
+                        </div>
+                    </div>
+
+                    <!-- Tanggal -->
+                    <div class="relative">
+                        <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Tanggal</label>
+                        <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e]">
+                            <span class="pl-3 text-slate-400"><i class="ti ti-calendar"></i></span>
+                            <input type="text" name="tanggal" id="tanggal" class="flatpickr-date w-full px-2 py-2.5 text-sm border-0 focus:ring-0 placeholder-slate-400" placeholder="Tanggal">
+                        </div>
+                    </div>
+
+                    <!-- Supplier -->
+                    <div class="relative">
+                        <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Supplier</label>
+                        <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e] bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
+                            <span class="pl-3 text-slate-400"><i class="ti ti-building-store"></i></span>
+                            <input type="text" name="nama_supplier" id="nama_supplier" class="w-full px-2 py-2.5 text-sm border-0 focus:ring-0 bg-transparent placeholder-slate-400 cursor-pointer" placeholder="Pilih Supplier" readonly>
+                        </div>
+                        <input type="hidden" id="kode_supplier" name="kode_supplier">
+                        <input type="hidden" id="kode_cabang_supplier" name="kode_cabang_supplier">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Form -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                 <h5 class="text-xs font-bold text-slate-700 uppercase mb-3">Pembayaran</h5>
+                 
+                 <div class="space-y-3">
+                    <div class="relative">
+                        <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Jenis Transaksi</label>
+                        <select name="jenis_transaksi" id="jenis_transaksi" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e]">
+                            <option value="">Pilih Jenis Transaksi</option>
+                            <option value="T">TUNAI</option>
+                            <option value="K">KREDIT</option>
+                        </select>
+                    </div>
+
+                    <div class="hidden">
+                         <!-- Input Grand Total Real (Hidden Visual, used for post) -->
+                         <input type="text" name="grandtotal" id="grandtotal" class="money">
+                         <!-- Hidden Potongan Inputs -->
+                        <input type="hidden" id="potongan_aida" name="potongan_aida" value="0">
+                        <input type="hidden" id="potongan_swan" name="potongan_swan" value="0">
+                        <input type="hidden" id="potongan_stick" name="potongan_stick" value="0">
+                        <input type="hidden" id="potongan_sambal" name="potongan_sambal" value="0">
+                        <input type="hidden" id="potis_aida" name="potis_aida" value="0">
+                        <input type="hidden" id="potis_swan" name="potis_swan" value="0">
+                        <input type="hidden" id="potis_stick" name="potis_stick" value="0">
+                        <input type="hidden" id="peny_aida" name="peny_aida" value="0">
+                        <input type="hidden" id="peny_swan" name="peny_swan" value="0">
+                        <input type="hidden" id="peny_stick" name="peny_stick" value="0">
+                    </div>
+
+
+                    <div class="hidden" id="jenis_bayar_tunai">
+                         <div class="relative mt-4">
+                            <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Jenis Bayar</label>
+                            <select name="jenis_bayar" id="jenis_bayar" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e]">
+                                <option value="">Pilih Jenis Bayar</option>
+                                <option value="TN">CASH</option>
+                                <option value="TR">TRANSFER</option>
+                            </select>
+                        </div>
+                    </div>
+
+                     <div class="hidden" id="titipan">
+                        <div class="relative mt-4">
+                            <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Titipan</label>
+                            <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden">
+                                <span class="pl-3 text-slate-400"><i class="ti ti-moneybag"></i></span>
+                                <input type="text" name="titipan" class="money w-full px-3 py-2 text-right text-sm border-0 focus:ring-0" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+
+                 </div>
+                 
+                 <button type="submit" id="btnSimpan" class="w-full px-4 py-3 text-sm font-bold text-white bg-[#003d9e] hover:bg-blue-800 rounded-lg shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 mt-6">
+                    <i class="ti ti-send"></i> Submit
+                </button>
+            </div>
+        </div>
+
     </div>
 </form>
 
 <x-modal-form id="modal" size="modal-xl" show="loadmodal" title="" />
 <x-modal-form id="modaleditProduk" size="" show="loadmodaleditProduk" title="" />
+<!-- Modal Supplier preserved -->
 <div class="modal fade" id="modalSupplier" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog">
         <div class="modal-content">
@@ -529,7 +299,7 @@
             order: [
                 [2, 'asc']
             ],
-            ajax: '{{ url()->current() }}',
+            ajax: '{{ route("suppliermarketing.getjson") }}',
             bAutoWidth: false,
             columns: [{
                     data: 'DT_RowIndex',
@@ -618,7 +388,7 @@
         function getSupplier(kode_supplier) {
             buttonDisable();
             $.ajax({
-                url: `/supplier/${kode_supplier}/getSupplier`,
+                url: `/suppliermarketing/${kode_supplier}/get-detail`,
                 type: "GET",
                 cache: false,
                 success: function(response) {
@@ -707,17 +477,25 @@
             let nama_produk = $(this).attr('nama_produk');
             let isi_pcs_dus = $(this).attr('isi_pcs_dus');
             let isi_pcs_pack = $(this).attr('isi_pcs_pack');
-            let kode_kategori_diskon = $(this).attr('kode_kategori_diskon');
+            let harga_supplier = $(this).attr('harga_supplier');
 
             // Set nilai produk
-            $("#kode_harga").val(""); // Kosongkan karena tidak ada dari getproduk
+            $("#kode_harga").val(""); 
             $("#kode_produk").val(kode_produk);
             $("#nama_produk").val(nama_produk);
-            $("#harga_dus").val("");
+            
+            // Set default harga from supplier
+            if(harga_supplier && harga_supplier != "" && harga_supplier != "0") {
+                 let formattedHarga = new Intl.NumberFormat('id-ID').format(harga_supplier);
+                 $("#harga_dus").val(formattedHarga);
+                 $("#harga_dus_produk").val(harga_supplier);
+            } else {
+                $("#harga_dus").val("");
+                $("#harga_dus_produk").val("");
+            }
+
             $("#harga_pack").val("");
             $("#harga_pcs").val("");
-
-            $("#harga_dus_produk").val("");
             $("#harga_pack_produk").val("");
             $("#harga_pcs_produk").val("");
 

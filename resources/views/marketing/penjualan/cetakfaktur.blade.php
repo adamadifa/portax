@@ -56,7 +56,7 @@
                         <td>FAKTUR</td>
                     </tr>
                     <tr>
-                        <td>NOMOR {{ $penjualan->no_faktur }}</td>
+                        <td>NOMOR {{ !empty($penjualan->no_fak_new) ? $penjualan->no_fak_new : $penjualan->no_faktur }}</td>
                     </tr>
                 </table>
             </td>
@@ -225,7 +225,7 @@
                         <td>FAKTUR</td>
                     </tr>
                     <tr>
-                        <td>NOMOR {{ $penjualan->no_faktur }}</td>
+                        <td>NOMOR {{ !empty($penjualan->no_fak_new) ? $penjualan->no_fak_new : $penjualan->no_faktur }}</td>
                     </tr>
                 </table>
             </td>
@@ -381,7 +381,7 @@
                             <td>FAKTUR</td>
                         </tr>
                         <tr>
-                            <td>NOMOR {{ $penjualan->no_faktur }}</td>
+                            <td>NOMOR {{ !empty($penjualan->no_fak_new) ? $penjualan->no_fak_new : $penjualan->no_faktur }}</td>
                         </tr>
                     </table>
                 </td>

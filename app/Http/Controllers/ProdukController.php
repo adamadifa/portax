@@ -131,7 +131,8 @@ class ProdukController extends Controller
         $produk = Produk::orderBy('kode_produk')
         ->join('produk_kategori', 'produk.kode_kategori_produk', '=', 'produk_kategori.kode_kategori_produk')
         ->join('produk_jenis', 'produk.kode_jenis_produk', '=', 'produk_jenis.kode_jenis_produk')
-        ->select('produk.*', 'produk_kategori.nama_kategori_produk', 'produk_jenis.nama_jenis_produk')
+        ->leftJoin('harga_supplier', 'produk.kode_produk', '=', 'harga_supplier.kode_produk')
+        ->select('produk.*', 'produk_kategori.nama_kategori_produk', 'produk_jenis.nama_jenis_produk', 'harga_supplier.harga as harga_supplier')
         ->where('status_aktif_produk', 1)
         ->get();
 

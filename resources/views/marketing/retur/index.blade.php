@@ -1,247 +1,418 @@
 @extends('layouts.app')
-@section('titlepage', 'Retur')
+@section('titlepage', 'Data Retur')
 
 @section('content')
-@section('navigasi')
-    <span>Retur</span>
-@endsection
+    <!-- Page Header -->
+    <div class="mb-5 flex flex-col md:flex-row items-center justify-between gap-4">
+        <!-- Title & Subtitle -->
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800 leading-tight">Data Retur</h2>
+            <p class="text-sm text-slate-500">Manage return transactions.</p>
+        </div>
+        <!-- Actions -->
+        <div class="flex flex-wrap gap-2">
+            @can('retur.create')
+                <a href="{{ route('retur.create') }}" class="bg-[#003d9e] hover:bg-blue-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-sm shadow-blue-200 text-sm font-medium" id="btnCreate">
+                    <i class="ti ti-plus"></i>
+                    <span>Input Retur</span>
+                </a>
+            @endcan
+        </div>
+    </div>
 
+    <!-- Content Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200">
+        
+        <!-- Search & Filter / Toolbar -->
+        <div class="p-3 border-b border-slate-100 bg-slate-50/50">
+            <form action="{{ route('retur.index') }}" class="grid grid-cols-1 md:grid-cols-12 gap-x-3 gap-y-1">
+                
+                @php
+                    $userHasCabang = false;
+                @endphp
+                @hasanyrole($roles_show_cabang)
+                    @php $userHasCabang = true; @endphp
+                @endhasanyrole
+
+                <!-- Row 1: Date Filters (Full Width Split) -->
+                
+                <!-- Dari Tgl -->
+                <div class="md:col-span-6 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ti ti-calendar text-slate-400"></i>
+                    </div>
+                    <input type="text" name="dari" value="{{ Request('dari') }}" 
+                        class="flatpickr-date w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 placeholder-slate-400 transition-all font-medium"
+                        placeholder="Dari Tanggal">
+                </div>
+
+                <!-- Sampai Tgl -->
+                <div class="md:col-span-6 relative">
+                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ti ti-calendar text-slate-400"></i>
+                    </div>
+                    <input type="text" name="sampai" value="{{ Request('sampai') }}" 
+                        class="flatpickr-date w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 placeholder-slate-400 transition-all font-medium"
+                        placeholder="Sampai Tanggal">
+                </div>
+
+                <!-- Row 2: Other Filters & Action -->
+                
+@section('style')
 <style>
-    /* Retur Page Specific Styles */
-    .retur-card {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
-        overflow: hidden;
+    /* Select2 Customization to match Tailwind Inputs perfectly */
+    .select2-container .select2-selection--single {
+        height: 42px !important; /* Match Tailwind input height */
+        background-color: #fff !important;
+        border: 1px solid #cbd5e1 !important; /* slate-300 */
+        border-radius: 0.5rem !important; /* rounded-lg */
+        box-sizing: border-box !important;
+    }
+    
+    /* Text Adjustment */
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #334155 !important; /* slate-700 */
+        font-size: 0.875rem !important; /* text-sm */
+        font-weight: 500 !important;
+        padding-left: 2.75rem !important; /* Space for icon */
+        padding-right: 2rem !important;
+        line-height: 40px !important; /* Vertically center text */
+        display: block !important;
     }
 
-    .retur-header {
-        background: linear-gradient(135deg, #03204f 0%, #1e3a8a 100%);
-        color: #ffffff !important;
-        padding: 16px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
+    /* Placeholder Color */
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #94a3b8 !important; /* slate-400 */
     }
 
-    .retur-header h4 {
-        margin: 0;
-        font-weight: 700;
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: #ffffff !important;
+    /* Arrow Positioning */
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 40px !important;
+        right: 8px !important;
+        top: 0 !important;
+        position: absolute;
     }
 
-    .retur-header i {
-        color: #ffffff !important;
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: #94a3b8 transparent transparent transparent !important;
+        margin-top: -2px !important;
     }
 
-    .retur-header .btn {
-        background: #ffc800;
-        color: #1a1a1a;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-weight: 600;
-        font-size: 14px;
-        transition: all 0.2s;
-        white-space: nowrap;
+    /* Focus State */
+    .select2-container--default.select2-container--open .select2-selection--single,
+    .select2-container--default .select2-selection--single:focus {
+        border-color: #003d9e !important;
+        box-shadow: 0 0 0 2px rgba(0, 61, 158, 0.2) !important; 
+        outline: none;
     }
 
-    .retur-header .btn:hover {
-        background: #ffd700;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(255, 200, 0, 0.3);
+    /* Dropdown Panel */
+    .select2-dropdown {
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 0.5rem !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        z-index: 9999;
+        margin-top: 4px;
+        background-color: #fff !important;
+    }
+
+    .select2-results__option {
+        padding: 8px 12px;
+        font-size: 0.875rem;
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #003d9e !important; /* Primary Brand Blue */
+        color: white !important;
+    }
+    
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 0.375rem !important;
+        padding: 6px 12px !important;
+    }
+
+    .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+        border-color: #003d9e !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+
+    /* Ensure dropdowns appear above cards */
+    [x-data] > div[x-show] {
+        z-index: 100 !important;
+    }
+
+    /* Alpine.js cloak */
+    [x-cloak] {
+        display: none !important;
+    }
+
+    /* Pure CSS Print Dropdown - No JavaScript needed */
+    .print-dropdown-wrapper {
+        position: relative;
+    }
+
+    .print-dropdown-menu {
+        z-index: 100;
+        pointer-events: none;
+    }
+
+    .print-dropdown-wrapper:hover .print-dropdown-menu,
+    .print-dropdown-menu:hover {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto;
     }
 </style>
+@endsection
 
-<div class="row">
-    <div class="col-lg-12 col-sm-12 col-xs-12">
-        <div class="card retur-card">
-            <div class="retur-header">
-                <h4>
-                    <i class="ti ti-arrow-back-up"></i>
-                    Data Retur
-                </h4>
-                <div class="btn-group">
-                    @can('retur.create')
-                        <a href="{{ route('retur.create') }}" class="btn" id="btnCreate">
-                            <i class="ti ti-plus me-2"></i>Input Retur
-                        </a>
-                    @endcan
+                <!-- Cabang (Conditional) -->
+                @if($userHasCabang)
+                <div class="md:col-span-2 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                        <i class="ti ti-building text-slate-400"></i>
+                    </div>
+                    <select name="kode_cabang_search" id="kode_cabang_search" class="select2Kodecabangsearch w-full pl-10 pr-8 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 appearance-none cursor-pointer font-medium">
+                        <option value="">Semua Cabang</option>
+                        @foreach ($cabang as $c)
+                            <option value="{{ $c->kode_cabang }}" {{ Request('kode_cabang_search') == $c->kode_cabang ? 'selected' : '' }}>{{ $c->nama_cabang }}</option>
+                        @endforeach
+                    </select>
                 </div>
-            </div>
-            <div class="card-body" style="padding: 20px;">
-                <!-- Search Form -->
-                <div class="search-card">
-                    <form action="{{ route('retur.index') }}">
-                        <!-- Row 1: Dari dan Sampai (Full Width dibagi 2) -->
-                        <div class="row g-2 mb-1">
-                            <div class="col-lg-6 col-sm-12 col-md-12">
-                                <x-input-with-icon label="Dari" value="{{ Request('dari') }}" name="dari" icon="ti ti-calendar"
-                                    datepicker="flatpickr-date" />
-                            </div>
-                            <div class="col-lg-6 col-sm-12 col-md-12">
-                                <x-input-with-icon label="Sampai" value="{{ Request('sampai') }}" name="sampai" icon="ti ti-calendar"
-                                    datepicker="flatpickr-date" />
-                            </div>
+                @endif
+                
+
+                 <!-- Salesman -->
+                 <div class="{{ $userHasCabang ? 'md:col-span-2' : 'md:col-span-3' }} relative">
+                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                        <i class="ti ti-tie text-slate-400"></i>
+                    </div>
+                     <select name="kode_salesman_search" id="kode_salesman_search" class="select2Kodesalesmansearch w-full pl-10 pr-8 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 appearance-none cursor-pointer font-medium">
+                         <option value="">Semua Salesman</option>
+                     </select>
+                </div>
+
+                 <!-- No Faktur -->
+                 <div class="{{ $userHasCabang ? 'md:col-span-2' : 'md:col-span-3' }} relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ti ti-barcode text-slate-400"></i>
+                    </div>
+                    <input type="text" name="no_faktur_search" value="{{ Request('no_faktur_search') }}" 
+                        class="w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 placeholder-slate-400 transition-all font-medium"
+                        placeholder="No. Faktur">
+                </div>
+
+                <!-- Kode Pelanggan -->
+                 <div class="md:col-span-2 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ti ti-code text-slate-400"></i>
+                    </div>
+                    <input type="text" name="kode_pelanggan_search" value="{{ Request('kode_pelanggan_search') }}" 
+                        class="w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 placeholder-slate-400 transition-all font-medium"
+                        placeholder="Kode Pelanggan">
+                </div>
+
+                <!-- Nama Pelanggan -->
+                 <div class="{{ $userHasCabang ? 'md:col-span-3' : 'md:col-span-3' }} relative">
+                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ti ti-user text-slate-400"></i>
+                    </div>
+                    <input type="text" name="nama_pelanggan_search" value="{{ Request('nama_pelanggan_search') }}" 
+                        class="w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 placeholder-slate-400 transition-all font-medium"
+                        placeholder="Nama Pelanggan">
+                </div>
+
+                <!-- Search Button (Icon Only) -->
+                <div class="md:col-span-1">
+                    <button type="submit" class="h-full w-full bg-[#003d9e] hover:bg-blue-800 text-white rounded-lg font-medium text-sm transition-colors shadow-sm shadow-blue-200 flex items-center justify-center">
+                        <i class="ti ti-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div> 
+    <!-- End Filter Section Card -->
+
+    <!-- Card List Container -->
+    <div class="flex flex-col gap-2 mt-3">
+        @forelse ($retur as $d)
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 hover:shadow-md transition-shadow flex flex-col md:flex-row items-start md:items-center gap-3 relative">
+                
+                <!-- 1. Identitas (Left Fixed) -->
+                <div class="flex items-start gap-3 w-full md:w-72 md:shrink-0 border-b md:border-b-0 md:border-r md:border-slate-200/60 pb-2 md:pb-0 md:pr-4">
+                    <!-- Icon placeholder -->
+                    <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                        <i class="ti ti-arrow-back-up text-lg"></i>
+                    </div>
+                    
+                    <div class="flex-1 min-w-0">
+                         <div class="flex items-center gap-2 mb-0.5">
+                            <span class="font-bold text-slate-800 text-sm truncate" title="{{ $d->no_retur }}">{{ $d->no_retur }}</span>
                         </div>
-                        <!-- Row 2: Cabang (jika ada) -->
-                        @hasanyrole($roles_show_cabang)
-                            <div class="row g-2 mb-2">
-                                <div class="col-12">
-                                    <x-select label="Semua Cabang" name="kode_cabang_search" :data="$cabang" key="kode_cabang"
-                                        textShow="nama_cabang" upperCase="true" selected="{{ Request('kode_cabang_search') }}"
-                                        select2="select2Kodecabangsearch" />
-                                </div>
-                            </div>
-                        @endhasanyrole
-                        <!-- Row 3: Salesman, No. Faktur, Kode Pelanggan, Nama Pelanggan sejajar (full width dibagi 4) -->
-                        <div class="row g-2 mb-2">
-                            <div class="col-lg-3 col-sm-12 col-md-12">
-                                <select name="kode_salesman_search" id="kode_salesman_search" class="form-select select2Kodesalesmansearch">
-                                    <option value="">Semua Salesman</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-3 col-md-12 col-sm-12">
-                                <x-input-with-icon label="No. Faktur" value="{{ Request('no_faktur_search') }}" name="no_faktur_search"
-                                    icon="ti ti-barcode" />
-                            </div>
-                            <div class="col-lg-3 col-md-12 col-sm-12">
-                                <x-input-with-icon label="Kode Pelanggan" value="{{ Request('kode_pelanggan_search') }}"
-                                    name="kode_pelanggan_search" icon="ti ti-barcode" />
-                            </div>
-                            <div class="col-lg-3 col-md-12 col-sm-12">
-                                <x-input-with-icon label="Nama Pelanggan" value="{{ Request('nama_pelanggan_search') }}"
-                                    name="nama_pelanggan_search" icon="ti ti-users" />
-                            </div>
+                        <div class="text-xs text-slate-500 font-medium mb-1">
+                            {{ DateToIndo($d->tanggal) }}
                         </div>
-                        <!-- Row 4: Button Cari -->
-                        <div class="row g-2">
-                            <div class="col-12">
-                                <button type="submit" class="btn w-100"
-                                    style="background: #03204f; color: white; border: none; border-radius: 8px; padding: 10px 20px;">
-                                    <i class="ti ti-search me-1"></i>Cari Data
+                         <h4 class="font-bold text-slate-700 text-sm truncate" title="{{ $d->nama_pelanggan }}">
+                             {{ textUpperCase($d->nama_pelanggan) }}
+                        </h4>
+                    </div>
+                </div>
+
+                <!-- 2. Details Info (Horizontal Grid) -->
+                <div class="flex-1 w-full grid grid-cols-2 lg:grid-cols-5 gap-y-2 gap-x-3 items-center">
+                    
+                    <!-- Salesman -->
+                     <div class="min-w-0">
+                        <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-0">Salesman</p>
+                        <span class="text-sm font-medium text-slate-700 truncate block" title="{{ $d->nama_salesman }}">{{ textUpperCase($d->nama_salesman) }}</span>
+                    </div>
+
+                    <!-- Cabang -->
+                    <div class="min-w-0">
+                         <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-0">Cabang</p>
+                         <span class="text-sm font-medium text-slate-700">{{ textUpperCase($d->nama_cabang) }}</span>
+                    </div>
+
+                    <!-- Jenis Retur -->
+                     <div class="min-w-0">
+                        <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-0">Jenis</p>
+                        @if ($d->jenis_retur == 'GB')
+                            <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+                                Ganti Barang
+                            </span>
+                        @else
+                             <span class="inline-flex items-center gap-1 text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded">
+                                Potong Faktur
+                            </span>
+                        @endif
+                    </div>
+
+                    <!-- No Faktur Ref -->
+                    <div class="min-w-0">
+                        <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-0">No. Faktur</p>
+                        <span class="text-xs font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">{{ $d->no_faktur }}</span>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="min-w-0">
+                        <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-0">Total Retur</p>
+                        <span class="text-sm font-bold text-[#003d9e]">{{ formatRupiah($d->total_retur) }}</span>
+                    </div>
+
+                </div>
+
+                <!-- 3. Actions -->
+                <div class="w-full md:w-auto flex flex-col md:flex-row items-center justify-end gap-1 border-t md:border-t-0 md:border-l border-slate-200/60 pt-2 md:pt-0 md:pl-4">
+                    
+                     <div class="inline-flex rounded-md shadow-sm isolate" role="group">
+                        
+                        <!-- Detail -->
+                        @can('retur.show')
+                            <a href="#" class="btnShow group relative w-8 h-8 flex items-center justify-center bg-white text-blue-600 hover:bg-blue-50 border-y border-l border-slate-200 rounded-l-lg hover:z-10 transition-all" 
+                               no_retur="{{ Crypt::encrypt($d->no_retur) }}" title="Detail">
+                                <i class="ti ti-file-description text-xs"></i>
+                            </a>
+                        @endcan
+                        
+                        <!-- Delete -->
+                        @can('retur.delete')
+                             <form method="POST" name="deleteform" class="deleteform d-inline" action="{{ route('retur.delete', Crypt::encrypt($d->no_retur)) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="delete-confirm w-8 h-8 flex items-center justify-center bg-white text-slate-500 hover:bg-rose-50 hover:text-rose-500 border border-slate-200 rounded-r-lg hover:z-10 transition-all" title="Hapus">
+                                    <i class="ti ti-trash text-xs"></i>
                                 </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <!-- Table -->
-                <div class="table-responsive">
-                    <table class="table modern-table">
-                        <thead>
-                            <tr>
-                                <th>No. Retur</th>
-                                <th>Tanggal</th>
-                                <th>No. Faktur</th>
-                                <th>Nama Pelanggan</th>
-                                <th>Nama Cabang</th>
-                                <th>Salesman</th>
-                                <th class="text-center">Jenis Retur</th>
-                                <th class="text-end">Total</th>
-                                <th class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($retur as $d)
-                                <tr>
-                                    <td>
-                                        <span class="code-badge">
-                                            <i class="ti ti-arrow-back-up me-1"></i>{{ $d->no_retur }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <i class="ti ti-calendar me-1" style="color: #6c757d;"></i>{{ DateToIndo($d->tanggal) }}
-                                    </td>
-                                    <td>
-                                        <span class="code-badge" style="background: #6c757d;">
-                                            <i class="ti ti-file-invoice me-1"></i>{{ $d->no_faktur }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="table-name">
-                                            <i class="ti ti-user me-1" style="color: #6c757d;"></i>{{ textUpperCase($d->nama_pelanggan) }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <i class="ti ti-building me-1" style="color: #6c757d;"></i>{{ textUpperCase($d->nama_cabang) }}
-                                    </td>
-                                    <td>
-                                        <i class="ti ti-user-circle me-1" style="color: #6c757d;"></i>{{ textUpperCase($d->nama_salesman) }}
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($d->jenis_retur == 'GB')
-                                            <span class="status-badge aktif">Ganti Barang</span>
-                                        @else
-                                            <span class="status-badge nonaktif">Potong Faktur</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-end" style="font-weight: 600; color: #03204f;">
-                                        {{ formatRupiah($d->total_retur) }}
-                                    </td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            @can('retur.show')
-                                                <a href="#" class="action-btn detail btnShow" 
-                                                   no_retur="{{ Crypt::encrypt($d->no_retur) }}" 
-                                                   title="Detail">
-                                                    <i class="ti ti-file-description"></i>
-                                                </a>
-                                            @endcan
-                                            @can('retur.delete')
-                                                <form method="POST" name="deleteform" class="deleteform d-inline"
-                                                    action="{{ route('retur.delete', Crypt::encrypt($d->no_retur)) }}">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <a href="#" class="action-btn delete delete-confirm" title="Hapus">
-                                                        <i class="ti ti-trash"></i>
-                                                    </a>
-                                                </form>
-                                            @endcan
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="9" class="text-center py-4">
-                                        <i class="ti ti-inbox" style="font-size: 40px; color: #d1d5db;"></i>
-                                        <p class="mt-2" style="color: #9ca3af;">Tidak ada data retur</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </form>
+                        @endcan
+
+                    </div>
                 </div>
 
-                <!-- Pagination -->
-                <div class="pagination-wrapper">
-                    {{ $retur->links() }}
+            </div>
+        @empty
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center text-slate-400 flex flex-col items-center">
+                <div class="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center mb-2">
+                    <i class="ti ti-inbox text-2xl text-slate-300"></i>
+                </div>
+                <h5 class="text-sm font-medium text-slate-600">Tidak ada data retur</h5>
+                <p class="text-xs mt-1">Coba ubah filter pencarian anda.</p>
+            </div>
+        @endforelse
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="text-xs text-slate-500">
+             Showing {{ $retur->firstItem() }} to {{ $retur->lastItem() }} of {{ $retur->total() }} entries
+        </div>
+        <div class="flex gap-1">
+            {{ $retur->links('pagination::tailwind') }} 
+        </div>
+    </div>
+
+
+    <!-- Tailwind Modal Implementation -->
+    <div id="tailwindModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300 ease-out opacity-0" id="modalBackdrop"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-xl bg-white text-left shadow-xl transition-all duration-300 ease-out sm:my-8 sm:w-full sm:max-w-4xl opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" id="modalPanel">
+                    <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                        <div id="modalContent">
+                            <div class="flex justify-center p-8">
+                                <i class="ti ti-loader fa-spin text-[#003d9e] text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<x-modal-form id="modal" size="modal-xl" show="loadmodal" title="" />
+
 @endsection
+
 @push('myscript')
 <script>
     $(function() {
-        function loading() {
-            $("#loadmodal").html(`<div class="sk-wave sk-primary" style="margin:auto">
-            <div class="sk-wave-rect"></div>
-            <div class="sk-wave-rect"></div>
-            <div class="sk-wave-rect"></div>
-            <div class="sk-wave-rect"></div>
-            <div class="sk-wave-rect"></div>
-            </div>`);
-        };
+        $(".flatpickr-date").flatpickr();
 
+         // --- Standard Modal Logic (Tailwind) ---
+        const modal = document.getElementById('tailwindModal');
+        const backdrop = document.getElementById('modalBackdrop');
+        const panel = document.getElementById('modalPanel');
+        const content = document.getElementById('modalContent');
+        
+        function openModal(url) {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                backdrop.classList.remove('opacity-0');
+                panel.classList.remove('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
+                panel.classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
+            }, 10);
+            $("#modalContent").html('<div class="flex justify-center p-8"><i class="ti ti-loader fa-spin text-[#003d9e] text-2xl"></i></div>');
+            $("#modalContent").load(url);
+        }
 
+        function closeModal() {
+            backdrop.classList.add('opacity-0');
+            panel.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
+            panel.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        if (backdrop) backdrop.addEventListener('click', closeModal);
+        window.closeTailwindModal = closeModal; // Expose for child views if needed
+
+        // --- Action Triggers ---
+        $(".btnShow").click(function(e) {
+            e.preventDefault();
+            const no_retur = $(this).attr('no_retur');
+            openModal(`/retur/${no_retur}/show`);
+        });
+
+        // --- Select2 Initialization ---
         const select2Kodecabangsearch = $('.select2Kodecabangsearch');
         if (select2Kodecabangsearch.length) {
             select2Kodecabangsearch.each(function() {
@@ -266,10 +437,11 @@
             });
         }
 
+        // --- Dependent Dropdown Logic ---
         function getsalesmanbyCabang() {
             var kode_cabang = $("#kode_cabang_search").val();
             var kode_salesman = "{{ Request('kode_salesman_search') }}";
-            //alert(selected);
+            
             $.ajax({
                 type: 'POST',
                 url: '/salesman/getsalesmanbycabang',
@@ -286,19 +458,33 @@
             });
         }
 
+        // Initial Load
         getsalesmanbyCabang();
+
+        // Change Event
         $("#kode_cabang_search").change(function(e) {
             getsalesmanbyCabang();
         });
-
-        $(".btnShow").click(function(e) {
+        
+        // SweetAlert Delete (using global logic or custom)
+         $(".delete-confirm").click(function(e) {
+            var form = $(this).closest("form");
             e.preventDefault();
-            loading();
-            const no_retur = $(this).attr('no_retur');
-            $("#modal").modal("show");
-            $("#modal").find(".modal-title").text("Detail Retur");
-            $("#loadmodal").load(`/retur/${no_retur}/show`);
+            Swal.fire({
+                title: 'Apakah Anda Yakin Data Ini Mau Di Hapus ?',
+                text: "Jika Dihapus Maka Data Akan Hilang Permanen",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Hapus Saja!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            })
         });
+
     });
 </script>
 @endpush

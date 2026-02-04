@@ -1,11 +1,14 @@
 @extends('layouts.app')
+@section('titlepage', 'Detail Penjualan')
+@section('style')
 <link rel="stylesheet" href="{{ asset('assets/vendor/css/pages/page-profile.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/vendor/libs/leaflet/leaflet.css') }}" />
 <style>
     #map {
         height: 200px;
     }
 </style>
-@section('titlepage', 'Detail Penjualan')
+@endsection
 
 @section('content')
 @section('navigasi')
@@ -217,7 +220,7 @@
                         <table class="table">
                             <tr>
                                 <th>No. Faktur</th>
-                                <td class="font-weight-bold">{{ $penjualan->no_faktur }}</td>
+                                <td class="font-weight-bold">{{ !empty($penjualan->no_fak_new) ? $penjualan->no_fak_new : $penjualan->no_faktur }}</td>
                             </tr>
                             <tr>
                                 <th>Tanggal</th>
@@ -745,6 +748,7 @@
 @endsection
 
 @push('myscript')
+<script src="{{ asset('assets/vendor/libs/leaflet/leaflet.js') }}"></script>
 <script>
     var latitude = "{{ !empty($penjualan->latitude) ? $penjualan->latitude : '-7.3665114' }}";
     var longitude = "{{ !empty($penjualan->longitude) ? $penjualan->longitude : '108.2148793' }}";

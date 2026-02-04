@@ -68,7 +68,7 @@
             <div>Keuangan</div>
         </a>
         <ul class="menu-sub">
-            @if (auth()->user()->hasAnyPermission(['pembayarantransfer.index', 'pembayarangiro.index']))
+            {{-- @if (auth()->user()->hasAnyPermission(['pembayarantransfer.index', 'pembayarangiro.index']))
                 <li class="menu-item {{ request()->is(['pembayarantransfer', 'pembayarangiro']) ? 'active' : '' }}">
                     <a href="{{ route('pembayarantransfer.index') }}" class="menu-link">
                         <div>Transfer & Giro</div>
@@ -89,7 +89,7 @@
                         <div>Kas Besar</div>
                     </a>
                 </li>
-            @endif
+            @endif --}}
             {{-- @if (auth()->user()->hasAnyPermission(['kontrabonpembelian.index']))
                 <li class="menu-item {{ request()->is(['kontrabonpembelian', 'kontrabonangkutan']) ? 'active' : '' }}">
                     <a href="{{ route('kontrabonpembelian.index') }}" class="menu-link">

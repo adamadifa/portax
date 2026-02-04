@@ -1,40 +1,47 @@
-<form action="{{ route('laporanmarketing.cetakretur') }}" method="POST" target="_blank" id="formRetur">
+<form action="{{ route('laporanmarketing.cetakretur') }}" method="POST" target="_blank" id="formRetur" class="space-y-3">
     @csrf
-    @hasanyrole($roles_show_cabang)
-        <div class="form-group mb-3">
-            <select name="kode_cabang" id="kode_cabang_retur" class="form-select select2Kodecabangretur">
+    
+    <div class="space-y-2">
+        @hasanyrole($roles_show_cabang)
+        <div class="relative">
+             <select name="kode_cabang" id="kode_cabang_retur" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodecabangretur">
                 <option value="">Semua Cabang</option>
                 @foreach ($cabang as $d)
                     <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
                 @endforeach
             </select>
         </div>
-    @endrole
-    <div class="form-group mb-3">
-        @hasanyrole('salesman')
-            <input type="hidden" name="kode_salesman" value="{{ auth()->user()->kode_salesman }}">
-        @else
-            <select name="kode_salesman" id="kode_salesman_retur" class="select2Kodesalesmanretur form-select">
+        @endrole
+        
+        <div class="relative">
+            @hasanyrole('salesman')
+                <input type="hidden" name="kode_salesman" value="{{ auth()->user()->kode_salesman }}">
+                <input type="text" class="w-full px-3 py-2.5 bg-gray-100 border border-slate-300 rounded-lg text-sm text-slate-500" value="{{ auth()->user()->name }}" readonly>
+            @else
+                <select name="kode_salesman" id="kode_salesman_retur" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodesalesmanretur">
+                </select>
+            @endhasanyrole
+        </div>
+
+        <div class="relative">
+            <select name="kode_pelanggan" id="kode_pelanggan_retur" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodepelangganretur">
             </select>
-        @endhasanyrole
-
-    </div>
-    <div class="form-group mb-3">
-        <select name="kode_pelanggan" id="kode_pelanggan_retur" class="select2Kodepelangganretur form-select">
-        </select>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Dari" name="dari" datepicker="flatpickr-date" />
         </div>
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Sampai" name="sampai" datepicker="flatpickr-date" />
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="relative">
+                 <input type="text" name="dari" id="dari" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Dari Tanggal">
+            </div>
+    
+            <div class="relative">
+                 <input type="text" name="sampai" id="sampai" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Sampai Tanggal">
+            </div>
         </div>
     </div>
-    <div class="row">
+
+    <div class="row mt-2">
         <div class="col-lg-10 col-md-12 col-sm-12">
-            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButtonRetur">
+            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButtonRetur" style="background-color: #003d9e; border-color: #003d9e;">
                 <i class="ti ti-printer me-1"></i> Cetak
             </button>
         </div>

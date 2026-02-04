@@ -27,7 +27,7 @@ class ReturController extends Controller
             }
         }
         $rtr = new Retur();
-        $retur = $rtr->getRetur($request, $no_retur = "")->cursorPaginate();
+        $retur = $rtr->getRetur($request, $no_retur = "")->paginate(15);
         $retur->appends(request()->all());
         $data['retur'] = $retur;
 

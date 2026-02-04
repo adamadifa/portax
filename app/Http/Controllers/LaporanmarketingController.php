@@ -304,7 +304,8 @@ class LaporanmarketingController extends Controller
             'marketing_penjualan.created_at',
             'marketing_penjualan.updated_at',
             'users.name as nama_user',
-            'marketing_penjualan.status_batal'
+            'marketing_penjualan.status_batal',
+            'marketing_penjualan.no_fak_new'
         );
         $qpenjualan->addSelect(DB::raw('(SELECT SUM(subtotal) FROM marketing_penjualan_detail WHERE no_faktur = marketing_penjualan.no_faktur) as total_bruto'));
 
@@ -507,6 +508,7 @@ class LaporanmarketingController extends Controller
         $qpenjualan->select(
             'marketing_penjualan_detail.no_faktur',
             'marketing_penjualan.no_faktur',
+            'marketing_penjualan.no_fak_new',
             'marketing_penjualan.tanggal',
             'marketing_penjualan.kode_pelanggan',
             'pelanggan.nama_pelanggan',
@@ -574,6 +576,7 @@ class LaporanmarketingController extends Controller
         $qpenjualan->groupBy(
             'marketing_penjualan_detail.no_faktur',
             'marketing_penjualan.no_faktur',
+            'marketing_penjualan.no_fak_new',
             'marketing_penjualan.tanggal',
             'marketing_penjualan.kode_pelanggan',
             'pelanggan.nama_pelanggan',
@@ -698,6 +701,7 @@ class LaporanmarketingController extends Controller
         $qpenjualan->select(
             'marketing_penjualan_detail.no_faktur',
             'marketing_penjualan.no_faktur',
+            'marketing_penjualan.no_fak_new',
             'marketing_penjualan.tanggal',
             'marketing_penjualan.kode_pelanggan',
             'pelanggan.nama_pelanggan',

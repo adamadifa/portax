@@ -18,6 +18,7 @@
                         </button>
                     </li>
                 @endcan
+                {{-- 
                 @can('keu.ledger')
                     <li class="nav-item" role="presentation">
                         <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#ledger" aria-controls="ledger"
@@ -143,7 +144,7 @@
                         </button>
                     </li>
                 @endcan
-
+                --}}
             </ul>
             <div class="tab-content">
                 @can('keu.kaskecil')
@@ -151,6 +152,7 @@
                         @include('keuangan.laporan.kaskecil')
                     </div>
                 @endcan
+                {{-- 
                 @can('keu.ledger')
                     <div class="tab-pane fade" id="ledger" role="tabpanel">
                         @include('keuangan.laporan.ledger')
@@ -226,6 +228,7 @@
                         @include('keuangan.laporan.rekapkartupiutang')
                     </div>
                 @endcan
+                 --}}
 
             </div>
         </div>

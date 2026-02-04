@@ -1,31 +1,29 @@
-<form action="{{ route('laporanmarketing.cetakrekapwilayah') }}" id="formRekapwilayah" target="_blank" method="POST">
+<form action="{{ route('laporanmarketing.cetakrekapwilayah') }}" id="formRekapwilayah" target="_blank" method="POST" class="space-y-3">
     @csrf
-    @hasanyrole($roles_show_cabang)
-        <div class="form-group mb-3">
-            <select name="kode_cabang" id="kode_cabang_rekapwilayah" class="form-select select2Kodecabangrekapwilayah">
-                <option value="">Cabang</option>
+    <div class="space-y-4">
+        @hasanyrole($roles_show_cabang)
+        <div class="relative">
+            <select name="kode_cabang" id="kode_cabang_rekapwilayah" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodecabangrekapwilayah">
+                <option value="">Semua Cabang</option>
                 @foreach ($cabang as $d)
                     <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
                 @endforeach
             </select>
         </div>
-    @endrole
-    <div class="row">
-        <div class="col">
-            <div class="form-group mb-3">
-                <select name="tahun" id="tahun" class="form-select">
-                    <option value="">Tahun</option>
-                    @for ($t = $start_year; $t <= date('Y'); $t++)
-                        <option value="{{ $t }}">{{ $t }}</option>
-                    @endfor
-                </select>
-            </div>
+        @endrole
+        <div class="relative">
+            <select name="tahun" id="tahun" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none form-select">
+                <option value="">Tahun</option>
+                @for ($t = $start_year; $t <= date('Y'); $t++)
+                    <option value="{{ $t }}">{{ $t }}</option>
+                @endfor
+            </select>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row mt-3">
         <div class="col-lg-10 col-md-12 col-sm-12">
-            <button type="submit" class="btn btn-primary w-100">
+            <button type="submit" class="btn btn-primary w-100" style="background-color: #003d9e; border-color: #003d9e;">
                 <i class="ti ti-printer me-1"></i> Cetak
             </button>
         </div>

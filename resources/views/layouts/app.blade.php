@@ -65,6 +65,7 @@
             border-radius: 0.75rem !important;
             padding: 0.5rem !important;
             width: auto !important;
+            z-index: 9999 !important;
         }
         .flatpickr-calendar.arrowTop:before, .flatpickr-calendar.arrowTop:after {
             border-bottom-color: #ffffff !important;

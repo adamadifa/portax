@@ -289,7 +289,7 @@
                     
                     <div class="flex-1 min-w-0">
                          <div class="flex items-center gap-2 mb-0.5">
-                            <span class="font-bold text-slate-800 text-sm truncate" title="{{ $d->no_faktur }}">{{ $d->no_faktur }}</span>
+                            <span class="font-bold text-slate-800 text-sm truncate" title="{{ $d->no_faktur }}">{{ !empty($d->no_fak_new) ? $d->no_fak_new : $d->no_faktur }}</span>
                         </div>
                         <div class="text-xs text-slate-500 font-medium mb-1">
                             {{ date('d-m-Y', strtotime($d->tanggal)) }}

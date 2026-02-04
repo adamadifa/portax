@@ -2,246 +2,178 @@
 @section('titlepage', 'Pembelian Marketing')
 
 @section('content')
-@section('navigasi')
-    <span>Pembelian Marketing</span>
-@endsection
-
-<style>
-    /* Pembelian Page Specific Styles */
-    .pembelian-card {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
-        overflow: hidden;
-    }
-
-    .pembelian-header {
-        background: linear-gradient(135deg, #03204f 0%, #1e3a8a 100%);
-        color: #ffffff !important;
-        padding: 16px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    .pembelian-header h4 {
-        margin: 0;
-        font-weight: 700;
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: #ffffff !important;
-    }
-
-    .pembelian-header i {
-        color: #ffffff !important;
-    }
-
-    .pembelian-header .btn {
-        background: #ffc800;
-        color: #1a1a1a;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-weight: 600;
-        font-size: 14px;
-        transition: all 0.2s;
-        white-space: nowrap;
-    }
-
-    .pembelian-header .btn:hover {
-        background: #ffd700;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(255, 200, 0, 0.3);
-    }
-
-    .pembelian-header .btn-group {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    .info-alert {
-        border-radius: 10px;
-        border: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        margin-bottom: 20px;
-    }
-</style>
-
-<div class="row">
-    <div class="col-lg-12 col-sm-12 col-xs-12">
-        <!-- Info Alert -->
-        <div class="alert alert-info alert-dismissible d-flex align-items-baseline info-alert" role="alert">
-            <span class="alert-icon alert-icon-lg text-info me-2">
-                <i class="ti ti-info-circle ti-sm"></i>
-            </span>
-            <div class="d-flex flex-column ps-1">
-                <h5 class="alert-heading mb-2">Informasi</h5>
-                <p class="mb-0">
-                    Halaman untuk mengelola data pembelian marketing
-                </p>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+    <!-- Page Header -->
+    <div class="mb-5 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800 leading-tight">Data Pembelian Marketing</h2>
+            <p class="text-sm text-slate-500">Manage pembelian marketing data.</p>
         </div>
-
-        <div class="card pembelian-card">
-            <div class="pembelian-header">
-                <h4>
-                    <i class="ti ti-shopping-bag"></i>
-                    Data Pembelian Marketing
-                </h4>
-                <div class="btn-group">
-                    @can('pembelianmarketing.create')
-                        <a href="{{ route('pembelianmarketing.create') }}" class="btn" id="btnCreate">
-                            <i class="ti ti-plus me-2"></i>Input Pembelian
-                        </a>
-                    @endcan
-                </div>
-            </div>
-            <div class="card-body" style="padding: 20px;">
-                <!-- Search Form -->
-                <div class="search-card">
-                    <form action="{{ route('pembelianmarketing.index') }}">
-                        <!-- Row 1: Dari dan Sampai (Full Width dibagi 2) -->
-                        <div class="row g-2 mb-1">
-                            <div class="col-lg-6 col-sm-12 col-md-12">
-                                <x-input-with-icon label="Dari" value="{{ Request('dari') }}" name="dari" icon="ti ti-calendar"
-                                    datepicker="flatpickr-date" />
-                            </div>
-                            <div class="col-lg-6 col-sm-12 col-md-12">
-                                <x-input-with-icon label="Sampai" value="{{ Request('sampai') }}" name="sampai" icon="ti ti-calendar"
-                                    datepicker="flatpickr-date" />
-                            </div>
-                        </div>
-                        <!-- Row 2: No. Bukti, Kode Supplier, Nama Supplier sejajar (full width dibagi 3) -->
-                        <div class="row g-2 mb-2">
-                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                <x-input-with-icon label="No. Bukti" value="{{ Request('no_bukti_search') }}" name="no_bukti_search"
-                                    icon="ti ti-barcode" />
-                            </div>
-                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                <x-input-with-icon label="Kode Supplier" value="{{ Request('kode_supplier_search') }}" name="kode_supplier_search"
-                                    icon="ti ti-barcode" />
-                            </div>
-                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                <x-input-with-icon label="Nama Supplier" value="{{ Request('nama_supplier_search') }}" name="nama_supplier_search"
-                                    icon="ti ti-users" />
-                            </div>
-                        </div>
-                        <!-- Row 4: Button Cari -->
-                        <div class="row g-2">
-                            <div class="col-12">
-                                <button type="submit" class="btn w-100"
-                                    style="background: #03204f; color: white; border: none; border-radius: 8px; padding: 10px 20px;">
-                                    <i class="ti ti-search me-1"></i>Cari Data
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <!-- Table -->
-                <div class="table-responsive">
-                    <table class="table modern-table">
-                        <thead>
-                            <tr>
-                                <th>No. Bukti</th>
-                                <th>Tanggal</th>
-                                <th>Nama Supplier</th>
-                                <th class="text-end">Total</th>
-                                <th class="text-center">JT</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($pembelian as $d)
-                                @php
-                                    $total_netto = $d->total_bruto ?? 0;
-                                @endphp
-
-                                <tr>
-                                    <td>
-                                        <span class="code-badge">
-                                            <i class="ti ti-file-invoice me-1"></i>{{ $d->no_bukti }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <i class="ti ti-calendar me-1" style="color: #6c757d;"></i>{{ date('d-m-Y', strtotime($d->tanggal)) }}
-                                    </td>
-                                    <td>
-                                        <div class="table-name">
-                                            <i class="ti ti-building-store me-1" style="color: #6c757d;"></i>{{ $d->nama_supplier }}
-                                        </div>
-                                    </td>
-                                    <td class="text-end" style="font-weight: 600; color: #03204f;">
-                                        {{ formatAngka($total_netto) }}
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($d->jenis_transaksi == 'T')
-                                            <span class="status-badge aktif">{{ $d->jenis_transaksi }}</span>
-                                        @elseif($d->jenis_transaksi == 'K')
-                                            <span class="status-badge nonaktif">{{ $d->jenis_transaksi }}</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($d->status == '1')
-                                            <span class="status-badge aktif">Lunas</span>
-                                        @else
-                                            <span class="status-badge nonaktif">Belum Lunas</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <div class="action-buttons">
-
-                                            @can('pembelianmarketing.show')
-                                                <a href="{{ route('pembelianmarketing.show', Crypt::encrypt($d->no_bukti)) }}"
-                                                    class="action-btn detail" title="Detail">
-                                                    <i class="ti ti-file-description"></i>
-                                                </a>
-                                            @endcan
-                                            @can('pembelianmarketing.delete')
-                                                <form method="POST" name="deleteform" class="deleteform d-inline"
-                                                    action="{{ route('pembelianmarketing.delete', Crypt::encrypt($d->no_bukti)) }}">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <a href="#" class="action-btn delete delete-confirm" title="Hapus">
-                                                        <i class="ti ti-trash"></i>
-                                                    </a>
-                                                </form>
-                                            @endcan
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="text-center py-4">
-                                        <i class="ti ti-inbox" style="font-size: 40px; color: #d1d5db;"></i>
-                                        <p class="mt-2" style="color: #9ca3af;">Tidak ada data pembelian</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination -->
-                <div class="pagination-wrapper">
-                    {{ $pembelian->links() }}
-                </div>
-            </div>
+        <div class="flex flex-wrap gap-2">
+            @can('pembelianmarketing.create')
+                <a href="{{ route('pembelianmarketing.create') }}" class="bg-[#003d9e] hover:bg-blue-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-sm shadow-blue-200 text-sm font-medium">
+                    <i class="ti ti-plus"></i>
+                    <span>Input Pembelian</span>
+                </a>
+            @endcan
         </div>
     </div>
-</div>
-<x-modal-form id="modal" size="" show="loadmodal" title="" />
+
+    <!-- Info Alert -->
+     <div class="mb-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
+        <i class="ti ti-info-circle text-blue-600 text-xl mt-0.5"></i>
+        <div class="text-sm text-blue-800">
+            <h5 class="font-bold mb-1">Informasi</h5>
+            <p class="mb-0">
+                Halaman untuk mengelola data pembelian marketing.
+            </p>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-4">
+        <div class="p-3 border-b border-slate-100 bg-slate-50/50">
+              <form action="{{ route('pembelianmarketing.index') }}" class="grid grid-cols-1 md:grid-cols-12 gap-x-3 gap-y-2">
+                 <!-- Row 1 -->
+                 <div class="md:col-span-2 relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ti ti-calendar text-slate-400"></i>
+                    </div>
+                      <input type="text" name="dari" value="{{ Request('dari') }}" class="flatpickr-date w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] placeholder-slate-400 transition-all font-medium" placeholder="Dari Tanggal">
+                 </div>
+                 <div class="md:col-span-2 relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ti ti-calendar text-slate-400"></i>
+                    </div>
+                      <input type="text" name="sampai" value="{{ Request('sampai') }}" class="flatpickr-date w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] placeholder-slate-400 transition-all font-medium" placeholder="Sampai Tanggal">
+                 </div>
+                 <div class="md:col-span-2 relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ti ti-barcode text-slate-400"></i>
+                    </div>
+                      <input type="text" name="no_bukti_search" value="{{ Request('no_bukti_search') }}" class="w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] placeholder-slate-400 transition-all font-medium" placeholder="No. Bukti">
+                 </div>
+                 <div class="md:col-span-2 relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ti ti-barcode text-slate-400"></i>
+                    </div>
+                      <input type="text" name="kode_supplier_search" value="{{ Request('kode_supplier_search') }}" class="w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] placeholder-slate-400 transition-all font-medium" placeholder="Kode Supplier">
+                 </div>
+                 <div class="md:col-span-3 relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ti ti-users text-slate-400"></i>
+                    </div>
+                      <input type="text" name="nama_supplier_search" value="{{ Request('nama_supplier_search') }}" class="w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] placeholder-slate-400 transition-all font-medium" placeholder="Nama Supplier">
+                 </div>
+                  <div class="md:col-span-1">
+                    <button type="submit" class="h-full w-full bg-[#003d9e] hover:bg-blue-800 text-white rounded-lg font-medium text-sm transition-colors shadow-sm shadow-blue-200 flex items-center justify-center">
+                        <i class="ti ti-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Data List -->
+    <div class="flex flex-col gap-2 mt-3">
+        @forelse ($pembelian as $d)
+            @php
+                 $total_netto = $d->total_bruto ?? 0;
+            @endphp
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 hover:shadow-md transition-shadow flex flex-col md:flex-row items-center gap-3">
+                <!-- Identitas -->
+                 <div class="flex items-start gap-3 w-full md:w-72 md:shrink-0 border-b md:border-b-0 md:border-r md:border-slate-200/60 pb-2 md:pb-0 md:pr-4">
+                     <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                        <i class="ti ti-file-invoice text-lg"></i>
+                    </div>
+                     <div class="flex-1 min-w-0">
+                         <div class="flex items-center gap-2 mb-0.5">
+                            <span class="font-bold text-slate-800 text-sm truncate">{{ $d->no_bukti }}</span>
+                        </div>
+                        <div class="text-xs text-slate-500 font-medium mb-1">
+                            {{ date('d-m-Y', strtotime($d->tanggal)) }}
+                        </div>
+                         <h4 class="font-bold text-slate-700 text-sm truncate">
+                             {{ $d->nama_supplier }}
+                        </h4>
+                    </div>
+                </div>
+                
+                 <!-- Detail Grid -->
+                 <div class="flex-1 w-full grid grid-cols-2 lg:grid-cols-4 gap-y-2 gap-x-3 items-center">
+                    <!-- Total -->
+                    <div class="min-w-0">
+                        <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-0">Total</p>
+                        <span class="text-sm font-bold text-[#003d9e]">{{ formatAngka($total_netto) }}</span>
+                    </div>
+                    <!-- Jenis -->
+                    <div class="min-w-0">
+                         <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-0">Jenis</p>
+                         @if ($d->jenis_transaksi == 'T')
+                            <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-600">
+                                <i class="ti ti-cash"></i> Tunai
+                            </span>
+                        @else
+                             <span class="inline-flex items-center gap-1 text-xs font-medium text-amber-600">
+                                <i class="ti ti-credit-card"></i> Kredit
+                            </span>
+                        @endif
+                    </div>
+                     <!-- Status -->
+                    <div class="min-w-0">
+                        <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-0">Status</p>
+                        @if ($d->status == '1')
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700">LUNAS</span>
+                        @else
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">BELUM LUNAS</span>
+                        @endif
+                    </div>
+                 </div>
+                 
+                 <!-- Actions -->
+                  <div class="w-full md:w-auto flex flex-col md:flex-row items-center justify-end gap-1 border-t md:border-t-0 md:border-l border-slate-200/60 pt-2 md:pt-0 md:pl-4">
+                       <div class="inline-flex rounded-md shadow-sm isolate" role="group">
+                           @can('pembelianmarketing.show')
+                            <a href="{{ route('pembelianmarketing.show', Crypt::encrypt($d->no_bukti)) }}" class="group relative w-8 h-8 flex items-center justify-center bg-white text-blue-600 hover:bg-blue-50 border-y border-l border-slate-200 rounded-l-lg hover:z-10 transition-all" title="Detail">
+                                <i class="ti ti-file-description text-xs"></i>
+                            </a>
+                           @endcan
+                            @can('pembelianmarketing.delete')
+                                <form method="POST" name="deleteform" class="deleteform d-inline" action="{{ route('pembelianmarketing.delete', Crypt::encrypt($d->no_bukti)) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="delete-confirm w-8 h-8 flex items-center justify-center bg-white text-slate-500 hover:bg-rose-50 hover:text-rose-500 border-y border-r border-slate-200 rounded-r-lg hover:z-10 transition-all" title="Hapus">
+                                        <i class="ti ti-trash text-xs"></i>
+                                    </button>
+                                </form>
+                            @endcan
+                       </div>
+                  </div>
+            </div>
+        @empty
+             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center text-slate-400 flex flex-col items-center">
+                <div class="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center mb-2">
+                    <i class="ti ti-inbox text-2xl text-slate-300"></i>
+                </div>
+                <h5 class="text-sm font-medium text-slate-600">Tidak ada data pembelian</h5>
+                <p class="text-xs mt-1">Coba ubah filter pencarian anda.</p>
+            </div>
+        @endforelse
+    </div>
+    
+     <!-- Pagination -->
+    <div class="mt-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="text-xs text-slate-500">
+             Showing {{ $pembelian->firstItem() }} to {{ $pembelian->lastItem() }} of {{ $pembelian->total() }} entries
+        </div>
+        <div class="flex gap-1">
+            {{ $pembelian->links('pagination::tailwind') }} 
+        </div>
+    </div>
 @endsection
 @push('myscript')
 <script>
     $(function() {
-        // Scripts jika diperlukan
+        $(".flatpickr-date").flatpickr();
     });
 </script>
 @endpush

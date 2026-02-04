@@ -8,13 +8,13 @@
         }
 
         .greeting-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px;
+            background: linear-gradient(135deg, #003d9e 0%, #002a6b 100%);
+            border-radius: 12px;
             padding: 2.5rem;
             color: white;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 61, 158, 0.3);
             margin-bottom: 2rem;
         }
 
@@ -25,7 +25,7 @@
             right: -10%;
             width: 400px;
             height: 400px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 50%;
             z-index: 0;
         }
@@ -37,7 +37,7 @@
             left: -10%;
             width: 300px;
             height: 300px;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 50%;
             z-index: 0;
         }
@@ -50,38 +50,32 @@
         .greeting-time {
             font-size: 1rem;
             font-weight: 500;
-            opacity: 0.95;
+            opacity: 0.9;
             margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-        }
-
-        .greeting-time i {
-            font-size: 1.2rem;
+            color: #e0e7ff;
         }
 
         .greeting-name {
-            font-size: 2rem;
+            font-size: 2.25rem;
             font-weight: 700;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
             line-height: 1.2;
+            color: #ffffff;
         }
 
         .greeting-role {
-            font-size: 1rem;
-            opacity: 0.9;
+            font-size: 0.95rem;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            backdrop-filter: blur(10px);
-        }
-
-        .greeting-role i {
-            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .greeting-icon {
@@ -89,24 +83,31 @@
             right: 2rem;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 8rem;
-            opacity: 0.15;
+            font-size: 9rem;
+            opacity: 0.1;
             z-index: 0;
+            color: white;
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+            border: 1px solid #f1f5f9;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            border-color: #003d9e;
         }
 
-        @media (max-width: 768px) {
-            .greeting-card {
-                padding: 1.5rem;
-            }
-
-            .greeting-name {
-                font-size: 1.5rem;
-            }
-
-            .greeting-icon {
-                font-size: 5rem;
-                right: 1rem;
-            }
+        .icon-box {
+            background-color: #eff6ff;
+            color: #003d9e;
+        }
+        
+        .stat-card:hover .icon-box {
+            background-color: #003d9e;
+            color: #ffffff;
         }
     </style>
 @section('navigasi')
@@ -130,7 +131,7 @@
     }
 @endphp
 <div class="row">
-    <div class="col-xl-12">
+    <div class="col-xl-12 mb-4">
         <div class="greeting-card">
             <div class="greeting-icon">
                 <i class="ti {{ $icon }}"></i>
@@ -151,4 +152,5 @@
         </div>
     </div>
 </div>
+
 @endsection

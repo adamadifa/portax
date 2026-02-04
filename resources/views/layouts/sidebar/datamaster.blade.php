@@ -63,6 +63,11 @@
                          <div>Harga</div>
                      </a>
                  </li>
+                 <li class="menu-item {{ request()->is(['hargasupplier', 'hargasupplier/*']) ? 'active' : '' }}">
+                     <a href="{{ route('hargasupplier.index') }}" class="menu-link">
+                         <div>Harga Supplier</div>
+                     </a>
+                 </li>
              @endcan
              @can('pelanggan.index')
                  <li class="menu-item {{ request()->is(['pelanggan', 'pelanggan/*']) ? 'active' : '' }}">
@@ -105,6 +110,13 @@
                      </a>
                  </li>
              @endcan
+             {{-- @can('suppliermarketing.index') --}}
+             <li class="menu-item {{ request()->is(['suppliermarketing', 'suppliermarketing/*']) ? 'active' : '' }}">
+                 <a href="{{ route('suppliermarketing.index') }}" class="menu-link">
+                     <div>Supplier Marketing</div>
+                 </a>
+             </li>
+             {{-- @endcan --}}
              {{-- <li class="menu-header small text-uppercase">
                  <span class="menu-header-text">HRD</span>
              </li> --}}

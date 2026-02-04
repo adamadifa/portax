@@ -623,6 +623,22 @@ class PenjualanController extends Controller
 
 
 
+            //No. Faktur New (Auto)
+            $no_fak_new = null;
+            if ($request->tanggal >= '2024-03-01' && $salesman->kode_cabang != "PST") {
+                $lastransaksi = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
+                    ->where('tanggal', '>=', $start_date)
+                    ->whereRaw('MID(no_fak_new,6,1)="' . $salesman->kode_sales . '"')
+                    ->where('salesman.kode_cabang', $salesman->kode_cabang)
+                    ->whereRaw('YEAR(tanggal)="' . $thn . '"')
+                    ->whereRaw('LEFT(no_fak_new,3)="' . $salesman->kode_pt . '"')
+                    ->orderBy('no_fak_new', 'desc')
+                    ->first();
+                $last_no_fak_new = $lastransaksi != NULL ? $lastransaksi->no_fak_new : "";
+                $no_fak_new = buatkode($last_no_fak_new, $salesman->kode_pt . $tahun . $salesman->kode_sales, 6);
+            }
+
+
             //No. Bukti Pembayaran
             $lastbayar = Historibayarpenjualan::whereRaw('LEFT(no_bukti,6) = "' . $salesman->kode_cabang . date('y') . '-"')
                 ->orderBy("no_bukti", "desc")
@@ -634,6 +650,7 @@ class PenjualanController extends Controller
             //Insert Penjualan
             $simpanpenjualan = Penjualan::create([
                 'no_faktur' => $no_faktur,
+                'no_fak_new' => $no_fak_new,
                 'tanggal' => $tanggal,
                 'kode_pelanggan' => $kode_pelanggan,
                 'kode_salesman' => $kode_salesman,

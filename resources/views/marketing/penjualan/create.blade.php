@@ -2,7 +2,14 @@
 @section('titlepage', 'Input Penjualan')
 @section('content')
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
     <style>
+        .font-public-sans {
+            font-family: 'Public Sans', sans-serif !important;
+        }
         .nonaktif {
             background-color: red;
         }
@@ -10,340 +17,354 @@
 @section('navigasi')
     <span class="text-muted">Penjualan</span> / <span>Input Penjualan</span>
 @endsection
-<form action="{{ route('penjualan.store') }}" method="POST" id="formPenjualan">
+<form action="{{ route('penjualan.store') }}" method="POST" id="formPenjualan" class="mt-4 font-public-sans">
     @csrf
     <input type="hidden" name="limit_pelanggan" id="limit_pelanggan">
     <input type="hidden" name="sisa_piutang" id="sisa_piutang">
     <input type="hidden" name="siklus_pembayaran" id="siklus_pembayaran">
     <input type="hidden" name="max_kredit" id="max_kredit">
 
-    <div class="row">
-        <div class="col-lg-3 col-sm-12 col-xs-12">
-            <div class="row mb-3">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <x-input-with-icon label="No. Faktur" name="no_faktur" icon="ti ti-barcode" />
-                            <x-input-with-icon label="Tanggal" name="tanggal" icon="ti ti-calendar"
-                                datepicker="flatpickr-date" />
-                            <x-input-with-icon label="Pelanggan" name="nama_pelanggan" icon="ti ti-user"
-                                readonly="true" />
-                            <input type="hidden" id="kode_pelanggan" name="kode_pelanggan">
-                            <input type="hidden" id="kode_cabang_pelanggan" name="kode_cabang_pelanggan">
-                            <x-input-with-icon label="Salesman" name="nama_salesman" icon="ti ti-user"
-                                readonly="true" />
-                            <input type="hidden" name="kode_salesman" id="kode_salesman">
-                            <div class="form-group mb-3">
-                                <textarea name="keterangan" class="form-control" id="" cols="30" rows="5" id="keterangan"
-                                    placeholder="Keterangan"></textarea>
-                            </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- BLOCK 1: Header Info (Top Left - 4 Cols) -->
+        <div class="col-span-12 lg:col-span-4">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 h-full">
+                <div class="space-y-4">
+                    <!-- No Faktur -->
+                    <div class="relative">
+                        <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">No. Faktur</label>
+                        <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e]">
+                            <span class="pl-3 text-slate-400"><i class="ti ti-barcode"></i></span>
+                            <input type="text" name="no_faktur" id="no_faktur" class="w-full px-2 py-2.5 text-sm border-0 focus:ring-0 placeholder-slate-400" placeholder="No. Faktur">
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <div class="card h-100">
-                        <img class="card-img-top" src="../../assets/img/elements/2.jpg" alt="Card image cap"
-                            style="height:250px; object-fit:cover" id="foto">
-                        <div class="card-body">
-                            <p class="card-text" id="alamat_pelanggan">
 
-                            </p>
-                            <table class="table">
-                                <tr>
-                                    <th style="width: 60%">No. HP</th>
-                                    <td id="no_hp_pelanggan" style="width: 40%"></td>
-                                </tr>
-                                <tr>
-                                    <th>Lokasi</th>
-                                    <td id="latitude"></td>
-                                </tr>
-                                <tr>
-                                    <th>Longitude</th>
-                                    <td id="longitude"></td>
-                                </tr>
-                                <tr>
-                                    <th>Limit</th>
-                                    <td id="limit_pelanggan_text"></td>
-                                </tr>
-                                <tr>
-                                    <th>Piutang</th>
-                                    <td id="sisa_piutang_text"></td>
-                                </tr>
-                                <tr>
-                                    <th>Faktur Kredit</th>
-                                    <td id="jmlfaktur_kredit"></td>
-                                </tr>
-                                <tr>
-                                    <th>Saldo Voucher</th>
-                                    <td id="saldo_voucher_text"></td>
-                                </tr>
-                            </table>
+                    <!-- Tanggal -->
+                    <div class="relative">
+                        <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Tanggal</label>
+                        <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e]">
+                            <span class="pl-3 text-slate-400"><i class="ti ti-calendar"></i></span>
+                            <input type="text" name="tanggal" id="tanggal" class="flatpickr-date w-full px-2 py-2.5 text-sm border-0 focus:ring-0 placeholder-slate-400" placeholder="Tanggal">
                         </div>
+                    </div>
+
+                    <!-- Pelanggan -->
+                    <div class="relative">
+                        <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Pelanggan</label>
+                        <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e] bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors">
+                            <span class="pl-3 text-slate-400"><i class="ti ti-user"></i></span>
+                            <input type="text" name="nama_pelanggan" id="nama_pelanggan" class="w-full px-2 py-2.5 text-sm border-0 focus:ring-0 bg-transparent placeholder-slate-400 cursor-pointer" placeholder="Pilih Pelanggan" readonly>
+                        </div>
+                        <input type="hidden" id="kode_pelanggan" name="kode_pelanggan">
+                        <input type="hidden" id="kode_cabang_pelanggan" name="kode_cabang_pelanggan">
+                    </div>
+
+                    <!-- Salesman -->
+                    <div class="relative">
+                        <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Salesman</label>
+                        <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden bg-slate-50">
+                            <span class="pl-3 text-slate-400"><i class="ti ti-user-check"></i></span>
+                            <input type="text" name="nama_salesman" id="nama_salesman" class="w-full px-2 py-2.5 text-sm border-0 focus:ring-0 bg-transparent placeholder-slate-400" placeholder="Salesman" readonly>
+                        </div>
+                        <input type="hidden" name="kode_salesman" id="kode_salesman">
+                    </div>
+
+                    <!-- Keterangan -->
+                    <div class="relative">
+                        <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Keterangan</label>
+                        <textarea name="keterangan" id="keterangan" rows="1" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] placeholder-slate-400 resize-none" placeholder="Keterangan Transaksi"></textarea>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-9 col-md-12 col-sm-12">
-            <div class="row mb-3">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div class="icon-cart mt-3">
-                                    <i class="ti ti-shopping-bag text-primary" style="font-size: 8rem"></i>
-                                </div>
-                                <div class="mt-2">
-                                    <h1 style="font-size: 6.5rem" id="grandtotal_text">0</h1>
-                                </div>
+
+        <!-- BLOCK 2: Grand Total & Status Pelanggan (Top Right - 8 Cols) -->
+        <div class="col-span-12 lg:col-span-8 flex flex-col gap-4">
+             <!-- Top Half: Grand Total -->
+             <div class="bg-[#003d9e] rounded-xl shadow-lg p-4 relative overflow-hidden text-center group flex-1 flex flex-col justify-center">
+                <div class="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-colors"></div>
+                <div class="absolute -right-6 -top-6 text-white/10 rotate-12">
+                    <i class="ti ti-shopping-cart text-[10rem]"></i>
+                </div>
+                 <p class="text-blue-100 text-xs uppercase tracking-wider mb-1 relative z-10">Total Bayar</p>
+                 <h1 class="text-5xl md:text-6xl font-black text-white tracking-tight relative z-10" id="grandtotal_text">0</h1>
+            </div>
+
+            <!-- Bottom Half: Status Pelanggan (Compact Horizontal) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex-1 flex flex-row">
+                <!-- Foto & Alamat (Left) -->
+                <div class="w-1/3 relative bg-slate-900 overflow-hidden group">
+                    <!-- Full Background Image -->
+                    <img src="{{ asset('assets/img/elements/2.jpg') }}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-110" id="foto">
+                    
+                    <!-- Gradient Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+
+                    <!-- Content -->
+                    <div class="absolute bottom-0 left-0 w-full p-4">
+                        <p class="text-[10px] uppercase font-bold text-blue-400 mb-1 flex items-center gap-1.5"><i class="ti ti-map-pin"></i> Lokasi</p>
+                        <p class="text-xs font-medium text-white line-clamp-2 leading-relaxed" id="alamat_pelanggan">-</p>
+                    </div>
+                     
+                    <!-- Hidden Data -->
+                    <div class="hidden">
+                        <span id="no_hp_pelanggan"></span>
+                        <span id="latitude"></span>
+                        <span id="longitude"></span>
+                        <span id="saldo_voucher_text"></span>
+                    </div>
+                </div>
+
+                <!-- Stats (Right) -->
+                 <div class="w-2/3 p-4 flex flex-col justify-center">
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-3">
+                         <div>
+                             <p class="text-[10px] font-bold uppercase text-slate-400">Limit Kredit</p>
+                             <p class="text-lg font-bold text-blue-600" id="limit_pelanggan_text">0</p>
+                         </div>
+                         <div>
+                            <p class="text-[10px] font-bold uppercase text-slate-400">Sisa Piutang</p>
+                            <p class="text-lg font-bold text-red-500" id="sisa_piutang_text">0</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold uppercase text-slate-400">Faktur Kredit</p>
+                            <p class="text-base font-bold text-slate-700"><span id="jmlfaktur_kredit">0</span> Fkt</p>
+                        </div>
+                        <div>
+                             <p class="text-[10px] font-bold uppercase text-slate-400">Jatuh Tempo</p>
+                             <p class="text-base font-bold text-slate-700" id="jatuh_tempo">-</p>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        </div>
+        
+        <!-- BLOCK 3: Workspace (Bottom - Full Width) -->
+        <div class="col-span-12 space-y-6">
+            
+            <!-- Input Produk -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 space-y-2">
+                
+                <!-- Row 1: Inputs -->
+                <div class="flex flex-col lg:flex-row gap-2 items-start">
+                    <!-- Product Selector (Left - Grow) -->
+                    <div class="flex-1 w-full lg:w-auto">
+                        <div class="relative h-full">
+                            <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e] h-[78px]"> <!-- Reduced height to match tighter inputs -->
+                                <span class="pl-3 text-slate-400"><i class="ti ti-scan"></i></span>
+                                <input type="text" name="nama_produk" id="nama_produk" class="w-full px-3 py-2 text-sm border-0 focus:ring-0 bg-transparent placeholder-slate-400 cursor-pointer h-full" placeholder="Pilih Produk..." readonly>
                             </div>
+                         </div>
+                        <input type="hidden" id="kode_harga" name="kode_harga">
+                        <input type="hidden" id="kode_produk" name="kode_produk">
+                        <input type="hidden" id="isi_pcs_dus" name="isi_pcs_dus">
+                        <input type="hidden" id="isi_pcs_pack" name="isi_pcs_pack">
+                        <input type="hidden" id="kode_kategori_diskon" name="kode_kategori_diskon">
+                    </div>
+
+                    <!-- Unit Inputs (Right - Fixed Widths) -->
+                    <div class="flex items-start gap-2 flex-wrap lg:flex-nowrap">
+                        
+                        <!-- Dus -->
+                        <div class="w-[130px] space-y-2">
+                             <!-- Qty -->
+                            <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e] h-[35px]">
+                                <span class="pl-2 text-slate-400 text-sm"><i class="ti ti-box"></i></span>
+                                <input type="text" name="jml_dus" id="jml_dus" class="money w-full px-2 py-1 text-right text-sm border-0 focus:ring-0 placeholder-slate-300" placeholder="Dus">
+                            </div>
+                            <!-- Price -->
+                             <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e] h-[35px]">
+                                <span class="pl-2 text-slate-400 text-sm"><i class="ti ti-tag"></i></span>
+                                <input type="text" name="harga_dus" id="harga_dus" class="money w-full px-2 py-1 text-right text-xs border-0 focus:ring-0 placeholder-slate-300 bg-slate-50" placeholder="Harga / Dus" readonly>
+                                <input type="hidden" id="harga_dus_produk">
+                            </div>
+                        </div>
+
+                         <!-- Pack -->
+                        <div class="w-[130px] space-y-2">
+                             <!-- Qty -->
+                            <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e] h-[35px]">
+                                <span class="pl-2 text-slate-400 text-sm"><i class="ti ti-box"></i></span>
+                                <input type="text" name="jml_pack" id="jml_pack" class="money w-full px-2 py-1 text-right text-sm border-0 focus:ring-0 placeholder-slate-300" placeholder="Pack">
+                            </div>
+                            <!-- Price -->
+                             <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e] h-[35px]">
+                                <span class="pl-2 text-slate-400 text-sm"><i class="ti ti-tag"></i></span>
+                                <input type="text" name="harga_pack" id="harga_pack" class="money w-full px-2 py-1 text-right text-xs border-0 focus:ring-0 placeholder-slate-300 bg-slate-50" placeholder="Harga / Pack" readonly>
+                                <input type="hidden" id="harga_pack_produk">
+                            </div>
+                        </div>
+
+                         <!-- Pcs -->
+                        <div class="w-[130px] space-y-2">
+                             <!-- Qty -->
+                            <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e] h-[35px]">
+                                <span class="pl-2 text-slate-400 text-sm"><i class="ti ti-box"></i></span>
+                                <input type="text" name="jml_pcs" id="jml_pcs" class="money w-full px-2 py-1 text-right text-sm border-0 focus:ring-0 placeholder-slate-300" placeholder="Pcs">
+                            </div>
+                            <!-- Price -->
+                             <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e] h-[35px]">
+                                <span class="pl-2 text-slate-400 text-sm"><i class="ti ti-tag"></i></span>
+                                <input type="text" name="harga_pcs" id="harga_pcs" class="money w-full px-2 py-1 text-right text-xs border-0 focus:ring-0 placeholder-slate-300 bg-slate-50" placeholder="Harga / Pcs" readonly>
+                                <input type="hidden" id="harga_pcs_produk">
+                            </div>
+                        </div>
+
+                        <!-- Promosi Checkbox -->
+                        <div class="flex items-center h-[78px] pl-2">
+                             <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input class="form-checkbox h-4 w-4 text-[#003d9e] rounded border-slate-300 focus:ring-[#003d9e] status_promosi" name="status_promosi" type="checkbox" value="1" id="status_promosi">
+                                <span class="text-xs font-bold text-slate-600">Promosi</span>
+                            </label>
                         </div>
                     </div>
                 </div>
+
+                <!-- Row 2: Button -->
+                <button type="button" id="tambahproduk" class="w-full bg-[#003d9e] hover:bg-blue-800 text-white text-sm font-bold py-2 px-4 rounded-lg shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2">
+                    <i class="ti ti-plus"></i> Tambah Produk
+                </button>
             </div>
-            <div class="row">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title">Detail Penjualan</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-lg-4 col-md-12 col-sm12">
-                                    <x-input-with-icon label="Produk" name="nama_produk" icon="ti ti-barcode"
-                                        height="80px" readonly="true" />
-                                    <input type="hidden" id="kode_harga" name="kode_harga">
-                                    <input type="hidden" id="kode_produk" name="kode_produk">
-                                    <input type="hidden" id="isi_pcs_dus" name="isi_pcs_dus">
-                                    <input type="hidden" id="isi_pcs_pack" name="isi_pcs_pack">
-                                    <input type="hidden" id="kode_kategori_diskon" name="kode_kategori_diskon">
-                                </div>
-                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-icon label="Dus" name="jml_dus" icon="ti ti-box"
-                                                align="right" money="true" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-icon label="Harga / Dus" name="harga_dus"
-                                                icon="ti ti-moneybag" align="right" money="true" />
-                                            <input type="hidden" id="harga_dus_produk">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-icon label="Pack" name="jml_pack" icon="ti ti-box"
-                                                align="right" money="true" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-icon label="Harga / Pack" name="harga_pack"
-                                                icon="ti ti-moneybag" align="right" money="true" />
-                                            <input type="hidden" id="harga_pack_produk">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-icon label="Pack" name="jml_pcs" icon="ti ti-box"
-                                                align="right" money="true" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-icon label="Harga / Pcs" name="harga_pcs"
-                                                icon="ti ti-moneybag" align="right" money="true" />
-                                            <input type="hidden" id="harga_pcs_produk">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-2">
-                                    <div class="form-check mt-3 mb-3">
-                                        <input class="form-check-input status_promosi" name="status_promosi"
-                                            type="checkbox" value="1" id="status_promosi">
-                                        <label class="form-check-label" for="status_promosi"> Promosi </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col">
-                                    <a href="#" id="tambahproduk" class="btn btn-primary w-100"><i
-                                            class="ti ti-plus me-1"></i>Tambah
-                                        Produk</a>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered" id="tabelproduk">
-                                            <thead class="text-center table-dark">
-                                                <tr>
-                                                    <th rowspan="2">Kode</th>
-                                                    <th rowspan="2">Nama Barang</th>
-                                                    <th colspan="6">Quantity</th>
-                                                    <th rowspan="2">Subtotal</th>
-                                                    <th rowspan="2">Aksi</th>
-                                                </tr>
-                                                <tr>
-                                                    <th>Dus</th>
-                                                    <th>Harga</th>
-                                                    <th>Pack</th>
-                                                    <th>Harga</th>
-                                                    <th>Pcs</th>
-                                                    <th>Harga</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="loadproduk"></tbody>
-                                            <tfoot class="table-dark">
-                                                <tr>
-                                                    <td colspan="8">SUBTOTAL</td>
-                                                    <td class="text-end" id="subtotal"></td>
-                                                    <td></td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col-lg-3 col-sm-12">
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="divider text-start divider-primary">
-                                                <div class="divider-text" style="font-size: 1rem">
-                                                    <i class="ti ti-discount"></i> Potongan
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-group label="AIDA" placeholder="Potongan AIDA"
-                                                name="potongan_aida" align="right" money="true"
-                                                readonly="true" />
-                                            <x-input-with-group label="SWAN" placeholder="Potongan SWAN"
-                                                name="potongan_swan" align="right" money="true"
-                                                readonly="true" />
-                                            <x-input-with-group label="STICK" placeholder="Potongan STICK"
-                                                name="potongan_stick" align="right" money="true"
-                                                readonly="true" />
-                                            <x-input-with-group label="SAMBAL" placeholder="Potongan SAMBAL"
-                                                name="potongan_sambal" align="right" money="true"
-                                                readonly="true" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 col-sm-12">
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="divider text-start divider-primary">
-                                                <div class="divider-text" style="font-size: 1rem">
-                                                    <i class="ti ti-discount"></i> Potongan Istimewa
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-group label="AIDA" placeholder="Potongan Istimewa AIDA"
-                                                name="potis_aida" align="right" money="true" />
-                                            <x-input-with-group label="SWAN" placeholder="Potongan Istimewa SWAN"
-                                                name="potis_swan" align="right" money="true" />
-                                            <x-input-with-group label="STICK" placeholder="Potongan Istimewa STICK"
-                                                name="potis_stick" align="right" money="true" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 col-sm-12">
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="divider text-start divider-primary">
-                                                <div class="divider-text" style="font-size: 1rem">
-                                                    <i class="ti ti-tag"></i> Penyesuaian
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <x-input-with-group label="AIDA" placeholder="Penyesuaian AIDA"
-                                                name="peny_aida" align="right" money="true" />
-                                            <x-input-with-group label="SWAN" placeholder="Penyesuaian SWAN"
-                                                name="peny_swan" align="right" money="true" />
-                                            <x-input-with-group label="STICK" placeholder="Penyesuaian STICK"
-                                                name="peny_stick" align="right" money="true" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 col-sm-12">
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="divider text-start divider-primary">
-                                                <div class="divider-text" style="font-size: 1rem">
-                                                    <i class="ti ti-moneybag"></i> Pembayaran
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="form-group mb-3">
-                                                <select name="jenis_transaksi" id="jenis_transaksi"
-                                                    class="form-select">
-                                                    <option value="">Jenis Transaksi</option>
-                                                    <option value="T">TUNAI</option>
-                                                    <option value="K">KREDIT</option>
-                                                </select>
-                                            </div>
-                                            <x-input-with-icon label="Grand Total" name="grandtotal" id="grandtotal"
-                                                icon="ti ti-shopping-cart" align="right" disabled="true" />
-                                        </div>
-                                    </div>
-                                    <div class="row" id="jenis_bayar_tunai">
-                                        <div class="col">
-                                            <div class="form-group mb-3">
-                                                <select name="jenis_bayar" id="jenis_bayar" class="form-select">
-                                                    <option value="">Jenis Bayar</option>
-                                                    <option value="TN">CASH</option>
-                                                    <option value="TR">TRANSFER</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row" id="titipan">
-                                        <div class="col">
-                                            <x-input-with-icon icon="ti ti-moneybag" name="titipan" money="true"
-                                                align="right" label="Titipan" />
-                                        </div>
-                                    </div>
-                                    <div class="row" id="voucher_tunai">
-                                        <div class="col">
-                                            <x-input-with-icon icon="ti ti-tag" name="voucher" money="true"
-                                                align="right" label="Voucher" />
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="form-group mb-3">
-                                                <button class="btn btn-primary w-100" id="btnSimpan"><i
-                                                        class="ti ti-send me-1"></i>Submit</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
+            <!-- Table -->
+            <div class="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+                 <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-slate-600" id="tabelproduk">
+                        <thead class="text-xs text-white uppercase bg-[#003d9e]">
+                             <tr>
+                                <th rowspan="2" class="px-3 py-3 font-medium border-r border-blue-500">Kode</th>
+                                <th rowspan="2" class="px-3 py-3 font-medium border-r border-blue-500 w-[30%]">Nama Barang</th>
+                                <th colspan="6" class="px-3 py-2 text-center border-b border-r border-blue-500">Qty & Harga</th>
+                                <th rowspan="2" class="px-3 py-3 font-medium border-r border-blue-500 text-right">Subtotal</th>
+                                <th rowspan="2" class="px-3 py-3 text-center">Aksi</th>
+                             </tr>
+                             <tr>
+                                <th class="px-3 py-2 text-center font-normal border-r border-blue-500 bg-[#003d9e]">Dus</th>
+                                <th class="px-3 py-2 text-center font-normal border-r border-blue-500 bg-[#003d9e]">Harga</th>
+                                <th class="px-3 py-2 text-center font-normal border-r border-blue-500 bg-[#003d9e]">Pack</th>
+                                <th class="px-3 py-2 text-center font-normal border-r border-blue-500 bg-[#003d9e]">Harga</th>
+                                <th class="px-3 py-2 text-center font-normal border-r border-blue-500 bg-[#003d9e]">Pcs</th>
+                                <th class="px-3 py-2 text-center font-normal border-r border-blue-500 bg-[#003d9e]">Harga</th>
+                            </tr>
+                        </thead>
+                        <tbody id="loadproduk" class="divide-y divide-slate-100 bg-white">
+                             <!-- Rows by JS -->
+                        </tbody>
+                        <tfoot class="bg-slate-50 border-t border-slate-200">
+                            <tr>
+                                <td colspan="8" class="px-4 py-3 text-right font-bold text-slate-700">SUBTOTAL</td>
+                                <td class="px-4 py-3 text-right font-bold text-slate-800" id="subtotal">0</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                 </div>
+            </div>
+
+        </div>
+
+        <!-- BLOCK 4: Financial Summary (Bottom - 4 Cols) -->
+        <div class="col-span-12">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Col 1: Potongan -->
+                 <div class="bg-white border border-slate-200 rounded-lg overflow-hidden h-full">
+                    <div class="p-3 bg-slate-50 border-b border-slate-100">
+                        <h6 class="text-xs font-bold uppercase text-slate-500">Potongan</h6>
                     </div>
+                    <div class="p-3 space-y-2">
+                         @foreach(['aida'=>'AIDA', 'swan'=>'SWAN', 'stick'=>'STICK', 'sambal'=>'SAMBAL'] as $key => $label)
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-medium text-slate-600 w-16">{{ $label }}</span>
+                            <input type="text" name="potongan_{{ $key }}" id="potongan_{{ $key }}" class="money w-full px-2 py-1 text-right border-b border-dashed border-slate-300 text-xs focus:outline-none focus:border-blue-500 bg-transparent" readonly placeholder="0">
+                        </div>
+                        @endforeach
+                    </div>
+                 </div>
+
+                 <!-- Col 2: Potongan Istimewa -->
+                <div class="bg-white border border-slate-200 rounded-lg overflow-hidden h-full">
+                    <div class="p-3 bg-slate-50 border-b border-slate-100">
+                        <h6 class="text-xs font-bold uppercase text-slate-500">Potongan Istimewa</h6>
+                    </div>
+                     <div class="p-3 space-y-2">
+                        @foreach(['aida'=>'AIDA', 'swan'=>'SWAN', 'stick'=>'STICK'] as $key => $label)
+                        <div class="relative">
+                            <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">{{ $label }}</label>
+                            <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e]">
+                                <span class="pl-3 text-slate-400"><i class="ti ti-discount-2"></i></span>
+                                <input type="text" name="potis_{{ $key }}" id="potis_{{ $key }}" class="money w-full px-2 py-2.5 text-right text-sm border-0 focus:ring-0 placeholder-slate-400 font-bold" placeholder="0">
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Col 3: Penyesuaian -->
+                 <div class="bg-white border border-slate-200 rounded-lg overflow-hidden h-full">
+                    <div class="p-3 bg-slate-50 border-b border-slate-100">
+                        <h6 class="text-xs font-bold uppercase text-slate-500">Penyesuaian</h6>
+                    </div>
+                    <div class="p-3 space-y-2">
+                         @foreach(['aida'=>'AIDA', 'swan'=>'SWAN', 'stick'=>'STICK'] as $key => $label)
+                        <div class="relative">
+                            <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">{{ $label }}</label>
+                            <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e]">
+                                <span class="pl-3 text-slate-400"><i class="ti ti-adjustments-alt"></i></span>
+                                <input type="text" name="peny_{{ $key }}" id="peny_{{ $key }}" class="money w-full px-2 py-2.5 text-right text-sm border-0 focus:ring-0 placeholder-slate-400 font-bold" placeholder="0">
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                 </div>
+
+                <!-- Col 4: Pembayaran -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 h-full flex flex-col justify-between">
+                     <div>
+                         <h5 class="text-xs font-bold text-slate-700 uppercase mb-3">Pembayaran</h5>
+                         
+                         <div class="space-y-3">
+                            <div>
+                                <select name="jenis_transaksi" id="jenis_transaksi" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e]">
+                                    <option value="">Jenis Transaksi</option>
+                                    <option value="T">TUNAI</option>
+                                    <option value="K">KREDIT</option>
+                                </select>
+                            </div>
+
+                            <div class="hidden" id="jenis_bayar_tunai">
+                                 <select name="jenis_bayar" id="jenis_bayar" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e]">
+                                    <option value="">Metode Bayar</option>
+                                    <option value="TN">CASH</option>
+                                    <option value="TR">TRANSFER</option>
+                                </select>
+                            </div>
+
+                            <!-- Input Grand Total Real (Hidden Visual, used for post) -->
+                            <input type="hidden" name="grandtotal" id="grandtotal" class="money">
+
+                             <div class="hidden" id="titipan">
+                                <div class="relative">
+                                    <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Titipan</label>
+                                    <input type="text" name="titipan" class="money w-full px-3 py-2 text-right border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e]" placeholder="0">
+                                </div>
+                            </div>
+
+                            <div class="hidden" id="voucher_tunai">
+                                 <div class="relative">
+                                    <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Voucher</label>
+                                    <input type="text" name="voucher" class="money w-full px-3 py-2 text-right border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e]" placeholder="0">
+                                </div>
+                            </div>
+                         </div>
+                     </div>
+                     
+                     <button type="submit" id="btnSimpan" class="w-full px-4 py-3 text-sm font-bold text-white bg-[#003d9e] hover:bg-blue-800 rounded-lg shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 mt-4">
+                        <i class="ti ti-send"></i> Simpan
+                    </button>
                 </div>
             </div>
         </div>
+
     </div>
 </form>
 
@@ -901,7 +922,7 @@
             } else {
                 let produk = `
                     <tr id="index_${index}" class="${bgcolor}">
-                        <td>
+                        <td class="px-4 py-3">
                             <input type="hidden" name="kode_harga_produk[]" value="${kode_harga}" class="kode_harga"/>
                             <input type="hidden" name="kode_produk[]" value="${kode_produk}" class="kode_produk"/>
                             <input type="hidden" name="status_promosi_produk[]" class="status_promosi" value="${status_promosi}"/>
@@ -911,30 +932,30 @@
                             <input type="hidden" name="isi_pcs_pack_produk[]" value="${isi_pcs_pack}"/>
                             ${kode_harga}
                         </td>
-                        <td>${nama_produk}</td>
-                        <td class="text-center">
+                        <td class="px-4 py-3">${nama_produk}</td>
+                        <td class="px-4 py-3 text-center">
                            ${dus===0 ? '' : dus}
                         </td>
-                        <td class="text-end">
+                        <td class="px-4 py-3 text-end">
                            ${harga_dus}
                            <input type="hidden" name="harga_dus_produk[]" value="${harga_dus}"/>
                         </td>
-                        <td class="text-center">${pack===0 ? '' :pack}</td>
-                        <td class="text-end">
+                        <td class="px-4 py-3 text-center">${pack===0 ? '' :pack}</td>
+                        <td class="px-4 py-3 text-end">
                            ${harga_pack}
                            <input type="hidden" name="harga_pack_produk[]" value="${harga_pack}"/>
                         </td>
-                        <td class="text-center">${pcs===0 ? '' :pcs}</td>
-                        <td class="text-end">
+                        <td class="px-4 py-3 text-center">${pcs===0 ? '' :pcs}</td>
+                        <td class="px-4 py-3 text-end">
                            ${harga_pcs}
                            <input type="hidden" name="harga_pcs_produk[]" value="${harga_pcs}"/>
                         </td>
-                        <td class="text-end">
+                        <td class="px-4 py-3 text-end">
                             ${convertToRupiah(subtotal)}
                             <input type="hidden" name="subtotal[]" class="subtotal" value="${subtotal}"/>
                         </td>
-                        <td class="text-center">
-                           <div class="d-flex">
+                        <td class="px-4 py-3 text-center">
+                           <div class="d-flex justify-content-center">
                               <div>
                                  <a href="#" key="${index}" class="edit me-2"><i class="ti ti-edit text-success"></i></a>
                               </div>
@@ -1137,7 +1158,7 @@
 
             let newRow = `
                     <tr id="index_${index}" class="${bgcolor}">
-                        <td>
+                        <td class="px-4 py-3">
                             <input type="hidden" name="kode_harga_produk[]" value="${kode_harga}" class="kode_harga"/>
                             <input type="hidden" name="kode_produk[]" value="${kode_produk}" class="kode_produk"/>
                             <input type="hidden" name="status_promosi_produk[]" value="${status_promosi}" class="status_promosi"/>
@@ -1147,30 +1168,30 @@
                             <input type="hidden" name="isi_pcs_pack_produk[]" value="${isi_pcs_pack}"/>
                             ${kode_harga}
                         </td>
-                        <td>${nama_produk}</td>
-                        <td class="text-center">
+                        <td class="px-4 py-3">${nama_produk}</td>
+                        <td class="px-4 py-3 text-center">
                            ${dus===0 ? '' : dus}
                         </td>
-                        <td class="text-end">
+                        <td class="px-4 py-3 text-end">
                            ${harga_dus}
                            <input type="hidden" name="harga_dus_produk[]" value="${harga_dus}"/>
                         </td>
-                        <td class="text-center">${pack===0 ? '' :pack}</td>
-                        <td class="text-end">
+                        <td class="px-4 py-3 text-center">${pack===0 ? '' :pack}</td>
+                        <td class="px-4 py-3 text-end">
                            ${harga_pack}
                            <input type="hidden" name="harga_pack_produk[]" value="${harga_pack}"/>
                         </td>
-                        <td class="text-center">${pcs===0 ? '' :pcs}</td>
-                        <td class="text-end">
+                        <td class="px-4 py-3 text-center">${pcs===0 ? '' :pcs}</td>
+                        <td class="px-4 py-3 text-end">
                            ${harga_pcs}
                            <input type="hidden" name="harga_pcs_produk[]" value="${harga_pcs}"/>
                         </td>
-                        <td class="text-end">
+                        <td class="px-4 py-3 text-end">
                             <input type="hidden" name="subtotal[]" class="subtotal" value="${subtotal}"/>
                             ${convertToRupiah(subtotal)}
                         </td>
-                        <td class="text-center">
-                           <div class="d-flex">
+                        <td class="px-4 py-3 text-center">
+                           <div class="d-flex justify-content-center">
                               <div>
                                  <a href="#" key="${index}" class="edit me-2"><i class="ti ti-edit text-success"></i></a>
                               </div>
@@ -1632,7 +1653,6 @@
 
 
         $("#formPenjualan").submit(function(e) {
-            // e.preventDefault();
             const no_faktur = $("#no_faktur").val();
             const tanggal = $("#tanggal").val();
             const kode_pelanggan = $("#kode_pelanggan").val();
@@ -1648,43 +1668,57 @@
             const jenis_transaksi = $("#jenis_transaksi").val();
             const jenis_bayar = $("#jenis_bayar").val();
             const keterangan = $("#keterangan").val();
-            const voucher = $("#voucher").val().replace(/\./g, '');
+            const voucher = $("#voucher").val();
+            const voucherVal = voucher ? parseInt(voucher.replace(/\./g, '')) : 0;
+
             if (no_faktur == '') {
+                e.preventDefault();
                 SwalWarning('no_faktur', 'No. Faktur Tidak Boleh Kosong');
                 return false;
             } else if (tanggal == '') {
+                e.preventDefault();
                 SwalWarning('tanggal', 'Tanggal Tidak Boleh Kosong');
                 return false;
             } else if (kode_pelanggan == "") {
+                e.preventDefault();
                 SwalWarning('nama_pelanggan', 'Pelanggan Tidak Boleh Kosong');
                 return false;
             } else if (kode_salesman == "") {
+                e.preventDefault();
                 SwalWarning('nama_salesman', 'Salesman Tidak Boleh Kosong');
                 return false;
             } else if ($('#loadproduk tr').length == 0) {
+                e.preventDefault();
                 SwalWarning('nama_produk', 'Detail Produk Tidak Boleh Kosong');
                 return false;
             } else if (jenis_transaksi == "") {
+                e.preventDefault();
                 SwalWarning('jenis_transaksi', 'Jenis Transaksi Tidak Boleh Kosong');
                 return false;
             } else if (jenis_transaksi == "T" && jenis_bayar == "") {
+                e.preventDefault();
                 SwalWarning('jenis_bayar', 'Jenis Bayar Tidak Boleh Kosong');
                 return false;
             } else if (jenis_transaksi == "K" && siklus_pembayaran === '0' && parseInt(totalPiutang) >
                 parseInt(limit_pelanggan)) {
+                e.preventDefault();
                 SwalWarning('nama_produk', 'Melebihi Limit, Silahkan Ajukan Penambahan Limit !');
                 return false;
             } else if (jenis_transaksi == "K" && siklus_pembayaran === '1' && parseInt(grandtotal) >
                 parseInt(limit_pelanggan)) {
+                e.preventDefault();
                 SwalWarning('nama_produk', 'Melebihi Limit, Silahkan Ajukan Penambahan Limit !');
                 return false;
             } else if (jenis_transaksi == "K" && jmlfakturbelumlunas >= jmlfakturmax) {
+                e.preventDefault();
                 SwalWarning('keterangan', 'Melebihi Batas Jumlah Faktur Kredit !');
                 return false;
-            } else if (voucher > saldo_voucher) {
+            } else if (voucherVal > saldo_voucher) {
+                e.preventDefault();
                 SwalWarning('voucher', 'Melebihi Saldo Voucher !');
                 return false;
             } else if (jenis_transaksi == "K" && sisa_piutang > 0 && keterangan == "") {
+                e.preventDefault();
                 SwalWarning('keterangan', 'Keterangan Harus Diisi !');
                 return false;
             } else {

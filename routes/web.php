@@ -37,6 +37,7 @@ use App\Http\Controllers\FsthpController;
 use App\Http\Controllers\GajiController;
 use App\Http\Controllers\HargaawalhppController;
 use App\Http\Controllers\HargaController;
+use App\Http\Controllers\HargaSupplierController;
 use App\Http\Controllers\HariliburController;
 use App\Http\Controllers\HppController;
 use App\Http\Controllers\InsentifController;
@@ -161,6 +162,7 @@ use App\Http\Controllers\SlipgajiController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SuratjalanangkutanController;
 use App\Http\Controllers\SuratjalanController;
+use App\Http\Controllers\SupplierMarketingController;
 use App\Http\Controllers\SuratperingatanController;
 use App\Http\Controllers\TargetkomisiController;
 use App\Http\Controllers\TicketController;
@@ -354,10 +356,22 @@ Route::middleware('auth')->group(function () {
         Route::get('/harga/{kode_harga}/edit', 'edit')->name('harga.edit')->can('harga.edit');
         Route::put('/harga/{kode_harga}', 'update')->name('harga.update')->can('harga.update');
         Route::delete('/harga/{kode_harga}', 'destroy')->name('harga.delete')->can('harga.delete');
+        Route::get('/harga/{kode_harga}/settanggalberlaku', 'settanggalberlaku')->name('harga.settanggalberlaku')->can('harga.edit');
+        Route::post('/harga/{kode_harga}/storetanggalberlaku', 'storetanggalberlaku')->name('harga.storetanggalberlaku')->can('harga.edit');
 
         //AjaxRequest
         Route::get('/harga/{kode_pelanggan}/gethargabypelanggan', 'gethargabypelanggan')->name('harga.gethargabypelanggan');
         Route::get('/harga/{kode_pelanggan}/gethargareturbypelanggan', 'gethargareturbypelanggan')->name('harga.gethargareturbypelanggan');
+    });
+
+    Route::controller(HargaSupplierController::class)->group(function () {
+        Route::get('/hargasupplier', 'index')->name('hargasupplier.index');
+        Route::get('/hargasupplier/create', 'create')->name('hargasupplier.create');
+        Route::post('/hargasupplier', 'store')->name('hargasupplier.store');
+        Route::get('/hargasupplier/{kode_produk}/edit', 'edit')->name('hargasupplier.edit');
+        Route::put('/hargasupplier/{kode_produk}', 'update')->name('hargasupplier.update');
+        Route::delete('/hargasupplier/{kode_produk}', 'destroy')->name('hargasupplier.delete');
+        Route::get('/hargasupplier/{kode_produk}/getharga', 'getHarga')->name('hargasupplier.getharga');
     });
 
     Route::controller(PelangganController::class)->group(function () {
@@ -1960,6 +1974,20 @@ Route::middleware('auth')->group(function () {
         Route::post('/laporanpembelian/cetakjurnalkoreksi', 'cetakjurnalkoreksi')->name('laporanpembelian.cetakjurnalkoreksi')->can('pb.jurnalkoreksi');
         Route::post('/laporanpembelian/cetakrekapakun', 'cetakrekapakun')->name('laporanpembelian.cetakrekapakun')->can('pb.rekapakun');
         Route::post('/laporanpembelian/cetakrekapkontrabon', 'cetakrekapkontrabon')->name('laporanpembelian.cetakrekapkontrabon')->can('pb.rekapkontrabon');
+    });
+
+    Route::controller(SupplierMarketingController::class)->group(function () {
+        Route::get('/suppliermarketing', 'index')->name('suppliermarketing.index')->can('suppliermarketing.index');
+        Route::get('/suppliermarketing/create', 'create')->name('suppliermarketing.create')->can('suppliermarketing.create');
+        Route::post('/suppliermarketing', 'store')->name('suppliermarketing.store')->can('suppliermarketing.create');
+        Route::get('/suppliermarketing/{kode_supplier}/edit', 'edit')->name('suppliermarketing.edit')->can('suppliermarketing.edit');
+        Route::put('/suppliermarketing/{kode_supplier}', 'update')->name('suppliermarketing.update')->can('suppliermarketing.edit');
+        Route::delete('/suppliermarketing/{kode_supplier}', 'destroy')->name('suppliermarketing.delete')->can('suppliermarketing.delete');
+        // AJAX routes - Protected by index permission generally or left open for authenticated users if used in other places. 
+        // Given usage in create form, 'suppliermarketing.create' or 'suppliermarketing.index' might be appropriate.
+        // But getSupplier is used in create view, so 'suppliermarketing.create' or just auth is fine.
+        Route::get('/suppliermarketing/get-json', 'getSupplierMarketing')->name('suppliermarketing.getjson')->can('suppliermarketing.index');
+        Route::get('/suppliermarketing/{kode_supplier}/get-detail', 'getSupplier')->name('suppliermarketing.getdetail')->can('suppliermarketing.index');
     });
 
 

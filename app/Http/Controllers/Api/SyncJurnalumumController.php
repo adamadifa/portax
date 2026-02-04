@@ -34,7 +34,7 @@ class SyncJurnalumumController extends Controller
                 'kode_akun' => 'required|string|max:6',
                 'kode_dept' => 'required|string|max:3',
                 'kode_peruntukan' => 'required|string|max:3',
-                'id_user' => 'required|integer',
+                //'id_user' => 'required|integer',
 
                 // Optional fields
                 'kode_cabang' => 'nullable|string|max:3',
@@ -89,7 +89,7 @@ class SyncJurnalumumController extends Controller
                 'kode_dept' => $request->kode_dept,
                 'kode_peruntukan' => $request->kode_peruntukan, // Note: typo di migration menggunakan kode_pruntukan
                 'kode_cabang' => $request->kode_cabang,
-                'id_user' => $request->id_user,
+                'id_user' => 1,
             ];
 
             if ($isUpdate) {

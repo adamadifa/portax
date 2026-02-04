@@ -1,46 +1,43 @@
-<form action="{{ route('laporanmarketing.cetakanalisatransaksi') }}" method="POST" target="_blank" id="formanalisatransaksi">
+<form action="{{ route('laporanmarketing.cetakanalisatransaksi') }}" method="POST" target="_blank" id="formanalisatransaksi" class="space-y-3">
     @csrf
-    @hasanyrole($roles_show_cabang)
-        <div class="form-group mb-3">
-            <select name="kode_cabang" id="kode_cabang_analisatransaksi" class="form-select select2Kodecabanganalisatransaksi">
+    <div class="space-y-4">
+        @hasanyrole($roles_show_cabang)
+        <div class="relative">
+            <select name="kode_cabang" id="kode_cabang_analisatransaksi" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodecabanganalisatransaksi">
                 <option value="">Pilih Cabang</option>
                 @foreach ($cabang as $d)
                     <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
                 @endforeach
             </select>
         </div>
-    @endrole
-    <div class="form-group mb-3">
-        <select name="kode_salesman" id="kode_salesman_analisatransaksi" class="select2Kodesalesmananalisatransaksi form-select">
-        </select>
-    </div>
-    <div class="row">
-        <div class="col">
-            <div class="form-group mb-3">
-                <select name="bulan" id="bulan" class="form-select">
-                    <option value="">Bulan</option>
-                    @foreach ($list_bulan as $d)
-                        <option value="{{ $d['kode_bulan'] }}">{{ $d['nama_bulan'] }}</option>
-                    @endforeach
-                </select>
-            </div>
+        @endrole
+        
+        <div class="relative">
+             <select name="kode_salesman" id="kode_salesman_analisatransaksi" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodesalesmananalisatransaksi">
+            </select>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <div class="form-group mb-3">
-                <select name="tahun" id="tahun" class="form-select">
-                    <option value="">Tahun</option>
-                    @for ($t = $start_year; $t <= date('Y'); $t++)
-                        <option value="{{ $t }}">{{ $t }}</option>
-                    @endfor
-                </select>
-            </div>
+
+        <div class="relative">
+            <select name="bulan" id="bulan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none form-select">
+                <option value="">Bulan</option>
+                @foreach ($list_bulan as $d)
+                    <option value="{{ $d['kode_bulan'] }}">{{ $d['nama_bulan'] }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="relative">
+            <select name="tahun" id="tahun" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none form-select">
+                <option value="">Tahun</option>
+                @for ($t = $start_year; $t <= date('Y'); $t++)
+                    <option value="{{ $t }}">{{ $t }}</option>
+                @endfor
+            </select>
         </div>
     </div>
     <div class="row">
         <div class="col-lg-10 col-md-12 col-sm-12">
-            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButtonAnalisatransaksi">
+            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButtonAnalisatransaksi" style="background-color: #003d9e; border-color: #003d9e;">
                 <i class="ti ti-printer me-1"></i> Cetak
             </button>
         </div>

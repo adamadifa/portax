@@ -1,32 +1,34 @@
-<form action="{{ route('laporanmarketing.cetakrekapkendaraan') }}" method="POST" target="_blank" id="formrekapkendaraan">
+<form action="{{ route('laporanmarketing.cetakrekapkendaraan') }}" method="POST" target="_blank" id="formrekapkendaraan" class="space-y-3">
     @csrf
-    @hasanyrole($roles_show_cabang)
-        <div class="form-group mb-3">
-            <select name="kode_cabang" id="kode_cabang_rekapkendaraan" class="form-select select2Kodecabangrekapkendaraan">
-                <option value="">Cabang</option>
+    <div class="space-y-4">
+        @hasanyrole($roles_show_cabang)
+        <div class="relative">
+            <select name="kode_cabang" id="kode_cabang_rekapkendaraan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodecabangrekapkendaraan">
+                <option value="">Semua Cabang</option>
                 @foreach ($cabang as $d)
                     <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
                 @endforeach
             </select>
         </div>
-    @endrole
-    <div class="form-group mb-3">
-        <select name="kode_kendaraan" id="kode_kendaraan" class="select2Kodekendaraan form-select">
-        </select>
+        @endrole
+        <div class="relative">
+            <select name="kode_kendaraan" id="kode_kendaraan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodekendaraan">
+            </select>
+        </div>
+    
+        <div class="grid grid-cols-2 gap-4">
+            <div class="relative">
+                <input type="text" name="dari" id="dari" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Dari Tanggal">
+            </div>
+            <div class="relative">
+                <input type="text" name="sampai" id="sampai" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Sampai Tanggal">
+            </div>
+        </div>
     </div>
 
-
-    <div class="row">
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Dari" name="dari" datepicker="flatpickr-date" />
-        </div>
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Sampai" name="sampai" datepicker="flatpickr-date" />
-        </div>
-    </div>
-    <div class="row">
+    <div class="row mt-3">
         <div class="col-lg-10 col-md-12 col-sm-12">
-            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButtonrekapkendaraan">
+            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButtonrekapkendaraan" style="background-color: #003d9e; border-color: #003d9e;">
                 <i class="ti ti-printer me-1"></i> Cetak
             </button>
         </div>
@@ -46,7 +48,11 @@
                 select2Kodecabangrekapkendaraan.each(function() {
                     var $this = $(this);
                     $this.wrap('<div class="position-relative"></div>').select2({
-                        placeholder: 'Cabang',
+                    $this.wrap('<div class="position-relative"></div>').select2({
+                        placeholder: 'Semua Cabang',
+                        allowClear: true,
+                        dropdownParent: $this.parent()
+                    });
                         allowClear: true,
                         dropdownParent: $this.parent()
                     });

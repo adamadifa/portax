@@ -1,42 +1,51 @@
-<form action="{{ route('laporanmarketing.cetakkartupiutang') }}" method="POST" target="_blank" id="formKartupiutang">
+<form action="{{ route('laporanmarketing.cetakkartupiutang') }}" method="POST" target="_blank" id="formKartupiutang" class="space-y-3">
     @csrf
-    @hasanyrole($roles_show_cabang)
-        <div class="form-group mb-3">
-            <select name="kode_cabang" id="kode_cabang_kartupiutang" class="form-select select2Kodecabangkartupiutang">
+    
+    <div class="space-y-2">
+        @hasanyrole($roles_show_cabang)
+        <div class="relative">
+             <select name="kode_cabang" id="kode_cabang_kartupiutang" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodecabangkartupiutang">
                 <option value="">Semua Cabang</option>
                 @foreach ($cabang as $d)
                     <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
                 @endforeach
             </select>
         </div>
-    @endrole
-    <div class="form-group mb-3">
-        <select name="kode_salesman" id="kode_salesman_kartupiutang" class="select2Kodesalesmankartupiutang form-select">
-        </select>
-    </div>
-    <div class="form-group mb-3">
-        <select name="kode_pelanggan" id="kode_pelanggan_kartupiutang" class="select2Kodepelanggankartupiutang form-select">
-        </select>
-    </div>
-    <div class="form-group mb-3">
-        <select name="formatlaporan" id="formatlaporan" class="form-select">
-            <option value="">Format Laporan</option>
-            <option value="1">Sudah Jatuh Tempo ( > 30 Hari )</option>
-            <option value="2">Belum Jatuh Tempo</option>
-        </select>
+        @endrole
+        
+        <div class="relative">
+            <select name="kode_salesman" id="kode_salesman_kartupiutang" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodesalesmankartupiutang">
+            </select>
+        </div>
+
+        <div class="relative">
+            <select name="kode_pelanggan" id="kode_pelanggan_kartupiutang" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodepelanggankartupiutang">
+            </select>
+        </div>
+        
+        <div class="relative">
+            <select name="formatlaporan" id="formatlaporan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none form-select">
+                <option value="">Format Laporan</option>
+                <option value="1">Sudah Jatuh Tempo ( > 30 Hari )</option>
+                <option value="2">Belum Jatuh Tempo</option>
+            </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="relative">
+                 <input type="text" name="dari" id="dari" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Dari Tanggal">
+            </div>
+    
+            <div class="relative">
+                 <input type="text" name="sampai" id="sampai" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Sampai Tanggal">
+            </div>
+        </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Dari" name="dari" datepicker="flatpickr-date" />
-        </div>
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Sampai" name="sampai" datepicker="flatpickr-date" />
-        </div>
-    </div>
-    <div class="row">
+
+    <div class="row mt-2">
         <div class="col-lg-10 col-md-12 col-sm-12">
-            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButton">
+            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButton" style="background-color: #003d9e; border-color: #003d9e;">
                 <i class="ti ti-printer me-1"></i> Cetak
             </button>
         </div>

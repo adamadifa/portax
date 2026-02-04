@@ -34,10 +34,10 @@ class PembelianmarketingController extends Controller
         $query = DB::table('marketing_pembelian')
             ->select(
                 'marketing_pembelian.*',
-                'supplier.nama_supplier'
+                'supplier_marketing.nama_supplier'
             )
             ->selectRaw('(SELECT SUM(subtotal) FROM marketing_pembelian_detail WHERE no_bukti = marketing_pembelian.no_bukti) as total_bruto')
-            ->leftJoin('supplier', 'marketing_pembelian.kode_supplier', '=', 'supplier.kode_supplier');
+            ->leftJoin('supplier_marketing', 'marketing_pembelian.kode_supplier', '=', 'supplier_marketing.kode_supplier');
 
         // Filter tanggal
         if (!empty($request->dari) && !empty($request->sampai)) {
@@ -60,13 +60,13 @@ class PembelianmarketingController extends Controller
 
         // Filter nama supplier
         if (!empty($request->nama_supplier_search)) {
-            $query->where('supplier.nama_supplier', 'like', '%' . $request->nama_supplier_search . '%');
+            $query->where('supplier_marketing.nama_supplier', 'like', '%' . $request->nama_supplier_search . '%');
         }
 
         $query->orderBy('marketing_pembelian.tanggal', 'desc');
         $query->orderBy('marketing_pembelian.no_bukti', 'desc');
 
-        $pembelian = $query->cursorPaginate(15);
+        $pembelian = $query->paginate(15);
         $pembelian->appends(request()->all());
 
         $data['pembelian'] = $pembelian;
@@ -80,32 +80,6 @@ class PembelianmarketingController extends Controller
     {
         $user = User::findOrFail(auth()->user()->id);
         $roles_access_all_cabang = config('global.roles_access_all_cabang');
-
-        // Ajax request for supplier list (DataTables)
-        if ($request->ajax()) {
-            $query = Supplier::query();
-            $query->select(
-                'supplier.kode_supplier',
-                'supplier.nama_supplier',
-                'supplier.no_hp_supplier',
-                'supplier.alamat_supplier'
-            );
-
-            // Filter by search
-            if ($request->has('search') && !empty($request->search['value'])) {
-                $searchValue = $request->search['value'];
-                $query->where(function ($q) use ($searchValue) {
-                    $q->where('supplier.nama_supplier', 'like', '%' . $searchValue . '%');
-                });
-            }
-
-            return DataTables::of($query)
-                ->addIndexColumn()
-                ->addColumn('action', function ($item) {
-                    return '<a href="#" kode_supplier="' . Crypt::encrypt($item->kode_supplier) . '" class="pilihsupplier"><i class="ti ti-external-link"></i></a>';
-                })
-                ->make();
-        }
 
         return view('marketing.pembelian.create');
     }
@@ -275,9 +249,9 @@ class PembelianmarketingController extends Controller
         // Get pembelian data
         $pembelian = Pembelianmarketing::select(
             'marketing_pembelian.*',
-            'supplier.nama_supplier'
+            'supplier_marketing.nama_supplier'
         )
-        ->leftJoin('supplier', 'marketing_pembelian.kode_supplier', '=', 'supplier.kode_supplier')
+        ->leftJoin('supplier_marketing', 'marketing_pembelian.kode_supplier', '=', 'supplier_marketing.kode_supplier')
         ->where('marketing_pembelian.no_bukti', $no_bukti)
         ->firstOrFail();
         

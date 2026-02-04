@@ -1,35 +1,38 @@
-<form action="{{ route('laporanmarketing.cetakrekappelanggan') }}" method="POST" target="_blank" id="formrekappelanggan">
+<form action="{{ route('laporanmarketing.cetakrekappelanggan') }}" method="POST" target="_blank" id="formrekappelanggan" class="space-y-3">
     @csrf
-    @hasanyrole($roles_show_cabang)
-        <div class="form-group mb-3">
-            <select name="kode_cabang" id="kode_cabang_rekappelanggan" class="form-select select2Kodecabangrekappelanggan">
+    <div class="space-y-4">
+        @hasanyrole($roles_show_cabang)
+        <div class="relative">
+            <select name="kode_cabang" id="kode_cabang_rekappelanggan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodecabangrekappelanggan">
                 <option value="">Semua Cabang</option>
                 @foreach ($cabang as $d)
                     <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
                 @endforeach
             </select>
         </div>
-    @endrole
-    <div class="form-group mb-3">
-        <select name="kode_salesman" id="kode_salesman_rekappelanggan" class="select2Kodesalesmanrekappelanggan form-select">
-        </select>
-    </div>
-    <div class="form-group mb-3">
-        <select name="kode_pelanggan" id="kode_pelanggan_rekappelanggan" class="select2Kodepelangganrekappelanggan form-select">
-        </select>
+        @endrole
+        <div class="relative">
+            <select name="kode_salesman" id="kode_salesman_rekappelanggan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodesalesmanrekappelanggan">
+            </select>
+        </div>
+        <div class="relative">
+            <select name="kode_pelanggan" id="kode_pelanggan_rekappelanggan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodepelangganrekappelanggan">
+            </select>
+        </div>
+    
+        <div class="grid grid-cols-2 gap-4">
+            <div class="relative">
+                <input type="text" name="dari" id="dari" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Dari Tanggal">
+            </div>
+            <div class="relative">
+                <input type="text" name="sampai" id="sampai" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Sampai Tanggal">
+            </div>
+        </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Dari" name="dari" datepicker="flatpickr-date" />
-        </div>
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Sampai" name="sampai" datepicker="flatpickr-date" />
-        </div>
-    </div>
-    <div class="row">
+    <div class="row mt-3">
         <div class="col-lg-10 col-md-12 col-sm-12">
-            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButtonrekappelanggan">
+            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButtonrekappelanggan" style="background-color: #003d9e; border-color: #003d9e;">
                 <i class="ti ti-printer me-1"></i> Cetak
             </button>
         </div>

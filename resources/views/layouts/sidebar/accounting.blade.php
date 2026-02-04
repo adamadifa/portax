@@ -17,7 +17,7 @@
             <div>Accounting</div>
         </a>
         <ul class="menu-sub">
-            @if (auth()->user()->hasAnyPermission(['coa.index']))
+            {{-- @if (auth()->user()->hasAnyPermission(['coa.index']))
                 <li class="menu-item {{ request()->is(['coa']) ? 'active' : '' }}">
                     <a href="{{ route('coa.index') }}" class="menu-link">
                         <div>Chart of Account (COA)</div>
@@ -30,15 +30,15 @@
                         <div>Saldo Awal Buku Besar</div>
                     </a>
                 </li>
-            @endif
-            @if (auth()->user()->hasAnyPermission(['costratio.index']))
+            @endif --}}
+            {{-- @if (auth()->user()->hasAnyPermission(['costratio.index']))
                 <li class="menu-item {{ request()->is(['costratio']) ? 'active' : '' }}">
                     <a href="{{ route('costratio.index') }}" class="menu-link">
                         <div>Cost Ratio</div>
                     </a>
                 </li>
-            @endif
-            @if (auth()->user()->hasAnyPermission(['jurnalumum.index']))
+            @endif --}}
+            {{-- @if (auth()->user()->hasAnyPermission(['jurnalumum.index']))
                 <li class="menu-item {{ request()->is(['jurnalumum']) ? 'active' : '' }}">
                     <a href="{{ route('jurnalumum.index') }}" class="menu-link">
                         <div>Jurnal Umum</div>
@@ -52,7 +52,7 @@
                         <div>HPP</div>
                     </a>
                 </li>
-            @endif
+            @endif --}}
 
             @if (auth()->user()->hasAnyPermission(['akt.rekapbj', 'akt.rekappersediaan', 'akt.costratio', 'akt.jurnalumum']))
                 <li class="menu-item {{ request()->is(['laporanaccounting', 'laporanaccounting/*']) ? 'active' : '' }}">

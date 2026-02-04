@@ -25,7 +25,7 @@
 
 <!-- Flatpickr (Datepicker - Good to have globally) -->
 <script src="{{ asset('assets/vendor/libs/flatpickr/flatpickr.js') }}"></script>
-
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.js"></script>
 <!-- Main Global JS -->
 <!-- <script src="{{ asset('/assets/js/main.js') }}"></script> -->
 
@@ -92,7 +92,20 @@
 
         // Formatting money class
         $(".money").maskMoney();
+        $(".flatpickr-date").flatpickr();
     });
+
+    function SwalWarning(elementId, message) {
+        Swal.fire({
+            title: "Oops!",
+            text: message,
+            icon: "warning",
+            showConfirmButton: true,
+            didClose: () => {
+                $("#" + elementId).focus();
+            },
+        });
+    }
 </script>
 
 <!-- Stack for page specific scripts -->

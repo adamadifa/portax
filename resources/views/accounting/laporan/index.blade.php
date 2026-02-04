@@ -7,6 +7,7 @@
     <span>Laporan Accounting</span>
 @endsection
 <div class="row">
+    <!--
     <div class="col-xl-6 col-md-12 col-sm-12">
         <div class="nav-align-left nav-tabs-shadow mb-4">
             <ul class="nav nav-tabs" role="tablist">
@@ -44,7 +45,7 @@
                 @endcan
             </ul>
             <div class="tab-content">
-                <!-- Laporan Persediaan-->
+               
                 @can('akt.rekappersediaan')
                     <div class="tab-pane fade active show" id="rekkappersediaan" role="tabpanel">
                         @include('accounting.laporan.rekappersediaan')
@@ -68,6 +69,7 @@
             </div>
         </div>
     </div>
+-->
     @if (auth()->user()->hasAnyPermission(['lk.bukubesar']))
         <div class="col-xl-6 col-md-12 col-sm-12">
             <div class="nav-align-left nav-tabs-shadow mb-4">
@@ -83,7 +85,6 @@
 
                 </ul>
                 <div class="tab-content">
-                    <!-- Laporan Persediaan-->
                     @can('lk.bukubesar')
                         <div class="tab-pane fade active show" id="rekkappersediaan" role="tabpanel">
                             @include('accounting.laporan.lk.bukubesar')

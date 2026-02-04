@@ -1,49 +1,117 @@
-<h4 class="title">Saldo Voucher : {{ formatAngka($saldo_voucher) }}</h4>
+<div class="bg-blue-50 text-blue-600 p-3 rounded-lg mb-4 flex items-center gap-3 border border-blue-100">
+    <i class="ti ti-wallet text-xl"></i>
+    <div>
+        <h6 class="font-bold text-xs uppercase tracking-wide text-blue-500 mb-0.5">Saldo Voucher</h6>
+        <h4 class="font-bold text-lg leading-none">{{ formatAngka($saldo_voucher) }}</h4>
+    </div>
+</div>
+
 <form id="formBayar" method="POST" action="{{ route('pembayaranpenjualan.store', Crypt::encrypt($no_faktur)) }}">
     @csrf
-    <x-input-with-icon icon="ti ti-calendar" label="Tanggal Pembayaran" name="tanggal" datepicker="flatpickr-date" />
-    <x-input-with-icon icon="ti ti-moneybag" label="Jumlah Bayar" name="jumlah" align="right" />
+    
+    <!-- Tanggal -->
+    <div class="relative mb-4">
+        <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Tanggal Pembayaran</label>
+        <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e]">
+            <span class="pl-3 text-slate-400"><i class="ti ti-calendar"></i></span>
+            <input type="text" name="tanggal" id="tanggal" class="flatpickr-date w-full px-2 py-2.5 text-sm border-0 focus:ring-0 placeholder-slate-400" placeholder="Pilih Tanggal">
+        </div>
+    </div>
+
+    <!-- Jumlah -->
+    <div class="relative mb-4">
+        <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Jumlah Bayar</label>
+        <div class="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e]">
+            <span class="pl-3 text-slate-400"><i class="ti ti-moneybag"></i></span>
+            <input type="text" name="jumlah" id="jumlah" class="money w-full px-2 py-2.5 text-right text-sm border-0 focus:ring-0 placeholder-slate-400 font-bold" placeholder="0">
+        </div>
+    </div>
 
     @if ($level_user == 'salesman')
         <input type="hidden" name="kode_salesman" value="{{ Auth::user()->kode_salesman }}" />
     @else
-        <x-select label="Salesman Penagih" name="kode_salesman" :data="$salesman" key="kode_salesman" textShow="nama_salesman" upperCase="true"
-            select2="select2Kodesalesman" />
+        <div class="relative mb-4">
+            <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Salesman Penagih</label>
+            <div class="flex items-center border border-slate-300 rounded-lg focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e]">
+                <span class="pl-3 text-slate-400"><i class="ti ti-user"></i></span>
+                <div class="w-full">
+                     <select name="kode_salesman" id="kode_salesman" class="select2Kodesalesman w-full border-0 focus:ring-0">
+                        <option value="">Salesman Penagih</option>
+                        @foreach($salesman as $d)
+                            <option value="{{ $d->kode_salesman }}">{{ strtoupper($d->nama_salesman) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
     @endif
 
+    <div class="mb-4">
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input class="form-checkbox h-4 w-4 text-[#003d9e] rounded border-slate-300 focus:ring-[#003d9e] agreementvoucher" name="agreementvoucher" value="1" type="checkbox" id="agreementvoucher">
+            <span class="text-sm font-medium text-slate-700">Bayar Menggunakan Voucher ?</span>
+        </label>
+    </div>
 
-    <div class="row mt-2">
-        <div class="col-12">
-            <div class="form-check mt-3 mb-2">
-                <input class="form-check-input agreementvoucher" name="agreementvoucher" value="1" type="checkbox" id="agreementvoucher">
-                <label class="form-check-label" for="agreementvoucher"> Bayar Menggunakan Voucher ? </label>
+    <div class="mb-4" id="voucher">
+        <div class="relative mb-4">
+            <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Pilih Voucher</label>
+            <div class="flex items-center border border-slate-300 rounded-lg focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e]">
+                <span class="pl-3 text-slate-400"><i class="ti ti-ticket"></i></span>
+                 <div class="w-full">
+                    <select name="jenis_voucher" id="jenis_voucher" class="select2Kodevoucher w-full border-0 focus:ring-0">
+                        <option value="">Pilih Voucher</option>
+                        @foreach($jenis_voucher as $d)
+                            <option value="{{ $d->id }}">{{ strtoupper($d->nama_voucher) }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
     </div>
-    <div class="row" id="voucher">
-        <div class="col">
-            <x-select label="Pilih Voucher" name="jenis_voucher" :data="$jenis_voucher" key="id" textShow="nama_voucher" upperCase="true"
-                select2="select2Kodevoucher" />
-        </div>
+
+    <div class="mb-4">
+         <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input class="form-checkbox h-4 w-4 text-[#003d9e] rounded border-slate-300 focus:ring-[#003d9e] agreementgiro" name="agreementgiro" value="1" type="checkbox" id="agreementgiro">
+            <span class="text-sm font-medium text-slate-700">Ganti Giro Ke Cash ?</span>
+        </label>
     </div>
-    <div class="row">
-        <div class="col-12">
-            <div class="form-check mb-3">
-                <input class="form-check-input agreementgiro" name="agreementgiro" value="1" type="checkbox" id="agreementgiro">
-                <label class="form-check-label" for="agreementgiro"> Ganti Giro Ke Cash ? </label>
+
+    <div class="mb-4" id="giroditolak">
+        <div class="relative mb-4">
+             <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Pilih Giro</label>
+            <div class="flex items-center border border-slate-300 rounded-lg focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e]">
+                 <span class="pl-3 text-slate-400"><i class="ti ti-building-bank"></i></span>
+                 <div class="w-full">
+                    <select name="kode_giro" id="kode_giro" class="select2Kodegiro w-full border-0 focus:ring-0">
+                        <option value="">Pilih Giro</option>
+                        @foreach($giroditolak as $d)
+                            <option value="{{ $d->kode_giro }}">{{ $d->no_giro }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
     </div>
-    <div class="row" id="giroditolak">
-        <div class="col">
-            <x-select label="Pilih Giro" name="kode_giro" :data="$giroditolak" key="kode_giro" textShow="no_giro" upperCase="true"
-                select2="select2Kodegiro" />
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <button class="btn btn-primary w-100" id="btnSimpan"><i class="ti ti-send me-1"></i>Submit</button>
-        </div>
+    <style>
+        /* Custom Select2 Styling to match input fields */
+        .select2-container--default .select2-selection--single {
+            border: none !important;
+            height: 100% !important;
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 100% !important;
+            top: 0 !important;
+        }
+    </style>
+
+    <div class="mt-6">
+        <button class="w-full bg-[#003d9e] hover:bg-blue-800 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all active:scale-95 flex items-center justify-center gap-2" id="btnSimpan">
+            <i class="ti ti-send"></i> Submit Pembayaran
+        </button>
     </div>
 </form>
 
@@ -74,10 +142,10 @@
         if (select2Kodesalesman.length) {
             select2Kodesalesman.each(function() {
                 var $this = $(this);
-                $this.wrap('<div class="position-relative"></div>').select2({
+                $this.select2({
                     placeholder: 'Salesman Penagih',
                     allowClear: true,
-                    dropdownParent: $this.parent()
+                    dropdownParent: $('#modal')
                 });
             });
         }
@@ -86,10 +154,22 @@
         if (select2Kodevoucher.length) {
             select2Kodevoucher.each(function() {
                 var $this = $(this);
-                $this.wrap('<div class="position-relative"></div>').select2({
+                $this.select2({
                     placeholder: 'Pilih Voucher',
                     allowClear: true,
-                    dropdownParent: $this.parent()
+                    dropdownParent: $('#modal')
+                });
+            });
+        }
+
+        const select2Kodegiro = $('.select2Kodegiro');
+        if (select2Kodegiro.length) {
+            select2Kodegiro.each(function() {
+                var $this = $(this);
+                $this.select2({
+                    placeholder: 'Pilih Giro',
+                    allowClear: true,
+                    dropdownParent: $('#modal')
                 });
             });
         }
