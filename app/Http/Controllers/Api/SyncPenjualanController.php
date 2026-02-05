@@ -392,15 +392,39 @@ class SyncPenjualanController extends Controller
                     
                     // ... (Salesman/Pelanggan creation logic remains)
 
-                    // Auto Numbering
-                    // Only generate if creating new? Or only if no_fak_new not set?
-                    // If we use updateOrCreate, we might overwrite existing no_fak_new if we pass null variables.
-                    // But here we construct $penjualanData.
+                    // Auto Numbering Logic (Fix Undefined Variable)
+                    $no_fak_new = null;
+
+                    // Cek jika data sudah ada, gunakan no_fak_new yang lama agar tidak berubah
+                    $existingPenjualan = Penjualan::where('no_faktur', $penjualanData['no_faktur'])->first();
                     
-                    // Logic issue: If updating, we should probably fetch existing record to preserve no_fak_new if we don't want to change it.
-                    // However, let's proceed with calculating it. If it updates, it updates.
-                    
-                    // (Numbering logic remains same, it depends on request data mostly)
+                    if ($existingPenjualan && $existingPenjualan->no_fak_new) {
+                        $no_fak_new = $existingPenjualan->no_fak_new;
+                    } else {
+                        // Jika belum ada, generate baru
+                        $salesmanBatch = Salesman::join('cabang', 'salesman.kode_cabang', '=', 'cabang.kode_cabang')
+                            ->where('kode_salesman', $penjualanData['kode_salesman'])->first();
+                            
+                        if ($salesmanBatch) {
+                            $tahun = date('y', strtotime($penjualanData['tanggal']));
+                            $thn = date('Y', strtotime($penjualanData['tanggal']));
+                            $start_date = "2024-03-01";
+                            
+                            if ($penjualanData['tanggal'] >= '2024-03-01' && $salesmanBatch->kode_cabang != "PST") {
+                                $lastransaksi = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
+                                        ->where('tanggal', '>=', $start_date)
+                                        ->whereRaw('MID(no_fak_new,6,1)="' . $salesmanBatch->kode_sales . '"')
+                                        ->where('salesman.kode_cabang', $salesmanBatch->kode_cabang)
+                                        ->whereRaw('YEAR(tanggal)="' . $thn . '"')
+                                        ->whereRaw('LEFT(no_fak_new,3)="' . $salesmanBatch->kode_pt . '"')
+                                        ->orderBy('no_fak_new', 'desc')
+                                        ->first();
+                                
+                                $last_no_fak_new = $lastransaksi != NULL ? $lastransaksi->no_fak_new : "";
+                                $no_fak_new = buatkode($last_no_fak_new, $salesmanBatch->kode_pt . $tahun . $salesmanBatch->kode_sales, 6);
+                            }
+                        }
+                    }
 
                     // Upsert header
                      $header = array_merge($penjualanData, [
