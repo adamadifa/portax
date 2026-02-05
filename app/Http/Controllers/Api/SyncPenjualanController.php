@@ -472,6 +472,8 @@ class SyncPenjualanController extends Controller
 
                     unset($header['detail']);
                     unset($header['historibayar']);
+                    unset($header['salesman']);
+                    unset($header['pelanggan']);
 
                     Penjualan::updateOrCreate(
                         ['no_faktur' => $penjualanData['no_faktur']],
