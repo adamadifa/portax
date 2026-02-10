@@ -1874,6 +1874,18 @@ class LaporanaccountingController extends Controller
             header("Content-Disposition: attachment; filename=Laporan Biaya $data[cabang] $dari-$sampai.xls");
         }
 
+        if ($request->formatlaporan == '2') {
+            $biaya_rekap = $biaya->groupBy('kode_akun')->map(function ($row) {
+                return [
+                    'kode_akun' => $row->first()->kode_akun,
+                    'nama_akun' => $row->first()->nama_akun,
+                    'total' => $row->sum('jml_debet')
+                ];
+            });
+            $data['biaya'] = $biaya_rekap;
+            return view('accounting.laporan.cetak_biaya_rekap', $data);
+        }
+
         return view('accounting.laporan.cetak_biaya', $data);
     }
 }

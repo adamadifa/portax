@@ -39,7 +39,6 @@
                     <tr>
                         <th>TANGGAL</th>
                         <th>AKUN</th>
-                        <th>SUMBER</th>
                         <th>KETERANGAN</th>
                         <th>JUMLAH</th>
                     </tr>
@@ -56,7 +55,6 @@
                         <tr>
                             <td>{{ DateToIndo($d->tanggal) }}</td>
                             <td>{{ $d->kode_akun }} - {{ $d->nama_akun }}</td>
-                            <td>{{ $d->sumber }}</td>
                             <td>{{ $d->keterangan }}</td>
                             <td class="right">{{ formatAngka($jumlah) }}</td>
                         </tr>
@@ -64,7 +62,7 @@
                 </tbody>
                 <tfoot>
                     <tr style="background-color: #333; color: white; font-weight: bold;">
-                        <td colspan="4" class="center">TOTAL</td>
+                        <td colspan="3" class="center">TOTAL</td>
                         <td class="right">{{ formatAngka($grand_total) }}</td>
                     </tr>
                 </tfoot>

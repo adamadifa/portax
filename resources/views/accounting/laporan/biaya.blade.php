@@ -7,8 +7,16 @@
         <div class="col-lg-6 col-md-12 col-sm-12">
             <x-input-with-icon icon="ti ti-calendar" label="Sampai" name="sampai" datepicker="flatpickr-date" />
         </div>
-    </div>
     <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="form-group mb-3">
+                <select name="formatlaporan" id="formatlaporan" class="form-select">
+                    <option value="1">Detail</option>
+                    <option value="2">Rekap</option>
+                </select>
+            </div>
+        </div>
+    </div>
         <div class="col-lg-12 col-md-12 col-sm-12">
             @if (auth()->user()->kode_cabang == 'PST')
                 <div class="form-group mb-3">
