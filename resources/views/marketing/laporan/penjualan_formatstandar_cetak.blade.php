@@ -133,7 +133,7 @@
                                 $diskon = 0;
                                 $qty_dus_this_row = $d->jumlah / $d->isi_pcs_dus;
                                 if ($d->kode_kategori_diskon == "D002" && $jml_dus_aida > 0) {
-                                    $diskon = ($qty_dus_this_row / $jml_dus_aida) * $d->potongan_aida;
+                                    $diskon = (($qty_dus_this_row / $jml_dus_aida) * $d->potongan_aida) * (100/111);
                                 }
                             @endphp
                             @php
