@@ -286,6 +286,7 @@ class LaporanmarketingController extends Controller
             'marketing_penjualan_detail.harga_pack',
             'marketing_penjualan_detail.harga_pcs',
             'marketing_penjualan_detail.status_promosi',
+            'produk.kode_kategori_diskon',
             'produk.isi_pcs_dus',
             'produk.isi_pcs_pack',
             'marketing_penjualan_detail.subtotal',

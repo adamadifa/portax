@@ -61,7 +61,7 @@
                         <th rowspan="2">Klasifikasi</th>
                         <th rowspan="2">Wilayah</th>
                         <th rowspan="2">Nama Produk</th>
-                        <th colspan="10">Qty</th>
+                        <th colspan="11">Qty</th>
                         <th rowspan="2">Bruto</th>
                         <th rowspan="2">Peny</th>
                         <th colspan="6" class="red">Potongan</th>
@@ -86,6 +86,7 @@
                         <th>Harga</th>
                         <th>DPP</th>
                         <th>Subtotal</th>
+                        <th>Diskon</th>
 
                         <th class="red">AIDA</th>
                         <th class="red">SWAN</th>
@@ -117,10 +118,24 @@
                         $grandtotal_netto = 0;
 
                         $total = 0;
-
                     @endphp
                     @foreach ($arr as $key => $val)
+                        @php
+                             $jml_dus_aida = 0;
+                             foreach($val as $v){
+                                 if($v->kode_kategori_diskon == "D002"){
+                                     $jml_dus_aida += $v->jumlah / $v->isi_pcs_dus;
+                                 }
+                             }
+                        @endphp
                         @foreach ($val as $k => $d)
+                            @php
+                                $diskon = 0;
+                                $qty_dus_this_row = $d->jumlah / $d->isi_pcs_dus;
+                                if ($d->kode_kategori_diskon == "D002" && $jml_dus_aida > 0) {
+                                    $diskon = ($qty_dus_this_row / $jml_dus_aida) * $d->potongan_aida;
+                                }
+                            @endphp
                             @php
                                 if (!empty($d->isi_pcs_dus) && $d->status_batal == 0) {
                                     $qty = convertToduspackpcsv2($d->isi_pcs_dus, $d->isi_pcs_pack, $d->jumlah);
@@ -176,6 +191,8 @@
                                     {{ !empty($pcs) ? formatAngka($d->harga_pcs * (100/111)) : '' }}</td>
                                 <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                     {{ formatAngka($d->subtotal) }}</td>
+                                <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
+                                    {{ formatAngka($diskon) }}</td>
 
 
                                 @if ($k == 0)
@@ -226,7 +243,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="19">TOTAL</th>
+                        <th colspan="20">TOTAL</th>
                         <th class="right">{{ formatAngka($grandtotal_bruto) }}</th>
                         <th class="right">{{ formatAngka($grandtotal_peny) }}</th>
                         <th class="right">{{ formatAngka($grandtotal_potongan_aida) }}</th>
