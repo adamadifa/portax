@@ -61,7 +61,7 @@
                         <th rowspan="2">Klasifikasi</th>
                         <th rowspan="2">Wilayah</th>
                         <th rowspan="2">Nama Produk</th>
-                        <th colspan="13">Qty</th>
+                        <th colspan="14">Qty</th>
                         <th rowspan="2">Bruto</th>
                         <th rowspan="2">Peny</th>
                         <th colspan="6" class="red">Potongan</th>
@@ -89,6 +89,7 @@
                         <th>Diskon</th>
                         <th>TOTAL DPP</th>
                         <th>DPP LAIN</th>
+                        <th>PPN</th>
 
                         <th class="red">AIDA</th>
                         <th class="red">SWAN</th>
@@ -199,6 +200,8 @@
                                     {{ formatAngka(($d->subtotal * (100/111)) - $diskon) }}</td>
                                 <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                     {{ formatAngka((($d->subtotal * (100/111)) - $diskon) * (11/12)) }}</td>
+                                <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
+                                    {{ formatAngka((($d->subtotal * (100/111)) - $diskon) * (11/12) * 0.12) }}</td>
 
 
                                 @if ($k == 0)
@@ -249,7 +252,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="22">TOTAL</th>
+                        <th colspan="23">TOTAL</th>
                         <th class="right">{{ formatAngka($grandtotal_bruto) }}</th>
                         <th class="right">{{ formatAngka($grandtotal_peny) }}</th>
                         <th class="right">{{ formatAngka($grandtotal_potongan_aida) }}</th>
