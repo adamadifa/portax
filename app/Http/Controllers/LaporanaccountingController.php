@@ -1749,10 +1749,131 @@ class LaporanaccountingController extends Controller
 
             if (isset($_POST['exportButton'])) {
                 header("Content-type: application/vnd-ms-excel");
-                // Mendefinisikan nama file ekspor "-SahabatEkspor.xls"
                 header("Content-Disposition: attachment; filename=Laba Rugi.xls");
             }
+
             return view('accounting.laporan.lk.labarugi_cetak', $data);
         }
+    }
+
+    public function cetakbiaya(Request $request)
+    {
+        $dari = $request->dari;
+        $sampai = $request->sampai;
+
+        $data['dari'] = $dari;
+        $data['sampai'] = $sampai;
+
+        if (!empty($request->kode_cabang)) {
+            $cabang = Cabang::where('kode_cabang', $request->kode_cabang)->first();
+            $data['cabang'] = $cabang->nama_cabang;
+        } else {
+            $data['cabang'] = 'Semua Cabang';
+        }
+
+        // --- Ledger Transaksi (Bank Payments / Transfers) ---
+        $ledger_transaksi = Ledger::query();
+        $ledger_transaksi->select(
+            'keuangan_ledger.kode_akun',
+            'coa.jenis_akun',
+            'nama_akun',
+            'keuangan_ledger.tanggal',
+            'keuangan_ledger.no_bukti',
+            DB::raw('CONCAT_WS(" - ", bank.nama_bank, bank.no_rekening) AS sumber'),
+            'keuangan_ledger.keterangan',
+            DB::raw('IF(debet_kredit="K",jumlah,0) as jml_kredit'),
+            DB::raw('IF(debet_kredit="D",jumlah,0) as jml_debet'),
+            DB::raw('IF((coa.jenis_akun = "1" AND debet_kredit = "K") OR ((coa.jenis_akun = "1" OR coa.jenis_akun IS NULL) AND debet_kredit = "D"), 1, 2) as urutan')
+        );
+        $ledger_transaksi->whereBetween('keuangan_ledger.tanggal', [$dari, $sampai]);
+        if (!empty($request->kode_cabang)) {
+             if(!empty($request->kode_cabang)){
+                $ledger_transaksi->where('bank.kode_cabang', $request->kode_cabang);
+             }
+        }
+        $ledger_transaksi->join('coa', 'keuangan_ledger.kode_akun', '=', 'coa.kode_akun');
+        $ledger_transaksi->join('bank', 'keuangan_ledger.kode_bank', '=', 'bank.kode_bank');
+        
+        // Filter Expenses
+        $ledger_transaksi->where(function($q) {
+            $q->where('keuangan_ledger.kode_akun', 'LIKE', '6%')
+              ->orWhere('keuangan_ledger.kode_akun', 'LIKE', '7%')
+              ->orWhere('keuangan_ledger.kode_akun', 'LIKE', '8%');
+        });
+
+
+        // --- Kas Kecil Transaksi (Detail) ---
+        $kaskecil_transaksi = Kaskecil::query();
+        $kaskecil_transaksi->select(
+            'keuangan_kaskecil.kode_akun',
+            'coa.jenis_akun',
+            'nama_akun',
+            'keuangan_kaskecil.tanggal',
+            'keuangan_kaskecil.no_bukti',
+            DB::raw("CONCAT('KAS KECIL ', keuangan_kaskecil.kode_cabang) AS sumber"),
+            'keuangan_kaskecil.keterangan',
+            DB::raw('IF(debet_kredit="K",jumlah,0) as jml_kredit'),
+            DB::raw('IF(debet_kredit="D",jumlah,0) as jml_debet'),
+            DB::raw('IF(debet_kredit="D",1,2) as urutan') // Just dummy
+        );
+        $kaskecil_transaksi->whereBetween('keuangan_kaskecil.tanggal', [$dari, $sampai]);
+        if (!empty($request->kode_cabang)) {
+             $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
+        }
+        $kaskecil_transaksi->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil');
+        $kaskecil_transaksi->join('coa', 'keuangan_kaskecil.kode_akun', '=', 'coa.kode_akun');
+        
+        $kaskecil_transaksi->where(function($q) {
+            $q->where('keuangan_kaskecil.kode_akun', 'LIKE', '6%')
+              ->orWhere('keuangan_kaskecil.kode_akun', 'LIKE', '7%')
+              ->orWhere('keuangan_kaskecil.kode_akun', 'LIKE', '8%');
+        });
+
+
+        // --- Jurnal Umum ---
+        $jurnalumum = Jurnalumum::query();
+        $jurnalumum->select(
+            'accounting_jurnalumum.kode_akun',
+            'coa.jenis_akun',
+            'nama_akun',
+            'accounting_jurnalumum.tanggal',
+            'accounting_jurnalumum.kode_ju as no_bukti',
+            DB::raw("'JURNAL UMUM' AS sumber"),
+            'accounting_jurnalumum.keterangan',
+            DB::raw('IF(accounting_jurnalumum.debet_kredit="K",accounting_jurnalumum.jumlah,0) as jml_kredit'),
+            DB::raw('IF(accounting_jurnalumum.debet_kredit="D",accounting_jurnalumum.jumlah,0) as jml_debet'),
+            DB::raw('IF(accounting_jurnalumum.debet_kredit="D",2,1) as urutan')
+        );
+        $jurnalumum->whereBetween('accounting_jurnalumum.tanggal', [$dari, $sampai]);
+        if (!empty($request->kode_cabang)) {
+             $jurnalumum->where('accounting_jurnalumum.kode_cabang', $request->kode_cabang);
+        }
+        $jurnalumum->join('coa', 'accounting_jurnalumum.kode_akun', '=', 'coa.kode_akun');
+        $jurnalumum->where(function($q) {
+            $q->where('accounting_jurnalumum.kode_akun', 'LIKE', '6%')
+              ->orWhere('accounting_jurnalumum.kode_akun', 'LIKE', '7%')
+              ->orWhere('accounting_jurnalumum.kode_akun', 'LIKE', '8%');
+        });
+
+
+        // Union Data
+        $union_data = $ledger_transaksi
+            ->unionAll($kaskecil_transaksi)
+            ->unionAll($jurnalumum);
+
+        $biaya = DB::query()->fromSub($union_data, 'transaksi_biaya')
+               ->orderBy('tanggal')
+               ->orderBy('kode_akun')
+               ->get();
+        
+        $data['biaya'] = $biaya;
+        
+        if (isset($_POST['exportButton'])) {
+            header("Content-type: application/vnd-ms-excel");
+            // Mendefinisikan nama file ekspor
+            header("Content-Disposition: attachment; filename=Laporan Biaya $data[cabang] $dari-$sampai.xls");
+        }
+
+        return view('accounting.laporan.cetak_biaya', $data);
     }
 }

@@ -262,6 +262,35 @@ Cek apakah no_faktur sudah ada di server.
 
 ---
 
+---
+
+## 6. Reset No Faktur New
+
+**Endpoint:** `POST /sync-penjualan/reset-no-fak-new`
+
+Reset (generate ulang) `no_fak_new` untuk periode tertentu. Berguna jika urutan no_fak_new berantakan atau perlu di-resequence. Tanda (-) pada `no_fak_new` akan dihapus dan diganti dengan urutan baru yang kontinu berdasarkan prefix cabang/salesman/tahun.
+
+### Request Body
+```json
+{
+  "periode": "2024-04",
+  "kode_cabang": "PST",  // Optional. Jika kosong, semua cabang.
+  "kode_salesman": "SLS001" // Optional. Jika kosong, semua salesman di cabang tersebut.
+}
+```
+
+### Response Success (200)
+```json
+{
+  "success": true,
+  "message": "Reset no_fak_new berhasil",
+  "updated_count": 150,
+  "periode": "2024-04"
+}
+```
+
+---
+
 ## Field Reference
 
 ### Header Penjualan

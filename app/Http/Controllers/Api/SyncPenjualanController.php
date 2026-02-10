@@ -712,4 +712,132 @@ class SyncPenjualanController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Reset nomor faktur new berdasarkan periode
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function resetNoFakNew(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'periode' => 'required|date_format:Y-m',
+                'kode_cabang' => 'nullable|string',
+                'kode_salesman' => 'nullable|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $periode = $request->periode;
+            $bulan = date('m', strtotime($periode));
+            $tahun = date('Y', strtotime($periode));
+
+            $query = Penjualan::query()
+                ->select('marketing_penjualan.*', 'salesman.kode_pt', 'salesman.kode_sales', 'salesman.kode_cabang as salesman_cabang')
+                ->join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
+                ->whereMonth('marketing_penjualan.tanggal', $bulan)
+                ->whereYear('marketing_penjualan.tanggal', $tahun);
+
+            if ($request->has('kode_cabang') && !empty($request->kode_cabang)) {
+                $query->where('salesman.kode_cabang', $request->kode_cabang);
+            }
+
+            if ($request->has('kode_salesman') && !empty($request->kode_salesman)) {
+                $query->where('marketing_penjualan.kode_salesman', $request->kode_salesman);
+            }
+
+            // Order by tanggal and created_at to ensure sequence
+            $penjualanList = $query->orderBy('marketing_penjualan.tanggal', 'asc')
+                                   ->orderBy('marketing_penjualan.created_at', 'asc')
+                                   ->get();
+
+            if ($penjualanList->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Tidak ada data penjualan pada periode tersebut',
+                    'updated_count' => 0
+                ]);
+            }
+
+            DB::beginTransaction();
+
+            $updatedCount = 0;
+            $lastCodes = []; // Cache for last codes per prefix
+
+            // Start date of the period for finding previous last code
+            $periodStartDate = $tahun . '-' . $bulan . '-01';
+
+            foreach ($penjualanList as $penjualan) {
+                $thn = date('Y', strtotime($penjualan->tanggal));
+                $thn_short = date('y', strtotime($penjualan->tanggal));
+                
+                // Construct Prefix: PT + YY + SalesCode
+                // Example: PST + 24 + A = PST24A
+                $prefix = $penjualan->kode_pt . $thn_short . $penjualan->kode_sales;
+                
+                // Initialize last code for this prefix if not yet known in this session
+                if (!isset($lastCodes[$prefix])) {
+                    // Find the last no_fak_new from DB *before* this period
+                    // Logic similar to existing implementation but strict on time
+                    $lastTx = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
+                        ->where('salesman.kode_cabang', $penjualan->salesman_cabang)
+                        ->whereRaw('LEFT(no_fak_new,3)="' . $penjualan->kode_pt . '"')
+                        ->whereRaw('MID(no_fak_new,6,1)="' . $penjualan->kode_sales . '"')
+                        ->whereRaw('YEAR(tanggal)="' . $thn . '"')
+                        ->where('tanggal', '<', $periodStartDate)
+                        ->orderBy('no_fak_new', 'desc')
+                        ->first();
+
+                    if ($lastTx && $lastTx->no_fak_new) {
+                        $lastCodes[$prefix] = $lastTx->no_fak_new;
+                    } else {
+                        // If no previous transaction in this year, start from 0
+                        // The format expects 6 digits number at the end.
+                        // buatkode expects (last_code, prefix, length)
+                        // effective last code would be prefix . '000000' so next is ...1
+                        $lastCodes[$prefix] = $prefix . '000000';
+                    }
+                }
+
+                // Generate new code
+                $newCode = buatkode($lastCodes[$prefix], $prefix, 6);
+                
+                // Update if different
+                if ($penjualan->no_fak_new !== $newCode) {
+                    // Update straight to DB to avoid model events if any, or use model update
+                    // Using query builder update to be faster and safe
+                    Penjualan::where('no_faktur', $penjualan->no_faktur)->update(['no_fak_new' => $newCode]);
+                    $updatedCount++;
+                }
+                
+                // Update local cache for next iteration
+                $lastCodes[$prefix] = $newCode;
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Reset no_fak_new berhasil',
+                'updated_count' => $updatedCount,
+                'periode' => $periode
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal reset no_fak_new',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

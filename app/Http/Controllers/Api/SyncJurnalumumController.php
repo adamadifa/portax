@@ -278,7 +278,7 @@ class SyncJurnalumumController extends Controller
                         'debet_kredit' => $jurnalumumData['debet_kredit'],
                         'kode_akun' => $jurnalumumData['kode_akun'],
                         'kode_dept' => $jurnalumumData['kode_dept'],
-                        'kode_pruntukan' => $jurnalumumData['kode_peruntukan'], // Note: typo di migration
+                        'kode_peruntukan' => $jurnalumumData['kode_peruntukan'],
                         'kode_cabang' => $jurnalumumData['kode_cabang'] ?? null,
                         'id_user' => $jurnalumumData['id_user'],
                     ];
@@ -305,9 +305,9 @@ class SyncJurnalumumController extends Controller
                     $results[] = [
                         'kode_ju' => $jurnalumumData['kode_ju'] ?? 'unknown',
                         'status' => 'failed',
-                        'message' => $e->getMessage(),
-                        'sql_error' => config('app.debug') ? $e->getMessage() : null,
-                        'sql_code' => $e->getCode()
+                        'message' => 'Database error: ' . $e->getMessage(),
+                        'sql_code' => $e->getCode(),
+                        'details' => $e->getMessage() // Always return message for better debugging
                     ];
                 } catch (\Error $e) {
                     DB::rollBack();
@@ -315,9 +315,8 @@ class SyncJurnalumumController extends Controller
                     $results[] = [
                         'kode_ju' => $jurnalumumData['kode_ju'] ?? 'unknown',
                         'status' => 'failed',
-                        'message' => $e->getMessage(),
-                        'error_type' => get_class($e),
-                        'file' => config('app.debug') ? $e->getFile() . ':' . $e->getLine() : null
+                        'message' => 'PHP Error: ' . $e->getMessage(),
+                        'file' => $e->getFile() . ':' . $e->getLine()
                     ];
                 } catch (Exception $e) {
                     DB::rollBack();
@@ -325,8 +324,7 @@ class SyncJurnalumumController extends Controller
                     $results[] = [
                         'kode_ju' => $jurnalumumData['kode_ju'] ?? 'unknown',
                         'status' => 'failed',
-                        'message' => $e->getMessage(),
-                        'error_type' => config('app.debug') ? get_class($e) : null
+                        'message' => $e->getMessage()
                     ];
                 }
             }

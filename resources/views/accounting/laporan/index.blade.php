@@ -82,12 +82,24 @@
                             </button>
                         </li>
                     @endcan
-
+                    @can('lk.bukubesar')
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#biaya"
+                                aria-controls="biaya" aria-selected="false" tabindex="-1">
+                                Laporan Biaya
+                            </button>
+                        </li>
+                    @endcan
                 </ul>
                 <div class="tab-content">
                     @can('lk.bukubesar')
                         <div class="tab-pane fade active show" id="rekkappersediaan" role="tabpanel">
                             @include('accounting.laporan.lk.bukubesar')
+                        </div>
+                    @endcan
+                    @can('lk.bukubesar')
+                        <div class="tab-pane fade" id="biaya" role="tabpanel">
+                            @include('accounting.laporan.biaya')
                         </div>
                     @endcan
                 </div>

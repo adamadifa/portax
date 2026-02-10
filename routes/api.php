@@ -33,6 +33,7 @@ Route::prefix('sync')->group(function () {
     Route::post('/penjualan/check', [SyncPenjualanController::class, 'check']);
     Route::delete('/penjualan', [SyncPenjualanController::class, 'delete']);
     Route::delete('/penjualan/batch', [SyncPenjualanController::class, 'deleteBatch']);
+    Route::post('/penjualan/reset-no-fak-new', [SyncPenjualanController::class, 'resetNoFakNew']);
 
     // Kas Kecil
     Route::post('/kaskecil', [SyncKaskecilController::class, 'sync']);
@@ -71,6 +72,7 @@ Route::fallback(function (Request $request) {
                 '/api/sync/penjualan',
                 '/api/sync/penjualan/batch',
                 '/api/sync/penjualan/check',
+                '/api/sync/penjualan/reset-no-fak-new',
                 '/api/sync/kaskecil',
                 '/api/sync/kaskecil/batch',
                 '/api/sync/kaskecil/check',
