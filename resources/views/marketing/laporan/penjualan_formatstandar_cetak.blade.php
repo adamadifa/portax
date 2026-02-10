@@ -61,7 +61,7 @@
                         <th rowspan="2">Klasifikasi</th>
                         <th rowspan="2">Wilayah</th>
                         <th rowspan="2">Nama Produk</th>
-                        <th colspan="7">Qty</th>
+                        <th colspan="10">Qty</th>
                         <th rowspan="2">Bruto</th>
                         <th rowspan="2">Peny</th>
                         <th colspan="6" class="red">Potongan</th>
@@ -78,10 +78,13 @@
                     <tr>
                         <th>Dus</th>
                         <th>Harga</th>
+                        <th>DPP</th>
                         <th>Pack</th>
                         <th>Harga</th>
+                        <th>DPP</th>
                         <th>Pcs</th>
                         <th>Harga</th>
+                        <th>DPP</th>
                         <th>Subtotal</th>
 
                         <th class="red">AIDA</th>
@@ -157,14 +160,20 @@
                                     {{ formatAngka($dus) }}</td>
                                 <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                     {{ !empty($dus) ? formatAngka($d->harga_dus) : '' }}</td>
+                                <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
+                                    {{ !empty($dus) ? formatAngka($d->harga_dus * (100/111)) : '' }}</td>
                                 <td class="center" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                     {{ formatAngka($pack) }}</td>
                                 <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                     {{ !empty($pack) ? formatAngka($d->harga_pack) : '' }}</td>
+                                <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
+                                    {{ !empty($pack) ? formatAngka($d->harga_pack * (100/111)) : '' }}</td>
                                 <td class="center" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                     {{ formatAngka($pcs) }}</td>
                                 <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                     {{ !empty($pcs) ? formatAngka($d->harga_pcs) : '' }}</td>
+                                <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
+                                    {{ !empty($pcs) ? formatAngka($d->harga_pcs * (100/111)) : '' }}</td>
                                 <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                     {{ formatAngka($d->subtotal) }}</td>
 
@@ -217,7 +226,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="16">TOTAL</th>
+                        <th colspan="19">TOTAL</th>
                         <th class="right">{{ formatAngka($grandtotal_bruto) }}</th>
                         <th class="right">{{ formatAngka($grandtotal_peny) }}</th>
                         <th class="right">{{ formatAngka($grandtotal_potongan_aida) }}</th>
