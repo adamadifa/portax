@@ -1787,19 +1787,14 @@ class LaporanaccountingController extends Controller
         );
         $ledger_transaksi->whereBetween('keuangan_ledger.tanggal', [$dari, $sampai]);
         if (!empty($request->kode_cabang)) {
-             if(!empty($request->kode_cabang)){
-                $ledger_transaksi->where('bank.kode_cabang', $request->kode_cabang);
-             }
+            $ledger_transaksi->where(function ($query) use ($request) {
+                $query->where('bank.kode_cabang', $request->kode_cabang)
+                    ->orWhere('keuangan_ledger.kode_peruntukan', $request->kode_cabang);
+            });
         }
         $ledger_transaksi->join('coa', 'keuangan_ledger.kode_akun', '=', 'coa.kode_akun');
         $ledger_transaksi->join('bank', 'keuangan_ledger.kode_bank', '=', 'bank.kode_bank');
         
-        // Filter Expenses
-        $ledger_transaksi->where(function($q) {
-            $q->where('keuangan_ledger.kode_akun', 'LIKE', '6%')
-              ->orWhere('keuangan_ledger.kode_akun', 'LIKE', '7%')
-              ->orWhere('keuangan_ledger.kode_akun', 'LIKE', '8%');
-        });
 
 
         // --- Kas Kecil Transaksi (Detail) ---
@@ -1823,11 +1818,6 @@ class LaporanaccountingController extends Controller
         $kaskecil_transaksi->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil');
         $kaskecil_transaksi->join('coa', 'keuangan_kaskecil.kode_akun', '=', 'coa.kode_akun');
         
-        $kaskecil_transaksi->where(function($q) {
-            $q->where('keuangan_kaskecil.kode_akun', 'LIKE', '6%')
-              ->orWhere('keuangan_kaskecil.kode_akun', 'LIKE', '7%')
-              ->orWhere('keuangan_kaskecil.kode_akun', 'LIKE', '8%');
-        });
 
 
         // --- Jurnal Umum ---
@@ -1849,11 +1839,6 @@ class LaporanaccountingController extends Controller
              $jurnalumum->where('accounting_jurnalumum.kode_cabang', $request->kode_cabang);
         }
         $jurnalumum->join('coa', 'accounting_jurnalumum.kode_akun', '=', 'coa.kode_akun');
-        $jurnalumum->where(function($q) {
-            $q->where('accounting_jurnalumum.kode_akun', 'LIKE', '6%')
-              ->orWhere('accounting_jurnalumum.kode_akun', 'LIKE', '7%')
-              ->orWhere('accounting_jurnalumum.kode_akun', 'LIKE', '8%');
-        });
 
 
         // Union Data
