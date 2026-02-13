@@ -396,9 +396,9 @@ class SyncPenjualanController extends Controller
             // ============================================================
             DB::beginTransaction();
             try {
-                Detailpenjualan::whereIn('no_faktur', $no_fakturs)->delete();
-                Historibayarpenjualan::whereIn('no_faktur', $no_fakturs)->delete();
-                Penjualan::whereIn('no_faktur', $no_fakturs)->delete();
+                $deleted_detail = Detailpenjualan::whereIn('no_faktur', $no_fakturs)->delete();
+                $deleted_histori = Historibayarpenjualan::whereIn('no_faktur', $no_fakturs)->delete();
+                $deleted_header = Penjualan::whereIn('no_faktur', $no_fakturs)->delete();
                 DB::commit(); // Commit DELETE so it's visible to next queries
             } catch (Exception $e) {
                 DB::rollBack();
@@ -409,6 +409,15 @@ class SyncPenjualanController extends Controller
                 ], 500);
             }
 
+            // DEBUG: Check what remains in DB after delete commit
+            $debug_info = [
+                'deleted_header' => $deleted_header,
+                'deleted_detail' => $deleted_detail,
+                'deleted_histori' => $deleted_histori,
+                'batch_no_fakturs_count' => count($no_fakturs),
+                'first_record_debug' => null, // Will be filled for the first record
+            ];
+
             // ============================================================
             // PHASE 2: INSERT new data (in a new transaction)
             // Now the old records are truly gone, so buatkode() will find
@@ -418,6 +427,7 @@ class SyncPenjualanController extends Controller
             try {
                 $successCount = 0;
                 $results = [];
+                $isFirstRecord = true;
 
                 foreach ($data as $penjualanData) {
 
@@ -448,6 +458,31 @@ class SyncPenjualanController extends Controller
                             
                             $last_no_fak_new = $lastransaksi != NULL ? $lastransaksi->no_fak_new : "";
                             $no_fak_new = buatkode($last_no_fak_new, $salesmanBatch->kode_pt . $tahun . $salesmanBatch->kode_sales, 6);
+
+                            // DEBUG: Capture info for the first record to diagnose
+                            if ($isFirstRecord) {
+                                $remaining_count = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
+                                    ->where('tanggal', '>=', $start_date)
+                                    ->whereRaw('MID(no_fak_new,6,1)="' . $salesmanBatch->kode_sales . '"')
+                                    ->where('salesman.kode_cabang', $salesmanBatch->kode_cabang)
+                                    ->whereRaw('YEAR(tanggal)="' . $thn . '"')
+                                    ->whereRaw('LEFT(no_fak_new,3)="' . $salesmanBatch->kode_pt . '"')
+                                    ->count();
+
+                                $debug_info['first_record_debug'] = [
+                                    'kode_salesman' => $penjualanData['kode_salesman'],
+                                    'kode_sales' => $salesmanBatch->kode_sales,
+                                    'kode_cabang' => $salesmanBatch->kode_cabang,
+                                    'kode_pt' => $salesmanBatch->kode_pt,
+                                    'tahun' => $tahun,
+                                    'thn' => $thn,
+                                    'remaining_matching_records_after_delete' => $remaining_count,
+                                    'lastransaksi_found' => $lastransaksi != NULL ? $lastransaksi->no_fak_new : 'NULL (empty)',
+                                    'lastransaksi_no_faktur' => $lastransaksi != NULL ? $lastransaksi->no_faktur : 'NULL',
+                                    'generated_no_fak_new' => $no_fak_new,
+                                ];
+                                $isFirstRecord = false;
+                            }
                         }
                     }
 
@@ -541,6 +576,7 @@ class SyncPenjualanController extends Controller
                         'success' => $successCount,
                         'failed' => 0
                     ],
+                    'debug' => $debug_info,
                     'results' => $results
                 ], 200);
 
