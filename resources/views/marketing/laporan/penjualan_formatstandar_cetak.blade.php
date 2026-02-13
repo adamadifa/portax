@@ -167,7 +167,7 @@
                                 @if ($k == 0)
                                     <td rowspan="{{ count($val) }}">{{ formatIndo($d->tanggal) }}</td>
                                     <!-- <td rowspan="{{ count($val) }}">{{ !empty($d->no_fak_new) ? $d->no_fak_new : $d->no_faktur }}</td> -->
-                                     <td>{{ $d->no_faktur }}</td>
+                                    <td rowspan="{{ count($val) }}">{{ $d->no_faktur }}</td>
                                     <td rowspan="{{ count($val) }}">{{ $d->kode_pelanggan }}</td>
                                     <td rowspan="{{ count($val) }}">{{ $d->nama_pelanggan }}</td>
                                     <td rowspan="{{ count($val) }}">{{ $d->nama_salesman }}</td>
