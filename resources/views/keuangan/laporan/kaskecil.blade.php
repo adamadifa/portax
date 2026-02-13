@@ -1,30 +1,109 @@
-<form action="{{ route('laporankeuangan.cetakkaskecil') }}" id="formKaskecil" target="_blank" method="POST">
+<form action="{{ route('laporankeuangan.cetakkaskecil') }}" id="formKaskecil" target="_blank" method="POST" class="space-y-3">
     @csrf
     @php
         $role_admin_pusat = ['admin pusat'];
     @endphp
-    @hasanyrole(array_merge($roles_show_cabang, $role_admin_pusat))
-        <div class="form-group mb-3">
-            <select name="kode_cabang" id="kode_cabang_kaskecil" class="form-select select2Kodecabangkaskecil">
+    <style>
+        .select2-container .select2-selection--single {
+            height: 46px !important;
+            padding: 10px 12px !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 0.5rem !important;
+            background-color: #fff !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: normal !important;
+            padding-left: 0 !important;
+            color: #1e293b !important;
+            font-size: 0.875rem !important;
+            flex-grow: 1 !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 44px !important;
+            top: 1px !important;
+            right: 8px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #94a3b8 !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__clear {
+            margin-right: 0px !important;
+            font-weight: bold !important;
+            color: #cbd5e1 !important;
+            order: 2 !important;
+            margin-left: auto !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__clear:hover {
+            color: #64748b !important;
+        }
+
+        .form-select {
+            border-color: #cbd5e1 !important;
+            border-radius: 0.5rem !important;
+        }
+
+        .form-select:focus {
+            border-color: #003d9e !important;
+            box-shadow: 0 0 0 1px #003d9e !important;
+        }
+
+        .flatpickr-date,
+        .form-control {
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 0.5rem !important;
+            height: 46px !important;
+            padding: 10px 12px !important;
+        }
+
+        .flatpickr-date:focus,
+        .form-control:focus {
+            border-color: #003d9e !important;
+            box-shadow: 0 0 0 1px #003d9e !important;
+            outline: none !important;
+        }
+    </style>
+
+    <div class="space-y-2">
+        @hasanyrole(array_merge($roles_show_cabang, $role_admin_pusat))
+        <div class="relative">
+            <select name="kode_cabang" id="kode_cabang_kaskecil" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodecabangkaskecil">
                 <option value="">Semua Cabang</option>
                 @foreach ($cabang as $d)
                     <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
                 @endforeach
             </select>
         </div>
-    @endrole
-    <div class="form-group mb-3">
-        <select name="formatlaporan" id="formatlaporan" class="form-select">
-            <option value="">Format Laporan</option>
-            <option value="1">Detail</option>
-            <option value="2">Rekap</option>
-        </select>
-    </div>
-    <div class="row" id="coakaskecil">
-        <div class="col">
-            <div class="form-group">
-                <select name="kode_akun_dari" id="kode_akun_dari_kaskecil" class="form-select select2Kodeakundarikaskecil">
-                    <option value="">Semua Akun</option>
+        @endrole
+
+        <div class="relative">
+            <select name="formatlaporan" id="formatlaporan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none form-select">
+                <option value="">Format Laporan</option>
+                <option value="1">Detail</option>
+                <option value="2">Rekap</option>
+            </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4" id="coakaskecil">
+            <div class="relative">
+                <select name="kode_akun_dari" id="kode_akun_dari_kaskecil" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodeakundarikaskecil">
+                    <option value="">Dari Akun</option>
+                    @foreach ($coa as $d)
+                        <option value="{{ $d->kode_akun }}">{{ $d->kode_akun }} {{ truncateText($d->nama_akun) }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="relative">
+                <select name="kode_akun_sampai" id="kode_akun_sampai_kaskecil" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodeakunsampaikaskecil">
+                    <option value="">Sampai Akun</option>
                     @foreach ($coa as $d)
                         <option value="{{ $d->kode_akun }}">{{ $d->kode_akun }} {{ truncateText($d->nama_akun) }}</option>
                     @endforeach
@@ -32,28 +111,19 @@
             </div>
         </div>
 
-        <div class="col">
-            <div class="row">
-                <select name="kode_akun_sampai" id="kode_akun_sampai_kaskecil" class="form-select select2Kodeakunsampaikaskecil">
-                    <option value="">Semua Akun</option>
-                    @foreach ($coa as $d)
-                        <option value="{{ $d->kode_akun }}">{{ $d->kode_akun }} {{ truncateText($d->nama_akun) }}</option>
-                    @endforeach
-                </select>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="relative">
+                <input type="text" name="dari" id="dari" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Dari Tanggal">
+            </div>
+            <div class="relative">
+                <input type="text" name="sampai" id="sampai" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Sampai Tanggal">
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Dari" name="dari" datepicker="flatpickr-date" />
-        </div>
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Sampai" name="sampai" datepicker="flatpickr-date" />
-        </div>
-    </div>
-    <div class="row">
+
+    <div class="row mt-2">
         <div class="col-lg-10 col-md-12 col-sm-12">
-            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButton">
+            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButton" style="background-color: #003d9e; border-color: #003d9e;">
                 <i class="ti ti-printer me-1"></i> Cetak
             </button>
         </div>
@@ -84,7 +154,7 @@
                 select2Kodeakundarikaskecil.each(function() {
                     var $this = $(this);
                     $this.wrap('<div class="position-relative"></div>').select2({
-                        placeholder: 'Semua Akun',
+                        placeholder: 'Dari Akun',
                         allowClear: true,
                         dropdownParent: $this.parent()
                     });
@@ -95,7 +165,7 @@
                 select2Kodeakunsampaikaskecil.each(function() {
                     var $this = $(this);
                     $this.wrap('<div class="position-relative"></div>').select2({
-                        placeholder: 'Semua Akun',
+                        placeholder: 'Sampai Akun',
                         allowClear: true,
                         dropdownParent: $this.parent()
                     });
@@ -124,18 +194,6 @@
                 const sampai = formKaskecil.find('#sampai').val();
                 const start = new Date(dari);
                 const end = new Date(sampai);
-                // if (kode_cabang == "") {
-                //     Swal.fire({
-                //         title: "Oops!",
-                //         text: 'Cabang Harus Diisi !',
-                //         icon: "warning",
-                //         showConfirmButton: true,
-                //         didClose: (e) => {
-                //             formKaskecil.find("#kode_cabang_kaskecil").focus();
-                //         },
-                //     })
-                //     return false;
-                // } else
                 if (formatlaporan == "") {
                     Swal.fire({
                         title: "Oops!",

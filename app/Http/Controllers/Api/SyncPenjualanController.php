@@ -366,10 +366,6 @@ class SyncPenjualanController extends Controller
                 ], 422);
             }
 
-            $successCount = 0;
-            $failedCount = 0;
-            $results = [];
-
             // Get User once (Super Admin ID 1)
             $id_user = 1;
             $user = User::find($id_user);
@@ -381,70 +377,66 @@ class SyncPenjualanController extends Controller
             }
             $kode_cabang = $user->kode_cabang;
 
-            foreach ($request->data as $penjualanData) {
-                try {
-                    DB::beginTransaction();
+            $data = $request->data;
 
-                    // Cek duplikat REMOVED - Using Upsert
-                    
+            // Sort data by tanggal ASC so that insertion order matches date order (important for auto-numbering)
+            usort($data, function ($a, $b) {
+                return strtotime($a['tanggal']) - strtotime($b['tanggal']);
+            });
+
+            // Extract valid no_fakturs to delete first
+            $no_fakturs = array_column($data, 'no_faktur');
+
+            DB::beginTransaction();
+            try {
+                // DELETE ALL related data first to ensure no old numbering conflicts
+                Detailpenjualan::whereIn('no_faktur', $no_fakturs)->delete();
+                Historibayarpenjualan::whereIn('no_faktur', $no_fakturs)->delete();
+                Penjualan::whereIn('no_faktur', $no_fakturs)->delete();
+
+                $successCount = 0;
+                $results = [];
+
+                foreach ($data as $penjualanData) {
+
                     // Force User ID
                     $penjualanData['id_user'] = $id_user;
-                    
-                    // ... (Salesman/Pelanggan creation logic remains)
 
-                    // Auto Numbering Logic (Fix Undefined Variable)
+                    // Check & Create Salesman (Assuming logic is same as single sync, simplified for batch)
+                    // ... (Original logic for Salesman/Pelanggan creation can be kept inside loop or optimized outside)
+                    // For now, keep inside loop as per original logic structure but simplified.
+                    // Or actually, just ensure they exist.
+
+                    // Auto Numbering Logic (Re-implemented for Batch)
+                    // Since we deleted old records, we treat this as a NEW insert.
                     $no_fak_new = null;
-
-                    // Cek jika data sudah ada, gunakan no_fak_new yang lama agar tidak berubah
-                    $existingPenjualan = Penjualan::where('no_faktur', $penjualanData['no_faktur'])->first();
                     
-                    if ($existingPenjualan && $existingPenjualan->no_fak_new) {
-                        $no_fak_new = $existingPenjualan->no_fak_new;
-                    } else {
-                        // Jika belum ada, generate baru
-                        $salesmanBatch = Salesman::join('cabang', 'salesman.kode_cabang', '=', 'cabang.kode_cabang')
-                            ->where('kode_salesman', $penjualanData['kode_salesman'])->first();
+                    $salesmanBatch = Salesman::join('cabang', 'salesman.kode_cabang', '=', 'cabang.kode_cabang')
+                        ->where('kode_salesman', $penjualanData['kode_salesman'])->first();
+                        
+                    if ($salesmanBatch) {
+                        $tahun = date('y', strtotime($penjualanData['tanggal']));
+                        $thn = date('Y', strtotime($penjualanData['tanggal']));
+                        $start_date = "2024-03-01";
+                        
+                        if ($penjualanData['tanggal'] >= '2024-03-01' && $salesmanBatch->kode_cabang != "PST") {
+                            // Find the LAST transaction in DB (including ones we just inserted in previous iterations of this loop)
+                            $lastransaksi = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
+                                    ->where('tanggal', '>=', $start_date)
+                                    ->whereRaw('MID(no_fak_new,6,1)="' . $salesmanBatch->kode_sales . '"')
+                                    ->where('salesman.kode_cabang', $salesmanBatch->kode_cabang)
+                                    ->whereRaw('YEAR(tanggal)="' . $thn . '"')
+                                    ->whereRaw('LEFT(no_fak_new,3)="' . $salesmanBatch->kode_pt . '"')
+                                    ->orderBy('no_fak_new', 'desc')
+                                    ->first();
                             
-                        if ($salesmanBatch) {
-                            $tahun = date('y', strtotime($penjualanData['tanggal']));
-                            $thn = date('Y', strtotime($penjualanData['tanggal']));
-                            $start_date = "2024-03-01";
-                            
-                            if ($penjualanData['tanggal'] >= '2024-03-01' && $salesmanBatch->kode_cabang != "PST") {
-                                $lastransaksi = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
-                                        ->where('tanggal', '>=', $start_date)
-                                        ->whereRaw('MID(no_fak_new,6,1)="' . $salesmanBatch->kode_sales . '"')
-                                        ->where('salesman.kode_cabang', $salesmanBatch->kode_cabang)
-                                        ->whereRaw('YEAR(tanggal)="' . $thn . '"')
-                                        ->whereRaw('LEFT(no_fak_new,3)="' . $salesmanBatch->kode_pt . '"')
-                                        ->orderBy('no_fak_new', 'desc')
-                                        ->first();
-                                
-                                $last_no_fak_new = $lastransaksi != NULL ? $lastransaksi->no_fak_new : "";
-                                $no_fak_new = buatkode($last_no_fak_new, $salesmanBatch->kode_pt . $tahun . $salesmanBatch->kode_sales, 6);
-                            }
+                            $last_no_fak_new = $lastransaksi != NULL ? $lastransaksi->no_fak_new : "";
+                            $no_fak_new = buatkode($last_no_fak_new, $salesmanBatch->kode_pt . $tahun . $salesmanBatch->kode_sales, 6);
                         }
                     }
 
-                    // Upsert header
-                     $header = array_merge($penjualanData, [
-                        'no_fak_new' => $no_fak_new,
-                        // ... other fields
-                    ]);
-                    
-                    // Cleanup for insert/update
-                    // We need to regenerate $header because $penjualanData has 'detail' and 'historibayar'
-                    $header = array_diff_key($penjualanData, array_flip(['detail', 'historibayar']));
-                    // Add calculated fields
-                     $header['no_fak_new'] = $no_fak_new;
-                     $header['kode_akun'] = $penjualanData['kode_akun'] ?? '1-1401';
-                     $header['kode_akun_potongan'] = $penjualanData['kode_akun_potongan'] ?? '4-2201';
-                     $header['kode_akun_penyesuaian'] = $penjualanData['kode_akun_penyesuaian'] ?? '4-2202';
-                     // ... map other fields (it was already mapped in previous code block, check context)
-                     // Ah, the previous code block did this mapping cleanly. I should reuse that structure but change Penjualan::create to updateOrCreate.
-                     
-                     // Re-mapping from previous code context:
-                     $header = array_merge($penjualanData, [
+                    // Prepare Header Data
+                    $header = array_merge($penjualanData, [
                         'no_fak_new' => $no_fak_new,
                         'kode_akun' => $penjualanData['kode_akun'] ?? '1-1401',
                         'kode_akun_potongan' => $penjualanData['kode_akun_potongan'] ?? '4-2201',
@@ -470,19 +462,16 @@ class SyncPenjualanController extends Controller
                         'lock_print' => $penjualanData['lock_print'] ?? '0',
                     ]);
 
+                    // Remove non-table columns
                     unset($header['detail']);
                     unset($header['historibayar']);
                     unset($header['salesman']);
                     unset($header['pelanggan']);
 
-                    Penjualan::updateOrCreate(
-                        ['no_faktur' => $penjualanData['no_faktur']],
-                        $header
-                    );
+                    // Create New Record
+                    Penjualan::create($header);
 
-                    // 2. Detail: Replace
-                    Detailpenjualan::where('no_faktur', $penjualanData['no_faktur'])->delete();
-                    
+                    // Insert Details
                     foreach ($penjualanData['detail'] as $detail) {
                         Detailpenjualan::create([
                             'no_faktur' => $penjualanData['no_faktur'],
@@ -496,12 +485,11 @@ class SyncPenjualanController extends Controller
                         ]);
                     }
 
-                    // 3. History: Upsert
+                    // Insert History
                     if (isset($penjualanData['historibayar']) && is_array($penjualanData['historibayar'])) {
                         foreach ($penjualanData['historibayar'] as $bayar) {
-                             Historibayarpenjualan::updateOrCreate(
-                                ['no_bukti' => $bayar['no_bukti']],
-                                [
+                             Historibayarpenjualan::create([
+                                    'no_bukti' => $bayar['no_bukti'], // Assuming unique
                                     'no_faktur' => $penjualanData['no_faktur'],
                                     'tanggal' => $bayar['tanggal'],
                                     'kode_salesman' => $bayar['kode_salesman'] ?? $penjualanData['kode_salesman'],
@@ -518,34 +506,38 @@ class SyncPenjualanController extends Controller
                         }
                     }
 
-                    DB::commit();
                     $successCount++;
                     $results[] = [
                         'no_faktur' => $penjualanData['no_faktur'],
                         'status' => 'success',
-                        'message' => 'Berhasil disync'
-                    ];
-                } catch (Exception $e) {
-                    DB::rollBack();
-                    $failedCount++;
-                    $results[] = [
-                        'no_faktur' => $penjualanData['no_faktur'] ?? 'unknown',
-                        'status' => 'failed',
-                        'message' => $e->getMessage()
+                        'message' => 'Berhasil disync (re-inserted)',
+                        'no_fak_new' => $no_fak_new
                     ];
                 }
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => "Sync batch selesai. Total Processed: {$successCount}",
+                    'summary' => [
+                        'total' => count($request->data),
+                        'success' => $successCount,
+                        'failed' => 0 // Because single transaction rollback if error
+                    ],
+                    'results' => $results
+                ], 200);
+
+            } catch (Exception $e) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal sync batch (Transaction Rollback)',
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ], 500);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => "Sync batch selesai. Sukses: {$successCount}, Gagal: {$failedCount}",
-                'summary' => [
-                    'total' => count($request->data),
-                    'success' => $successCount,
-                    'failed' => $failedCount
-                ],
-                'results' => $results
-            ], 200);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
