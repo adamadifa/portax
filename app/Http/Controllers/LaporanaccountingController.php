@@ -1789,7 +1789,7 @@ class LaporanaccountingController extends Controller
         if (!empty($request->kode_cabang)) {
             $ledger_transaksi->where(function ($query) use ($request) {
                 $query->where('bank.kode_cabang', $request->kode_cabang)
-                    ->orWhere('keuangan_ledger.kode_peruntukan', $request->kode_cabang);
+                    ->orWhere('keuangan_ledger.keterangan_peruntukan', $request->kode_cabang);
             });
         }
         $ledger_transaksi->join('coa', 'keuangan_ledger.kode_akun', '=', 'coa.kode_akun');
