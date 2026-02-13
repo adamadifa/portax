@@ -337,6 +337,7 @@ class SyncPenjualanController extends Controller
     public function syncBatch(Request $request)
     {
         try {
+            dd('error');
             $validator = Validator::make($request->all(), [
                 'data' => 'required|array|min:1',
                 'data.*.no_faktur' => 'required|string|max:13',
