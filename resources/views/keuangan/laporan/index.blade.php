@@ -18,7 +18,7 @@
                         </button>
                     </li>
                 @endcan
-                {{-- 
+                
                 @can('keu.ledger')
                     <li class="nav-item" role="presentation">
                         <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#ledger" aria-controls="ledger"
@@ -32,6 +32,7 @@
                         </button>
                     </li>
                 @endcan
+                {{-- 
                 @can('keu.mutasikeuangan')
                     <li class="nav-item" role="presentation">
                         <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#mutasikeuangan"
