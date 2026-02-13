@@ -388,13 +388,34 @@ class SyncPenjualanController extends Controller
             // Extract valid no_fakturs to delete first
             $no_fakturs = array_column($data, 'no_faktur');
 
+            // ============================================================
+            // PHASE 1: DELETE all existing batch data (committed separately)
+            // This MUST be committed first so that the auto-numbering query
+            // in Phase 2 does not see the old records (MySQL REPEATABLE READ
+            // snapshot isolation would otherwise still show deleted rows).
+            // ============================================================
             DB::beginTransaction();
             try {
-                // DELETE ALL related data first to ensure no old numbering conflicts
                 Detailpenjualan::whereIn('no_faktur', $no_fakturs)->delete();
                 Historibayarpenjualan::whereIn('no_faktur', $no_fakturs)->delete();
                 Penjualan::whereIn('no_faktur', $no_fakturs)->delete();
+                DB::commit(); // Commit DELETE so it's visible to next queries
+            } catch (Exception $e) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menghapus data lama batch',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
 
+            // ============================================================
+            // PHASE 2: INSERT new data (in a new transaction)
+            // Now the old records are truly gone, so buatkode() will find
+            // the correct last number (or empty string if all were deleted).
+            // ============================================================
+            DB::beginTransaction();
+            try {
                 $successCount = 0;
                 $results = [];
 
@@ -403,13 +424,8 @@ class SyncPenjualanController extends Controller
                     // Force User ID
                     $penjualanData['id_user'] = $id_user;
 
-                    // Check & Create Salesman (Assuming logic is same as single sync, simplified for batch)
-                    // ... (Original logic for Salesman/Pelanggan creation can be kept inside loop or optimized outside)
-                    // For now, keep inside loop as per original logic structure but simplified.
-                    // Or actually, just ensure they exist.
-
-                    // Auto Numbering Logic (Re-implemented for Batch)
-                    // Since we deleted old records, we treat this as a NEW insert.
+                    // Auto Numbering Logic
+                    // Since old records are committed-deleted, query sees clean state
                     $no_fak_new = null;
                     
                     $salesmanBatch = Salesman::join('cabang', 'salesman.kode_cabang', '=', 'cabang.kode_cabang')
@@ -421,7 +437,6 @@ class SyncPenjualanController extends Controller
                         $start_date = "2024-03-01";
                         
                         if ($penjualanData['tanggal'] >= '2024-03-01' && $salesmanBatch->kode_cabang != "PST") {
-                            // Find the LAST transaction in DB (including ones we just inserted in previous iterations of this loop)
                             $lastransaksi = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
                                     ->where('tanggal', '>=', $start_date)
                                     ->whereRaw('MID(no_fak_new,6,1)="' . $salesmanBatch->kode_sales . '"')
@@ -490,7 +505,7 @@ class SyncPenjualanController extends Controller
                     if (isset($penjualanData['historibayar']) && is_array($penjualanData['historibayar'])) {
                         foreach ($penjualanData['historibayar'] as $bayar) {
                              Historibayarpenjualan::create([
-                                    'no_bukti' => $bayar['no_bukti'], // Assuming unique
+                                    'no_bukti' => $bayar['no_bukti'],
                                     'no_faktur' => $penjualanData['no_faktur'],
                                     'tanggal' => $bayar['tanggal'],
                                     'kode_salesman' => $bayar['kode_salesman'] ?? $penjualanData['kode_salesman'],
@@ -524,7 +539,7 @@ class SyncPenjualanController extends Controller
                     'summary' => [
                         'total' => count($request->data),
                         'success' => $successCount,
-                        'failed' => 0 // Because single transaction rollback if error
+                        'failed' => 0
                     ],
                     'results' => $results
                 ], 200);
@@ -533,7 +548,7 @@ class SyncPenjualanController extends Controller
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
-                    'message' => 'Gagal sync batch (Transaction Rollback)',
+                    'message' => 'Gagal sync batch (Insert Rollback). Data lama sudah terhapus, silakan ulangi sync.',
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ], 500);
