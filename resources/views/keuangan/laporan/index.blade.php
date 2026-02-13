@@ -153,12 +153,13 @@
                         @include('keuangan.laporan.kaskecil')
                     </div>
                 @endcan
-                {{-- 
+               
                 @can('keu.ledger')
                     <div class="tab-pane fade" id="ledger" role="tabpanel">
                         @include('keuangan.laporan.ledger')
                     </div>
                 @endcan
+                 {{-- 
                 @can('keu.mutasikeuangan')
                     <div class="tab-pane fade" id="mutasikeuangan" role="tabpanel">
                         @include('keuangan.laporan.mutasikeuangan')
