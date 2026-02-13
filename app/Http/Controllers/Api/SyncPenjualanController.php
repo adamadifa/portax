@@ -884,4 +884,113 @@ class SyncPenjualanController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Pre-delete data penjualan sebelum sync batch dimulai.
+     * Menghapus semua data yang match filter agar no_fak_new bisa reset.
+     * Panggil endpoint ini SEBELUM mengirim batch pertama.
+     *
+     * Parameter (semua opsional, kirim yang diperlukan):
+     * - kode_cabang: string
+     * - kode_salesman: string  
+     * - dari: date (awal periode)
+     * - sampai: date (akhir periode)
+     */
+    public function preDeleteSync(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'kode_cabang' => 'nullable|string',
+                'kode_salesman' => 'nullable|string',
+                'dari' => 'nullable|date',
+                'sampai' => 'nullable|date',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Minimal harus ada 1 filter agar tidak hapus semua data
+            if (!$request->kode_cabang && !$request->kode_salesman && !$request->dari && !$request->sampai) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Minimal harus ada 1 parameter filter (kode_cabang / kode_salesman / dari / sampai)'
+                ], 422);
+            }
+
+            // Build query to find matching no_fakturs
+            $query = Penjualan::query();
+            $query->select('marketing_penjualan.no_faktur');
+
+            if ($request->kode_cabang) {
+                $query->join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
+                      ->where('salesman.kode_cabang', $request->kode_cabang);
+            }
+
+            if ($request->kode_salesman) {
+                $query->where('marketing_penjualan.kode_salesman', $request->kode_salesman);
+            }
+
+            if ($request->dari && $request->sampai) {
+                $query->whereBetween('marketing_penjualan.tanggal', [$request->dari, $request->sampai]);
+            } elseif ($request->dari) {
+                $query->where('marketing_penjualan.tanggal', '>=', $request->dari);
+            } elseif ($request->sampai) {
+                $query->where('marketing_penjualan.tanggal', '<=', $request->sampai);
+            }
+
+            $no_fakturs = $query->pluck('marketing_penjualan.no_faktur')->toArray();
+
+            if (empty($no_fakturs)) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Tidak ada data yang perlu dihapus',
+                    'deleted_count' => 0
+                ]);
+            }
+
+            DB::beginTransaction();
+            try {
+                $deleted_detail = Detailpenjualan::whereIn('no_faktur', $no_fakturs)->delete();
+                $deleted_histori = Historibayarpenjualan::whereIn('no_faktur', $no_fakturs)->delete();
+                $deleted_header = Penjualan::whereIn('no_faktur', $no_fakturs)->delete();
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => "Pre-delete selesai. {$deleted_header} faktur dihapus.",
+                    'deleted' => [
+                        'header' => $deleted_header,
+                        'detail' => $deleted_detail,
+                        'histori_bayar' => $deleted_histori,
+                    ],
+                    'filter' => [
+                        'kode_cabang' => $request->kode_cabang,
+                        'kode_salesman' => $request->kode_salesman,
+                        'dari' => $request->dari,
+                        'sampai' => $request->sampai,
+                    ]
+                ]);
+
+            } catch (Exception $e) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menghapus data',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal pre-delete sync',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

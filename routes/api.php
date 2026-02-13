@@ -34,6 +34,7 @@ Route::prefix('sync')->group(function () {
     Route::delete('/penjualan', [SyncPenjualanController::class, 'delete']);
     Route::delete('/penjualan/batch', [SyncPenjualanController::class, 'deleteBatch']);
     Route::post('/penjualan/reset-no-fak-new', [SyncPenjualanController::class, 'resetNoFakNew']);
+    Route::post('/penjualan/pre-delete', [SyncPenjualanController::class, 'preDeleteSync']);
 
     // Kas Kecil
     Route::post('/kaskecil', [SyncKaskecilController::class, 'sync']);
@@ -73,6 +74,7 @@ Route::fallback(function (Request $request) {
                 '/api/sync/penjualan/batch',
                 '/api/sync/penjualan/check',
                 '/api/sync/penjualan/reset-no-fak-new',
+                '/api/sync/penjualan/pre-delete',
                 '/api/sync/kaskecil',
                 '/api/sync/kaskecil/batch',
                 '/api/sync/kaskecil/check',
@@ -119,6 +121,7 @@ Route::fallback(function (Request $request) {
                     'POST /api/sync/penjualan/check' => 'Check no_faktur penjualan',
                     'DELETE /api/sync/penjualan' => 'Delete single penjualan',
                     'DELETE /api/sync/penjualan/batch' => 'Delete batch penjualan',
+                    'POST /api/sync/penjualan/pre-delete' => 'Pre-delete penjualan sebelum sync batch',
                     'POST /api/sync/kaskecil' => 'Sync single kas kecil',
                     'POST /api/sync/kaskecil/batch' => 'Sync batch kas kecil',
                     'POST /api/sync/kaskecil/check' => 'Check id kas kecil',
