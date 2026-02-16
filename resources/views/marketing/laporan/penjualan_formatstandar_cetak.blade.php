@@ -62,14 +62,14 @@
                         <th rowspan="2">Wilayah</th>
                         <th rowspan="2">Nama Produk</th>
                         <th colspan="15">Qty</th>
-                        <th rowspan="2">Bruto</th>
+                        {{-- <th rowspan="2">Bruto</th>
                         <th rowspan="2">Peny</th>
                         <th colspan="6" class="red">Potongan</th>
                         <th rowspan="2">Pot. Istimewa</th>
                         <th rowspan="2">DPP</th>
                         <th rowspan="2">PPN</th>
                         <th rowspan="2">Retur</th>
-                        <th rowspan="2" class="green">Netto</th>
+                        <th rowspan="2" class="green">Netto</th> --}}
                         <th rowspan="2" class="green">T/K</th>
                         <th rowspan="2" class="green">Created</th>
                         <th rowspan="2" class="green">Updated</th>
@@ -92,12 +92,12 @@
                         <th>PPN</th>
                         <th>JUMLAH</th>
 
-                        <th class="red">AIDA</th>
+                        {{-- <th class="red">AIDA</th>
                         <th class="red">SWAN</th>
                         <th class="red">STICK</th>
                         <th class="red">SP</th>
                         <th class="red">SC</th>
-                        <th class="red">TOTAL</th>
+                        <th class="red">TOTAL</th> --}}
                     </tr>
                 </thead>
 
@@ -126,9 +126,29 @@
                     @foreach ($arr as $key => $val)
                         @php
                              $jml_dus_aida = 0;
+                             $jml_dus_swan = 0;
+                             $jml_dus_stick = 0;
+                             $jml_dus_sp = 0;
+                             $jml_dus_sambal = 0;
                              foreach($val as $v){
                                  if($v->kode_kategori_diskon == "D002"){
                                      $jml_dus_aida += $v->jumlah / $v->isi_pcs_dus;
+                                 }
+
+                                 if($v->kode_kategori_diskon == "D001"){
+                                     $jml_dus_swan += $v->jumlah / $v->isi_pcs_dus;
+                                 }
+
+                                 if($v->kode_kategori_diskon == "D003"){
+                                     $jml_dus_stick += $v->jumlah / $v->isi_pcs_dus;
+                                 }
+
+                                 if($v->kode_kategori_diskon == "D004"){
+                                     $jml_dus_sp += $v->jumlah / $v->isi_pcs_dus;
+                                 }
+
+                                 if($v->kode_kategori_diskon == "D005"){
+                                     $jml_dus_sambal += $v->jumlah / $v->isi_pcs_dus;
                                  }
                              }
                         @endphp
@@ -138,6 +158,22 @@
                                 $qty_dus_this_row = $d->jumlah / $d->isi_pcs_dus;
                                 if ($d->kode_kategori_diskon == "D002" && $jml_dus_aida > 0) {
                                     $diskon = (($qty_dus_this_row / $jml_dus_aida) * $d->potongan_aida) * (100/111);
+                                }
+
+                                if ($d->kode_kategori_diskon == "D001" && $jml_dus_swan > 0) {
+                                    $diskon = (($qty_dus_this_row / $jml_dus_swan) * $d->potongan_swan) * (100/111);
+                                }
+
+                                if ($d->kode_kategori_diskon == "D003" && $jml_dus_stick > 0) {
+                                    $diskon = (($qty_dus_this_row / $jml_dus_stick) * $d->potongan_stick) * (100/111);
+                                }
+
+                                if ($d->kode_kategori_diskon == "D004" && $jml_dus_sp > 0) {
+                                    $diskon = (($qty_dus_this_row / $jml_dus_sp) * $d->potongan_sp) * (100/111);
+                                }
+
+                                if ($d->kode_kategori_diskon == "D005" && $jml_dus_sambal > 0) {
+                                    $diskon = (($qty_dus_this_row / $jml_dus_sambal) * $d->potongan_sambal) * (100/111);
                                 }
                             @endphp
                             @php
@@ -226,7 +262,7 @@
                                         $grandtotal_retur += $d->total_retur;
                                         $grandtotal_netto += $netto;
                                     @endphp
-                                    <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->total_bruto) }}</td>
+                                    {{-- <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->total_bruto) }}</td>
                                     <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->penyesuaian) }}</td>
                                     <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->potongan_aida) }}</td>
                                     <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->potongan_swan) }}</td>
@@ -238,7 +274,7 @@
                                     <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($dpp) }}</td>
                                     <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->ppn) }}</td>
                                     <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->total_retur) }}</td>
-                                    <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($netto) }}</td>
+                                    <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($netto) }}</td> --}}
                                     <td rowspan="{{ count($val) }}" class="center">
                                         @if ($d->jenis_transaksi == 'K')
                                             KREDIT
@@ -257,7 +293,7 @@
                 <tfoot>
                     <tr>
                         <th colspan="24">TOTAL</th>
-                        <th class="right">{{ formatAngka($grandtotal_bruto) }}</th>
+                        {{-- <th class="right">{{ formatAngka($grandtotal_bruto) }}</th>
                         <th class="right">{{ formatAngka($grandtotal_peny) }}</th>
                         <th class="right">{{ formatAngka($grandtotal_potongan_aida) }}</th>
                         <th class="right">{{ formatAngka($grandtotal_potongan_swan) }}</th>
@@ -269,7 +305,7 @@
                         <th class="right">{{ formatAngka($grandtotal_dpp) }}</th>
                         <th class="right">{{ formatAngka($grandtotal_ppn) }}</th>
                         <th class="right">{{ formatAngka($grandtotal_retur) }}</th>
-                        <th class="right">{{ formatAngka($grandtotal_netto) }}</th>
+                        <th class="right">{{ formatAngka($grandtotal_netto) }}</th> --}}
                         <th colspan="4"></th>
 
                     </tr>
