@@ -120,6 +120,9 @@
                         $grandtotal_ppn = 0;
                         $grandtotal_retur = 0;
                         $grandtotal_netto = 0;
+                        $grand_total_dpp_global = 0;
+                        $grand_total_ppn_global = 0;
+                        $grand_total_jumlah_global = 0;
 
                         $total = 0;
                     @endphp
@@ -184,6 +187,14 @@
                                     $pack = $jml[1];
                                     $pcs = $jml[2];
                                     $total += $d->subtotal;
+                                    
+                                    $d__dpp = ($d->subtotal * (100/111)) - $diskon;
+                                    $d__ppn = ($d__dpp * (11/12) * 0.12);
+                                    $d__jumlah = $d__dpp + $d__ppn;
+
+                                    $grand_total_dpp_global += $d__dpp;
+                                    $grand_total_ppn_global += $d__ppn;
+                                    $grand_total_jumlah_global += $d__jumlah;
                                     if ($d->status_promosi == '1') {
                                         $bgcolorpromosi = 'yellow';
                                     } else {
@@ -292,20 +303,11 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="24">TOTAL</th>
-                        {{-- <th class="right">{{ formatAngka($grandtotal_bruto) }}</th>
-                        <th class="right">{{ formatAngka($grandtotal_peny) }}</th>
-                        <th class="right">{{ formatAngka($grandtotal_potongan_aida) }}</th>
-                        <th class="right">{{ formatAngka($grandtotal_potongan_swan) }}</th>
-                        <th class="right">{{ formatAngka($grandtotal_potongan_stick) }}</th>
-                        <th class="right">{{ formatAngka($grandtotal_potongan_sp) }}</th>
-                        <th class="right">{{ formatAngka($grandtotal_potongan_sc) }}</th>
-                        <th class="right">{{ formatAngka($grandtotal_potongan) }}</th>
-                        <th class="right">{{ formatAngka($grandtotal_potongan_istimewa) }}</th>
-                        <th class="right">{{ formatAngka($grandtotal_dpp) }}</th>
-                        <th class="right">{{ formatAngka($grandtotal_ppn) }}</th>
-                        <th class="right">{{ formatAngka($grandtotal_retur) }}</th>
-                        <th class="right">{{ formatAngka($grandtotal_netto) }}</th> --}}
+                        <th colspan="20">TOTAL</th>
+                        <th class="right">{{ formatAngka($grand_total_dpp_global) }}</th>
+                        <th class="right"></th>
+                        <th class="right">{{ formatAngka($grand_total_ppn_global) }}</th>
+                        <th class="right">{{ formatAngka($grand_total_jumlah_global) }}</th>
                         <th colspan="4"></th>
 
                     </tr>
