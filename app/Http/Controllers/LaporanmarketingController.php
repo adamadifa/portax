@@ -2977,6 +2977,7 @@ class LaporanmarketingController extends Controller
         // $saldoawal = Saldoawalpiutangpelanggan::where('bulan', $bulan)->where('tahun', $tahun)->first();
         $saldoawal = Saldoawalpiutangpelanggan::where('tanggal', '<=', $request->dari)->orderBy('tanggal', 'desc')->first();
         $saldoawal_date = $saldoawal ? $saldoawal->tanggal : $request->dari;
+        $kode_saldo_awal = $saldoawal ? $saldoawal->kode_saldo_awal : null;
 
         $querysaldoawal = Detailsaldoawalpiutangpelanggan::query();
         $querysaldoawal->select(
