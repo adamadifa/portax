@@ -3042,7 +3042,7 @@ class LaporanmarketingController extends Controller
         $querysaldoawal->join('wilayah', 'pelanggan.kode_wilayah', '=', 'wilayah.kode_wilayah');
         // $querysaldoawal->where('bulan', $bulan);
         // $querysaldoawal->where('tahun', $tahun);
-        $querysaldoawal->where('marketing_saldoawal_piutang.kode_saldo_awal', $saldoawal->kode_saldo_awal);
+        $querysaldoawal->where('marketing_saldoawal_piutang.kode_saldo_awal', $kode_saldo_awal);
         $querysaldoawal->whereRaw("IFNULL(marketing_saldoawal_piutang_detail.jumlah,0)- IFNULL((SELECT SUM(subtotal) FROM marketing_retur_detail
             INNER JOIN marketing_retur ON marketing_retur_detail.no_retur = marketing_retur.no_retur WHERE marketing_retur.no_faktur = marketing_penjualan.no_faktur AND jenis_retur ='PF' AND marketing_retur.tanggal >= '$saldoawal_date' AND marketing_retur.tanggal < '$request->dari'),0) - IFNULL((SELECT SUM(jumlah) FROM marketing_penjualan_historibayar WHERE marketing_penjualan_historibayar.no_faktur = marketing_penjualan.no_faktur AND marketing_penjualan_historibayar.tanggal >= '$saldoawal_date' AND marketing_penjualan_historibayar.tanggal < '$request->dari'),0) != 0");
 
