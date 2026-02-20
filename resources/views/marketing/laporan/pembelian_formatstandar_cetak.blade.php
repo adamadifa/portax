@@ -103,7 +103,7 @@
                                 <td>{{ $d->nama_produk }}</td>
                                 <td class="center">{{ formatAngka($dus) }}</td>
                                 <td class="right">{{ !empty($dus) ? formatAngka($d->harga_dus) : '' }}</td>
-                                <td class="right">{{ !empty($dus) ? formatAngka($d->harga_dus * (100/111)) : '' }}</td>
+                                <td class="right">{{ !empty($dus) ? formatAngka($d->harga_dus) : '' }}</td>
                                 <td class="right">{{ formatAngka($d->subtotal * (100/111)) }}</td>
                                 <td class="right">{{ formatAngka(($d->subtotal * (100/111)) * (11/12)) }}</td>
                                 <td class="right">{{ formatAngka(($d->subtotal * (100/111)) * (11/12) * 0.12) }}</td>
