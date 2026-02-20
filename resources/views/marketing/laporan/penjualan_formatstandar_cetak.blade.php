@@ -123,6 +123,7 @@
                         $grand_total_dpp_global = 0;
                         $grand_total_ppn_global = 0;
                         $grand_total_jumlah_global = 0;
+                        $grand_total_diskon_global = 0;
 
                         $total = 0;
                     @endphp
@@ -220,6 +221,7 @@
                                     $d__ppn = ($d__dpp * (11/12) * 0.12);
                                     $d__jumlah = $d__dpp + $d__ppn;
 
+                                    $grand_total_diskon_global += $diskon;
                                     $grand_total_dpp_global += $d__dpp;
                                     $grand_total_ppn_global += $d__ppn;
                                     $grand_total_jumlah_global += $d__jumlah;
@@ -331,7 +333,8 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="20">TOTAL</th>
+                        <th colspan="19">TOTAL</th>
+                        <th class="right">{{ formatAngka($grand_total_diskon_global) }}</th>
                         <th class="right">{{ formatAngka($grand_total_dpp_global) }}</th>
                         <th class="right"></th>
                         <th class="right">{{ formatAngka($grand_total_ppn_global) }}</th>
