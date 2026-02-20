@@ -45,6 +45,7 @@
                 <tbody>
                     @php
                         $grand_total_dpp_global = 0;
+                        $grand_total_dpp_lain_global = 0;
                         $grand_total_ppn_global = 0;
                         $grand_total_jumlah_global = 0;
                         $total = 0;
@@ -90,6 +91,7 @@
                                 $d__jumlah = $d__dpp + $d__ppn;
 
                                 $grand_total_dpp_global += $d__dpp;
+                                $grand_total_dpp_lain_global += $d__dpp_lain;
                                 $grand_total_ppn_global += $d__ppn;
                                 $grand_total_jumlah_global += $d__jumlah;
                             @endphp
@@ -124,7 +126,7 @@
                      <tr>
                         <th colspan="7" class="center">TOTAL</th>
                         <th class="right">{{ formatAngka($grand_total_dpp_global) }}</th>
-                        <th class="right"></th>
+                        <th class="right">{{ formatAngka($grand_total_dpp_lain_global) }}</th>
                         <th class="right">{{ formatAngka($grand_total_ppn_global) }}</th>
                         <th class="right">{{ formatAngka($grand_total_jumlah_global) }}</th>
                         <th class="right">{{ formatAngka($grand_total_keseluruhan) }}</th>

@@ -96,7 +96,7 @@ class LaporanmarketingController extends Controller
             'marketing_pembelian.no_bukti',
             'marketing_pembelian.tanggal',
             'marketing_pembelian.kode_supplier',
-            'supplier.nama_supplier',
+            'supplier_marketing.nama_supplier',
             'marketing_pembelian_detail.kode_produk',
             'produk.nama_produk',
             'marketing_pembelian_detail.harga_dus',
@@ -110,7 +110,7 @@ class LaporanmarketingController extends Controller
         );
         $qdetail->join('marketing_pembelian_detail', 'marketing_pembelian.no_bukti', '=', 'marketing_pembelian_detail.no_bukti');
         $qdetail->join('produk', 'marketing_pembelian_detail.kode_produk', '=', 'produk.kode_produk');
-        $qdetail->leftJoin('supplier', 'marketing_pembelian.kode_supplier', '=', 'supplier.kode_supplier');
+        $qdetail->leftJoin('supplier_marketing', 'marketing_pembelian.kode_supplier', '=', 'supplier_marketing.kode_supplier');
         $qdetail->leftJoin('users', 'marketing_pembelian.id_user', '=', 'users.id');
         
         $qdetail->whereBetween('marketing_pembelian.tanggal', [$request->dari, $request->sampai]);
