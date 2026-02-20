@@ -104,7 +104,9 @@ class LaporanmarketingController extends Controller
             'marketing_pembelian_detail.subtotal',
             'marketing_pembelian.jenis_transaksi',
             'marketing_pembelian.status',
-            'users.name as nama_user'
+            'users.name as nama_user',
+            'produk.isi_pcs_dus',
+            'produk.isi_pcs_pack'
         );
         $qdetail->join('marketing_pembelian_detail', 'marketing_pembelian.no_bukti', '=', 'marketing_pembelian_detail.no_bukti');
         $qdetail->join('produk', 'marketing_pembelian_detail.kode_produk', '=', 'produk.kode_produk');

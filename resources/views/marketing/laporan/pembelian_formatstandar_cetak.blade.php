@@ -67,27 +67,31 @@
                         @endphp
                         @foreach ($details as $d)
                             @php
+                                $dus = 0;
+                                $pack = 0;
+                                $pcs = 0;
+
                                 if (!empty($d->isi_pcs_dus)) {
                                     $qty = convertToduspackpcsv2($d->isi_pcs_dus, $d->isi_pcs_pack, $d->jumlah);
                                     $jml = explode('|', $qty);
                                     $dus = $jml[0];
                                     $pack = $jml[1];
                                     $pcs = $jml[2];
-                                    $total += $d->subtotal;
-                                    
-                                    // Asumsi logika PPN standar sesuai penjualan (11/12 * 0.12)
-                                    $d__dpp = $d->subtotal * (100/111);
-                                    $d__ppn = $d__dpp * (11/12) * 0.12;
-                                    $d__jumlah = $d__dpp + $d__ppn;
-
-                                    $grand_total_dpp_global += $d__dpp;
-                                    $grand_total_ppn_global += $d__ppn;
-                                    $grand_total_jumlah_global += $d__jumlah;
                                 } else {
-                                    $dus = 0;
-                                    $pack = 0;
-                                    $pcs = 0;
+                                    // If no conversion info, fallback to display raw jumlah as dus
+                                    $dus = $d->jumlah;
                                 }
+
+                                $total += $d->subtotal;
+                                
+                                // Asumsi logika PPN standar sesuai penjualan (11/12 * 0.12)
+                                $d__dpp = $d->subtotal * (100/111);
+                                $d__ppn = $d__dpp * (11/12) * 0.12;
+                                $d__jumlah = $d__dpp + $d__ppn;
+
+                                $grand_total_dpp_global += $d__dpp;
+                                $grand_total_ppn_global += $d__ppn;
+                                $grand_total_jumlah_global += $d__jumlah;
                             @endphp
                             <tr>
                                 @if ($first)
