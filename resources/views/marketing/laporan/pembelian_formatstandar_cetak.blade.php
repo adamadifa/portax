@@ -29,6 +29,7 @@
                         <th rowspan="2">User</th>
                         <th rowspan="2">Nama Produk</th>
                         <th colspan="7">Subtotal</th>
+                        <th rowspan="2">Total</th>
                         <th rowspan="2">Jenis Transaksi</th>
                         <th rowspan="2">Status</th>
                     </tr>
@@ -48,6 +49,7 @@
                         $grand_total_ppn_global = 0;
                         $grand_total_jumlah_global = 0;
                         $total = 0;
+                        $grand_total_keseluruhan = 0;
                         $arr = [];
                         foreach ($pembelian as $row) {
                             $arr[$row->no_bukti][] = $row;
@@ -57,6 +59,11 @@
                         @php
                             $first = true;
                             $rowspan = count($details);
+                            $total_faktur = 0;
+                            foreach ($details as $d) {
+                                $total_faktur += $d->subtotal;
+                            }
+                            $grand_total_keseluruhan += $total_faktur;
                         @endphp
                         @foreach ($details as $d)
                             @php
@@ -99,6 +106,7 @@
                                 <td class="right">{{ formatAngka( ($d->subtotal * (100/111)) + (($d->subtotal * (100/111)) * (11/12) * 0.12) ) }}</td>
 
                                 @if ($first)
+                                    <td rowspan="{{ $rowspan }}" class="right font-bold">{{ formatAngka($total_faktur) }}</td>
                                     <td rowspan="{{ $rowspan }}" class="center">{{ $d->jenis_transaksi == 'T' ? 'TUNAI' : 'KREDIT' }}</td>
                                     <td rowspan="{{ $rowspan }}" class="center text-{{ $d->status == '1' ? 'green' : 'red' }}">
                                         {{ $d->status == '1' ? 'LUNAS' : 'BLM LUNAS' }}
@@ -116,6 +124,7 @@
                         <th class="right"></th>
                         <th class="right">{{ formatAngka($grand_total_ppn_global) }}</th>
                         <th class="right">{{ formatAngka($grand_total_jumlah_global) }}</th>
+                        <th class="right">{{ formatAngka($grand_total_keseluruhan) }}</th>
                         <th colspan="2"></th>
                     </tr>
                 </tfoot>
