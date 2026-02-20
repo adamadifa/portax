@@ -119,6 +119,15 @@ class LaporanmarketingController extends Controller
             $qdetail->where('marketing_pembelian.jenis_transaksi', $request->jenis_transaksi);
         }
         
+        $user = User::findOrFail(auth()->user()->id);
+        $roles_access_all_cabang = config('global.roles_access_all_cabang');
+        
+        if (!empty($request->kode_cabang)) {
+            $qdetail->where('marketing_pembelian.kode_cabang', $request->kode_cabang);
+        } else if (!in_array($user->roles, $roles_access_all_cabang)) {
+            $qdetail->where('marketing_pembelian.kode_cabang', $user->kode_cabang);
+        }
+        
         $qdetail->orderBy('marketing_pembelian.tanggal');
         $qdetail->orderBy('marketing_pembelian.no_bukti');
         
@@ -144,7 +153,7 @@ class LaporanmarketingController extends Controller
             'marketing_pembelian.no_bukti',
             'marketing_pembelian.tanggal',
             'marketing_pembelian.kode_supplier',
-            'supplier.nama_supplier',
+            'supplier_marketing.nama_supplier',
             'marketing_pembelian.jenis_transaksi',
             'marketing_pembelian.status',
             'marketing_pembelian_detail.kode_produk',
@@ -158,13 +167,22 @@ class LaporanmarketingController extends Controller
         $query->addSelect(DB::raw('(SELECT SUM(jumlah) FROM marketing_pembelian_historibayar WHERE no_bukti_pembelian = marketing_pembelian.no_bukti) as total_bayar'));
 
         $query->join('marketing_pembelian_detail', 'marketing_pembelian.no_bukti', '=', 'marketing_pembelian_detail.no_bukti');
-        $query->leftJoin('supplier', 'marketing_pembelian.kode_supplier', '=', 'supplier.kode_supplier');
+        $query->leftJoin('supplier_marketing', 'marketing_pembelian.kode_supplier', '=', 'supplier_marketing.kode_supplier');
         $query->leftJoin('users', 'marketing_pembelian.id_user', '=', 'users.id');
         
         $query->whereBetween('marketing_pembelian.tanggal', [$request->dari, $request->sampai]);
         
         if (!empty($request->jenis_transaksi)) {
             $query->where('marketing_pembelian.jenis_transaksi', $request->jenis_transaksi);
+        }
+
+        $user = User::findOrFail(auth()->user()->id);
+        $roles_access_all_cabang = config('global.roles_access_all_cabang');
+        
+        if (!empty($request->kode_cabang)) {
+            $query->where('marketing_pembelian.kode_cabang', $request->kode_cabang);
+        } else if (!in_array($user->roles, $roles_access_all_cabang)) {
+            $query->where('marketing_pembelian.kode_cabang', $user->kode_cabang);
         }
 
         $query->orderBy('marketing_pembelian.tanggal');

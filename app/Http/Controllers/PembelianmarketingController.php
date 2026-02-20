@@ -63,6 +63,15 @@ class PembelianmarketingController extends Controller
             $query->where('supplier_marketing.nama_supplier', 'like', '%' . $request->nama_supplier_search . '%');
         }
 
+        // Filter Cabang based on roles
+        if (in_array($user->roles, $roles_access_all_cabang)) {
+            if (!empty($request->kode_cabang_search)) {
+                $query->where('marketing_pembelian.kode_cabang', $request->kode_cabang_search);
+            }
+        } else {
+            $query->where('marketing_pembelian.kode_cabang', $user->kode_cabang);
+        }
+
         $query->orderBy('marketing_pembelian.tanggal', 'desc');
         $query->orderBy('marketing_pembelian.no_bukti', 'desc');
 
@@ -154,6 +163,7 @@ class PembelianmarketingController extends Controller
                 'jenis_transaksi' => $jenis_transaksi,
                 'jenis_bayar' => $jenis_bayar,
                 'status' => '0',
+                'kode_cabang' => auth()->user()->kode_cabang,
                 'id_user' => auth()->user()->id
             ]);
 

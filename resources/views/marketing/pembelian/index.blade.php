@@ -58,14 +58,27 @@
                     </div>
                       <input type="text" name="kode_supplier_search" value="{{ Request('kode_supplier_search') }}" class="w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] placeholder-slate-400 transition-all font-medium" placeholder="Kode Supplier">
                  </div>
-                 <div class="md:col-span-3 relative">
+                 <div class="md:col-span-2 relative">
                       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="ti ti-users text-slate-400"></i>
                     </div>
                       <input type="text" name="nama_supplier_search" value="{{ Request('nama_supplier_search') }}" class="w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] placeholder-slate-400 transition-all font-medium" placeholder="Nama Supplier">
                  </div>
+                 @php
+                     $roles_access_all_cabang = config('global.roles_access_all_cabang');
+                 @endphp
+                 @if (in_array(auth()->user()->roles, $roles_access_all_cabang))
+                 <div class="md:col-span-1 relative">
+                     <select name="kode_cabang_search" class="w-full pl-2 pr-2 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] placeholder-slate-400 transition-all font-medium">
+                         <option value="">Cabang</option>
+                         @foreach ($cabang as $c)
+                             <option value="{{ $c->kode_cabang }}" {{ Request('kode_cabang_search') == $c->kode_cabang ? 'selected' : '' }}>{{ $c->kode_cabang }}</option>
+                         @endforeach
+                     </select>
+                 </div>
+                 @endif
                   <div class="md:col-span-1">
-                    <button type="submit" class="h-full w-full bg-[#003d9e] hover:bg-blue-800 text-white rounded-lg font-medium text-sm transition-colors shadow-sm shadow-blue-200 flex items-center justify-center">
+                    <button type="submit" class="h-full w-full bg-[#003d9e] hover:bg-blue-800 text-white rounded-lg font-medium text-sm transition-colors shadow-sm shadow-blue-200 flex items-center justify-center py-2 md:py-0">
                         <i class="ti ti-search"></i>
                     </button>
                 </div>
@@ -88,6 +101,9 @@
                      <div class="flex-1 min-w-0">
                          <div class="flex items-center gap-2 mb-0.5">
                             <span class="font-bold text-slate-800 text-sm truncate">{{ $d->no_bukti }}</span>
+                            @if (!empty($d->kode_cabang))
+                                <span class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-1.5 py-0.5 rounded ml-1">{{ $d->kode_cabang }}</span>
+                            @endif
                         </div>
                         <div class="text-xs text-slate-500 font-medium mb-1">
                             {{ date('d-m-Y', strtotime($d->tanggal)) }}

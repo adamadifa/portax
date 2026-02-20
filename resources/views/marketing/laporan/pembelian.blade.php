@@ -16,6 +16,21 @@
                 <option value="2">Satubaris</option>
             </select>
         </div>
+
+        @php
+            $roles_access_all_cabang = config('global.roles_access_all_cabang');
+            $cabang = \App\Models\Cabang::orderBy('kode_cabang')->get();
+        @endphp
+        @if (in_array(auth()->user()->roles, $roles_access_all_cabang))
+        <div class="relative">
+            <select name="kode_cabang" id="kode_cabang" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none form-select">
+                <option value="">Semua Cabang</option>
+                @foreach ($cabang as $c)
+                    <option value="{{ $c->kode_cabang }}">{{ textUpperCase($c->nama_cabang) }}</option>
+                @endforeach
+            </select>
+        </div>
+        @endif
         
         <div class="grid grid-cols-2 gap-4">
             <div class="relative">
