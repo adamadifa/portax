@@ -240,7 +240,7 @@ class LaporanmarketingController extends Controller
         $query->leftJoin(
             DB::raw("(
                 SELECT marketing_pembelian_detail.no_bukti,
-                SUM(subtotal) as totalhutang
+                SUM(subtotal + (subtotal * (11/12) * 0.12)) as totalhutang
                 FROM marketing_pembelian_detail
                 GROUP BY marketing_pembelian_detail.no_bukti
             ) detailpembelian"),
