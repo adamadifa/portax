@@ -146,7 +146,7 @@
                                      $jml_dus_stick += $v->jumlah / $v->isi_pcs_dus;
                                  }
 
-                                 if($v->kode_kategori_diskon == "D004"){
+                                 if($v->kode_kategori_diskon == "D009"){
                                      $jml_dus_sp += $v->jumlah / $v->isi_pcs_dus;
                                  }
 
@@ -166,12 +166,12 @@
                              $teoritis_swan = $jml_dus_swan * $diskon_normal_swan;
 
                              $diskon_normal_sp = 0;
-                             if ($jml_dus_sp >= 500) $diskon_normal_sp = 2500;
-                             elseif ($jml_dus_sp >= 300) $diskon_normal_sp = 2250;
-                             elseif ($jml_dus_sp >= 100) $diskon_normal_sp = 2000;
+                             if ($jml_dus_sp >= 500) $diskon_normal_sp = 2250;
+                             elseif ($jml_dus_sp >= 300) $diskon_normal_sp = 2000;
+                             elseif ($jml_dus_sp >= 100) $diskon_normal_sp = 1750;
                              elseif ($jml_dus_sp >= 50) $diskon_normal_sp = 1500;
-                             elseif ($jml_dus_sp >= 30) $diskon_normal_sp = 1000;
-                             elseif ($jml_dus_sp >= 5) $diskon_normal_sp = 500;
+                             elseif ($jml_dus_sp >= 30) $diskon_normal_sp = 1250;
+                             elseif ($jml_dus_sp >= 5) $diskon_normal_sp = 1000;
                              $teoritis_sp = $jml_dus_sp * $diskon_normal_sp;
                              
                              $total_teoritis = $teoritis_swan + $teoritis_sp;
@@ -194,7 +194,7 @@
                                     $diskon = (($qty_dus_this_row / $jml_dus_stick) * $d->potongan_stick) * (100/111);
                                 }
 
-                                if ($d->kode_kategori_diskon == "D004" && $jml_dus_sp > 0) {
+                                if ($d->kode_kategori_diskon == "D009" && $jml_dus_sp > 0) {
                                     $proporsi_sp = $total_teoritis > 0 ? ($teoritis_sp / $total_teoritis) : ($jml_dus_sp / ($jml_dus_swan + $jml_dus_sp));
                                     $diskon = (($qty_dus_this_row / $jml_dus_sp) * ($d->potongan_swan * $proporsi_sp)) * (100/111);
                                 }
