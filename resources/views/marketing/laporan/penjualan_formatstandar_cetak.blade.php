@@ -178,6 +178,10 @@
                                 if ($d->kode_kategori_diskon == "D005" && $jml_dus_sambal > 0) {
                                     $diskon = (($qty_dus_this_row / $jml_dus_sambal) * $d->potongan_sambal) * (100/111);
                                 }
+
+                                if ($k == 0) {
+                                    $diskon += ($d->potongan_istimewa * (100/111));
+                                }
                             @endphp
                             @php
                                 if (!empty($d->isi_pcs_dus) && $d->status_batal == 0) {
