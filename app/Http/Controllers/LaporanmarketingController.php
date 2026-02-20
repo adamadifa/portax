@@ -234,16 +234,14 @@ class LaporanmarketingController extends Controller
             DB::raw('IFNULL(totalhutang, 0) - IFNULL(jmlbayarbulanlalu, 0) as sisapiutang'),
             DB::raw('IFNULL(jmlbayarbulanlalu, 0) as jmlbayarbulanlalu'),
             DB::raw('IFNULL(jmlbayarbulanini, 0) as jmlbayarbulanini'),
-            DB::raw('IFNULL(pmbbulanini, 0) as pmbbulanini')
+            DB::raw("IF(marketing_pembelian.tanggal BETWEEN '$request->dari' AND '$request->sampai', IFNULL(totalhutang, 0), 0) as pmbbulanini")
         );
         $query->leftJoin('supplier_marketing', 'marketing_pembelian.kode_supplier', '=', 'supplier_marketing.kode_supplier');
         $query->leftJoin(
             DB::raw("(
                 SELECT marketing_pembelian_detail.no_bukti,
-                SUM(subtotal) as totalhutang,
-                IF(marketing_pembelian.tanggal BETWEEN '$request->dari' AND '$request->sampai', SUM(subtotal), 0) as pmbbulanini
+                SUM(subtotal) as totalhutang
                 FROM marketing_pembelian_detail
-                INNER JOIN marketing_pembelian ON marketing_pembelian_detail.no_bukti = marketing_pembelian.no_bukti
                 GROUP BY marketing_pembelian_detail.no_bukti
             ) detailpembelian"),
             function ($join) {
