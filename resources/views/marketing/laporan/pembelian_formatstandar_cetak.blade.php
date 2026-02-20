@@ -28,7 +28,7 @@
                         <th rowspan="2">Supplier</th>
                         <th rowspan="2">User</th>
                         <th rowspan="2">Nama Produk</th>
-                        <th colspan="7">Subtotal</th>
+                        <th colspan="6">Subtotal</th>
                         <th rowspan="2">Total</th>
                         <th rowspan="2">Jenis Transaksi</th>
                         <th rowspan="2">Status</th>
@@ -36,7 +36,6 @@
                     <tr>
                         <th>DUS</th>
                         <th>HARGA / DUS</th>
-                        <th>HARGA DPP</th>
                         <th>DPP</th>
                         <th>DPP LAIN</th>
                         <th>PPN</th>
@@ -84,9 +83,10 @@
 
                                 $total += $d->subtotal;
                                 
-                                // Asumsi logika PPN standar sesuai penjualan (11/12 * 0.12)
-                                $d__dpp = $d->subtotal * (100/111);
-                                $d__ppn = $d__dpp * (11/12) * 0.12;
+                                // DPP = Qty * Harga (Subtotal is exactly Qty * Harga in the system)
+                                $d__dpp = $d->subtotal;
+                                $d__dpp_lain = $d__dpp * (11/12);
+                                $d__ppn = $d__dpp_lain * 0.12;
                                 $d__jumlah = $d__dpp + $d__ppn;
 
                                 $grand_total_dpp_global += $d__dpp;
@@ -103,11 +103,10 @@
                                 <td>{{ $d->nama_produk }}</td>
                                 <td class="center">{{ formatAngka($dus) }}</td>
                                 <td class="right">{{ !empty($dus) ? formatAngka($d->harga_dus) : '' }}</td>
-                                <td class="right">{{ !empty($dus) ? formatAngka($d->harga_dus) : '' }}</td>
-                                <td class="right">{{ formatAngka($d->subtotal * (100/111)) }}</td>
-                                <td class="right">{{ formatAngka(($d->subtotal * (100/111)) * (11/12)) }}</td>
-                                <td class="right">{{ formatAngka(($d->subtotal * (100/111)) * (11/12) * 0.12) }}</td>
-                                <td class="right">{{ formatAngka( ($d->subtotal * (100/111)) + (($d->subtotal * (100/111)) * (11/12) * 0.12) ) }}</td>
+                                <td class="right">{{ formatAngka($d__dpp) }}</td>
+                                <td class="right">{{ formatAngka($d__dpp_lain) }}</td>
+                                <td class="right">{{ formatAngka($d__ppn) }}</td>
+                                <td class="right">{{ formatAngka($d__jumlah) }}</td>
 
                                 @if ($first)
                                     <td rowspan="{{ $rowspan }}" class="right font-bold">{{ formatAngka($total_faktur) }}</td>
@@ -123,7 +122,7 @@
                 </tbody>
                 <tfoot>
                      <tr>
-                        <th colspan="8" class="center">TOTAL</th>
+                        <th colspan="7" class="center">TOTAL</th>
                         <th class="right">{{ formatAngka($grand_total_dpp_global) }}</th>
                         <th class="right"></th>
                         <th class="right">{{ formatAngka($grand_total_ppn_global) }}</th>
