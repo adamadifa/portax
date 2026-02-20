@@ -36,7 +36,7 @@ class PembelianmarketingController extends Controller
                 'marketing_pembelian.*',
                 'supplier_marketing.nama_supplier'
             )
-            ->selectRaw('(SELECT SUM(subtotal) FROM marketing_pembelian_detail WHERE no_bukti = marketing_pembelian.no_bukti) as total_bruto')
+            ->selectRaw('(SELECT SUM(subtotal + (subtotal * (11/12) * 0.12)) FROM marketing_pembelian_detail WHERE no_bukti = marketing_pembelian.no_bukti) as total_bruto')
             ->leftJoin('supplier_marketing', 'marketing_pembelian.kode_supplier', '=', 'supplier_marketing.kode_supplier');
 
         // Filter tanggal
