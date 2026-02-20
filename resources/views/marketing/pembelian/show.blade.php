@@ -214,11 +214,21 @@
                                 <tbody>
                                     @php $subtotal = 0; @endphp
                                     @foreach ($detail as $d)
-                                        @php $subtotal += $d->subtotal; @endphp
+                                        @php
+                                            $subtotal += $d->subtotal;
+                                            $dus = 0;
+                                            if (!empty($d->isi_pcs_dus)) {
+                                                $qty = convertToduspackpcsv2($d->isi_pcs_dus, $d->isi_pcs_pack, $d->jumlah);
+                                                $jml = explode('|', $qty);
+                                                $dus = $jml[0];
+                                            } else {
+                                                $dus = $d->jumlah;
+                                            }
+                                        @endphp
                                         <tr>
                                             <td class="font-monospace text-muted small">{{ $d->kode_produk }}</td>
                                             <td>{{ $d->nama_produk }}</td>
-                                            <td class="text-end fw-bold">{{ formatAngka($d->jumlah) }}</td>
+                                            <td class="text-end fw-bold">{{ formatAngka($dus) }}</td>
                                             <td class="text-end text-muted">{{ formatAngka($d->harga_dus) }}</td>
                                             <td class="text-end fw-bold text-dark">{{ formatAngka($d->subtotal) }}</td>
                                         </tr>

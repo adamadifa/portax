@@ -258,7 +258,9 @@ class PembelianmarketingController extends Controller
         // Get detail pembelian
         $detail = Detailpembelianmarketing::select(
             'marketing_pembelian_detail.*',
-            'produk.nama_produk'
+            'produk.nama_produk',
+            'produk.isi_pcs_dus',
+            'produk.isi_pcs_pack'
         )
         ->join('produk', 'marketing_pembelian_detail.kode_produk', '=', 'produk.kode_produk')
         ->where('marketing_pembelian_detail.no_bukti', $no_bukti)
