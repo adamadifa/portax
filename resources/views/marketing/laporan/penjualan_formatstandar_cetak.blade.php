@@ -154,6 +154,28 @@
                                      $jml_dus_sambal += $v->jumlah / $v->isi_pcs_dus;
                                  }
                              }
+
+                             // Hitung rasio untuk D001 (SWAN) dan D004 (SP)
+                             $diskon_normal_swan = 0;
+                             if ($jml_dus_swan >= 500) $diskon_normal_swan = 2250;
+                             elseif ($jml_dus_swan >= 300) $diskon_normal_swan = 2000;
+                             elseif ($jml_dus_swan >= 100) $diskon_normal_swan = 1750;
+                             elseif ($jml_dus_swan >= 50) $diskon_normal_swan = 1500;
+                             elseif ($jml_dus_swan >= 30) $diskon_normal_swan = 1250;
+                             elseif ($jml_dus_swan >= 5) $diskon_normal_swan = 1000;
+                             $teoritis_swan = $jml_dus_swan * $diskon_normal_swan;
+
+                             $diskon_normal_sp = 0;
+                             if ($jml_dus_sp >= 500) $diskon_normal_sp = 2500;
+                             elseif ($jml_dus_sp >= 300) $diskon_normal_sp = 2250;
+                             elseif ($jml_dus_sp >= 100) $diskon_normal_sp = 2000;
+                             elseif ($jml_dus_sp >= 50) $diskon_normal_sp = 1500;
+                             elseif ($jml_dus_sp >= 30) $diskon_normal_sp = 1000;
+                             elseif ($jml_dus_sp >= 5) $diskon_normal_sp = 500;
+                             $teoritis_sp = $jml_dus_sp * $diskon_normal_sp;
+                             
+                             $total_teoritis = $teoritis_swan + $teoritis_sp;
+
                         @endphp
                         @foreach ($val as $k => $d)
                             @php
@@ -164,7 +186,8 @@
                                 }
 
                                 if ($d->kode_kategori_diskon == "D001" && $jml_dus_swan > 0) {
-                                    $diskon = (($qty_dus_this_row / $jml_dus_swan) * $d->potongan_swan) * (100/111);
+                                    $proporsi_swan = $total_teoritis > 0 ? ($teoritis_swan / $total_teoritis) : ($jml_dus_swan / ($jml_dus_swan + $jml_dus_sp));
+                                    $diskon = (($qty_dus_this_row / $jml_dus_swan) * ($d->potongan_swan * $proporsi_swan)) * (100/111);
                                 }
 
                                 if ($d->kode_kategori_diskon == "D003" && $jml_dus_stick > 0) {
@@ -172,7 +195,8 @@
                                 }
 
                                 if ($d->kode_kategori_diskon == "D004" && $jml_dus_sp > 0) {
-                                    $diskon = (($qty_dus_this_row / $jml_dus_sp) * $d->potongan_sp) * (100/111);
+                                    $proporsi_sp = $total_teoritis > 0 ? ($teoritis_sp / $total_teoritis) : ($jml_dus_sp / ($jml_dus_swan + $jml_dus_sp));
+                                    $diskon = (($qty_dus_this_row / $jml_dus_sp) * ($d->potongan_swan * $proporsi_sp)) * (100/111);
                                 }
 
                                 if ($d->kode_kategori_diskon == "D005" && $jml_dus_sambal > 0) {
