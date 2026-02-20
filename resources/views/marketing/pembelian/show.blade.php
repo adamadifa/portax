@@ -208,11 +208,17 @@
                                         <th>Nama Produk</th>
                                         <th class="text-end">Jumlah</th>
                                         <th class="text-end">Harga/Dus</th>
+                                        <th class="text-end">PPN</th>
                                         <th class="text-end">Subtotal</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $subtotal = 0; @endphp
+                                    @php
+                                        $subtotal = 0;
+                                        $total_dpp = 0;
+                                        $total_ppn = 0;
+                                        $total_jumlah = 0;
+                                    @endphp
                                     @foreach ($detail as $d)
                                         @php
                                             $subtotal += $d->subtotal;
@@ -224,20 +230,31 @@
                                             } else {
                                                 $dus = $d->jumlah;
                                             }
+
+                                            $d__dpp = $d->subtotal;
+                                            $d__dpp_lain = $d__dpp * (11/12);
+                                            $d__ppn = $d__dpp_lain * 0.12;
+                                            $d__jumlah = $d__dpp + $d__ppn;
+
+                                            $total_dpp += $d__dpp;
+                                            $total_ppn += $d__ppn;
+                                            $total_jumlah += $d__jumlah;
                                         @endphp
                                         <tr>
                                             <td class="font-monospace text-muted small">{{ $d->kode_produk }}</td>
                                             <td>{{ $d->nama_produk }}</td>
                                             <td class="text-end fw-bold">{{ formatAngka($dus) }}</td>
                                             <td class="text-end text-muted">{{ formatAngka($d->harga_dus) }}</td>
-                                            <td class="text-end fw-bold text-dark">{{ formatAngka($d->subtotal) }}</td>
+                                            <td class="text-end text-muted">{{ formatAngka(round($d__ppn)) }}</td>
+                                            <td class="text-end fw-bold text-dark">{{ formatAngka(round($d__jumlah)) }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="4" class="text-end text-uppercase text-muted small">Total Pembelian</td>
-                                        <td class="text-end fs-6 text-primary">{{ formatAngka($subtotal) }}</td>
+                                        <td colspan="4" class="text-end text-uppercase text-muted small">Total</td>
+                                        <td class="text-end text-muted">{{ formatAngka(round($total_ppn)) }}</td>
+                                        <td class="text-end fs-6 text-primary">{{ formatAngka(round($total_jumlah)) }}</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -252,7 +269,7 @@
                 <div class="grand-total-card mb-4 shadow-sm">
                     <div class="position-relative z-1 text-white">
                         <small class="opacity-75 text-uppercase fw-bold letter-spacing-1 d-block mb-1 text-white">Grand Total</small>
-                        <h2 class="mb-0 fw-bold text-white">Rp {{ formatAngka($total_bruto) }}</h2>
+                        <h2 class="mb-0 fw-bold text-white">Rp {{ formatAngka(round($total_jumlah)) }}</h2>
                     </div>
                 </div>
 
@@ -262,7 +279,7 @@
                         <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
                             <h5 class="section-title mb-0 border-0 p-0 text-primary"><i class="ti ti-history me-2"></i>Pembayaran</h5>
                              @can('pembayaranpembelianmarketing.create')
-                                @if ($pembelian->status == '0' && ($total_bruto - $historibayar->sum('jumlah')) > 0 )
+                                @if ($pembelian->status == '0' && (round($total_jumlah) - $historibayar->sum('jumlah')) > 0 )
                                     <a href="#" class="btn btn-primary btn-sm rounded-pill px-3 py-1" id="btnCreateBayar" style="font-size: 0.75rem;">
                                         <i class="ti ti-plus me-1"></i>Baru
                                     </a>
@@ -330,7 +347,7 @@
                                         <td colspan="2" class="text-end fw-bold text-success">{{ formatAngka($total_bayar) }}</td>
                                     </tr>
                                     @php
-                                        $sisa_bayar = $total_bruto - $total_bayar;
+                                        $sisa_bayar = round($total_jumlah) - $total_bayar;
                                         $status_color = $sisa_bayar <= 0 ? 'text-success' : 'text-danger';
                                         $status_bg = $sisa_bayar <= 0 ? 'success' : 'warning';
                                         $status_text = $sisa_bayar <= 0 ? 'LUNAS' : 'BELUM LUNAS';

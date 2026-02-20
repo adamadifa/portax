@@ -115,12 +115,7 @@
                 </div>
                 
                  <!-- Detail Grid -->
-                 <div class="flex-1 w-full grid grid-cols-2 lg:grid-cols-4 gap-y-2 gap-x-3 items-center">
-                    <!-- Total -->
-                    <div class="min-w-0">
-                        <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-0">Total</p>
-                        <span class="text-sm font-bold text-[#003d9e]">{{ formatAngka($total_netto) }}</span>
-                    </div>
+                 <div class="flex-1 w-full grid grid-cols-2 lg:grid-cols-3 gap-y-2 gap-x-3 items-center">
                     <!-- Jenis -->
                     <div class="min-w-0">
                          <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-0">Jenis</p>
@@ -142,6 +137,11 @@
                         @else
                             <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">BELUM LUNAS</span>
                         @endif
+                    </div>
+                    <!-- Total -->
+                    <div class="min-w-0 text-end">
+                        <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-0">Total</p>
+                        <span class="text-sm font-bold text-[#003d9e]">{{ formatAngka($total_netto) }}</span>
                     </div>
                  </div>
                  

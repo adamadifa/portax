@@ -17,9 +17,9 @@ class PembayaranpembelianmarketingController extends Controller
         $no_bukti = Crypt::decrypt($no_bukti);
         $pembelian = Pembelianmarketing::where('no_bukti', $no_bukti)->first();
         
-        $total_bruto = Detailpembelianmarketing::where('no_bukti', $no_bukti)->sum('subtotal');
+        $total_bruto = Detailpembelianmarketing::where('no_bukti', $no_bukti)->selectRaw('IFNULL(SUM(subtotal + (subtotal * (11/12) * 0.12)), 0) as total')->value('total');
         $total_bayar = Historibayarpembelianmarketing::where('no_bukti_pembelian', $no_bukti)->sum('jumlah');
-        $sisa_bayar = $total_bruto - $total_bayar;
+        $sisa_bayar = round($total_bruto) - $total_bayar;
 
         $data['pembelian'] = $pembelian;
         $data['no_bukti'] = $no_bukti;
@@ -83,11 +83,11 @@ class PembayaranpembelianmarketingController extends Controller
         
         $pembelian = Pembelianmarketing::where('no_bukti', $historibayar->no_bukti_pembelian)->first();
         
-        $total_bruto = Detailpembelianmarketing::where('no_bukti', $historibayar->no_bukti_pembelian)->sum('subtotal');
+        $total_bruto = Detailpembelianmarketing::where('no_bukti', $historibayar->no_bukti_pembelian)->selectRaw('IFNULL(SUM(subtotal + (subtotal * (11/12) * 0.12)), 0) as total')->value('total');
         $total_bayar = Historibayarpembelianmarketing::where('no_bukti_pembelian', $historibayar->no_bukti_pembelian)
             ->where('no_bukti', '!=', $historibayar->no_bukti)
             ->sum('jumlah');
-        $sisa_bayar = $total_bruto - $total_bayar;
+        $sisa_bayar = round($total_bruto) - $total_bayar;
 
         $data['historibayar'] = $historibayar;
         $data['pembelian'] = $pembelian;
