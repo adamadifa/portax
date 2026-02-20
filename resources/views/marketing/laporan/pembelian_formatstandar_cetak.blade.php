@@ -23,65 +23,86 @@
             <table class="datatable3" style="width: 100%">
                 <thead>
                     <tr>
-                        <th>Tanggal</th>
-                        <th>No. Bukti</th>
-                        <th>Supplier</th>
-                        <th>Jenis Transaksi</th>
-                        <th>Nama Produk</th>
-                        <th>Qty</th>
-                        <th>Harga</th>
-                        <th>Subtotal</th>
-                        <th>Total Bruto</th>
-                        <th>Total Bayar</th>
-                        <th>Status</th>
-                        <th>User</th>
+                        <th rowspan="2">Tanggal</th>
+                        <th rowspan="2">No. Bukti</th>
+                        <th rowspan="2">Supplier</th>
+                        <th rowspan="2">User</th>
+                        <th rowspan="2">Nama Produk</th>
+                        <th colspan="7">Subtotal</th>
+                        <th rowspan="2">Jenis Transaksi</th>
+                        <th rowspan="2">Status</th>
+                    </tr>
+                    <tr>
+                        <th>DUS</th>
+                        <th>HARGA / DUS</th>
+                        <th>HARGA DPP</th>
+                        <th>DPP</th>
+                        <th>DPP LAIN</th>
+                        <th>PPN</th>
+                        <th>JUMLAH</th>
                     </tr>
                 </thead>
                 <tbody>
                     @php
+                        $grand_total_dpp_global = 0;
+                        $grand_total_ppn_global = 0;
+                        $grand_total_jumlah_global = 0;
+                        $total = 0;
                         $arr = [];
                         foreach ($pembelian as $row) {
                             $arr[$row->no_bukti][] = $row;
                         }
-                        $grandtotal_bruto = 0;
                     @endphp
                     @foreach ($arr as $no_bukti => $details)
                         @php
                             $first = true;
                             $rowspan = count($details);
-                            $total_bruto_faktur = 0;
-                            // Pre-calculate total bruto for this invoice
-                             foreach ($details as $d) {
-                                $total_bruto_faktur += $d->subtotal;
-                             }
-                             $grandtotal_bruto += $total_bruto_faktur;
-                             
-                             // Since we don't have total_bayar in the query for standard yet unless we join or pre-calc, 
-                             // let's assume currently only bruto is critical or I need to adjust query.
-                             // Wait, I didn't validly join historibayar in standard query in the controller block above, 
-                             // I need to fix that or just show bruto for now. 
-                             // In the controller I joined detail, but total_bayar subquery was removed/not added to group.
                         @endphp
                         @foreach ($details as $d)
+                            @php
+                                if (!empty($d->isi_pcs_dus)) {
+                                    $qty = convertToduspackpcsv2($d->isi_pcs_dus, $d->isi_pcs_pack, $d->jumlah);
+                                    $jml = explode('|', $qty);
+                                    $dus = $jml[0];
+                                    $pack = $jml[1];
+                                    $pcs = $jml[2];
+                                    $total += $d->subtotal;
+                                    
+                                    // Asumsi logika PPN standar sesuai penjualan (11/12 * 0.12)
+                                    $d__dpp = $d->subtotal * (100/111);
+                                    $d__ppn = $d__dpp * (11/12) * 0.12;
+                                    $d__jumlah = $d__dpp + $d__ppn;
+
+                                    $grand_total_dpp_global += $d__dpp;
+                                    $grand_total_ppn_global += $d__ppn;
+                                    $grand_total_jumlah_global += $d__jumlah;
+                                } else {
+                                    $dus = 0;
+                                    $pack = 0;
+                                    $pcs = 0;
+                                }
+                            @endphp
                             <tr>
                                 @if ($first)
                                     <td rowspan="{{ $rowspan }}">{{ DateToIndo($d->tanggal) }}</td>
                                     <td rowspan="{{ $rowspan }}">{{ $d->no_bukti }}</td>
                                     <td rowspan="{{ $rowspan }}">{{ $d->nama_supplier }}</td>
-                                    <td rowspan="{{ $rowspan }}" class="center">{{ $d->jenis_transaksi == 'T' ? 'TUNAI' : 'KREDIT' }}</td>
+                                    <td rowspan="{{ $rowspan }}">{{ (!empty($d->nama_user)) ? $d->nama_user : '' }}</td>
                                 @endif
                                 <td>{{ $d->nama_produk }}</td>
-                                <td class="center">{{ formatAngka($d->jumlah) }}</td>
-                                <td class="right">{{ formatAngka($d->harga_dus) }}</td>
-                                <td class="right">{{ formatAngka($d->subtotal) }}</td>
+                                <td class="center">{{ formatAngka($dus) }}</td>
+                                <td class="right">{{ !empty($dus) ? formatAngka($d->harga_dus) : '' }}</td>
+                                <td class="right">{{ !empty($dus) ? formatAngka($d->harga_dus * (100/111)) : '' }}</td>
+                                <td class="right">{{ formatAngka($d->subtotal * (100/111)) }}</td>
+                                <td class="right">{{ formatAngka(($d->subtotal * (100/111)) * (11/12)) }}</td>
+                                <td class="right">{{ formatAngka(($d->subtotal * (100/111)) * (11/12) * 0.12) }}</td>
+                                <td class="right">{{ formatAngka( ($d->subtotal * (100/111)) + (($d->subtotal * (100/111)) * (11/12) * 0.12) ) }}</td>
+
                                 @if ($first)
-                                    <td rowspan="{{ $rowspan }}" class="right">{{ formatAngka($total_bruto_faktur) }}</td>
-                                    {{-- <td rowspan="{{ $rowspan }}" class="right">{{ formatAngka($d->total_bayar ?? 0) }}</td> --}}
-                                    <td rowspan="{{ $rowspan }}" class="right"></td> 
+                                    <td rowspan="{{ $rowspan }}" class="center">{{ $d->jenis_transaksi == 'T' ? 'TUNAI' : 'KREDIT' }}</td>
                                     <td rowspan="{{ $rowspan }}" class="center text-{{ $d->status == '1' ? 'green' : 'red' }}">
                                         {{ $d->status == '1' ? 'LUNAS' : 'BLM LUNAS' }}
                                     </td>
-                                    <td rowspan="{{ $rowspan }}">{{ $d->nama_user }}</td>
                                 @endif
                             </tr>
                             @php $first = false; @endphp
@@ -91,8 +112,11 @@
                 <tfoot>
                      <tr>
                         <th colspan="8" class="center">TOTAL</th>
-                        <th class="right">{{ formatAngka($grandtotal_bruto) }}</th>
-                        <th colspan="3"></th>
+                        <th class="right">{{ formatAngka($grand_total_dpp_global) }}</th>
+                        <th class="right"></th>
+                        <th class="right">{{ formatAngka($grand_total_ppn_global) }}</th>
+                        <th class="right">{{ formatAngka($grand_total_jumlah_global) }}</th>
+                        <th colspan="2"></th>
                     </tr>
                 </tfoot>
             </table>

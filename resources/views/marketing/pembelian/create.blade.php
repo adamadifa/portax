@@ -95,12 +95,12 @@
                     <table class="w-full text-sm text-left text-slate-600 relative" id="tabelproduk">
                         <thead class="text-xs text-white uppercase bg-[#003d9e] sticky top-0 z-10">
                              <tr>
-                                <th class="px-4 py-3 font-medium border-r border-blue-500 text-center">Kode</th>
-                                <th class="px-4 py-3 font-medium border-r border-blue-500 w-[30%]">Nama Barang</th>
-                                <th class="px-3 py-3 font-medium border-r border-blue-500 text-center">Dus</th>
-                                <th class="px-3 py-3 font-medium border-r border-blue-500 text-right">Harga / Dus</th>
-                                <th class="px-4 py-3 font-medium border-r border-blue-500 text-right">Subtotal</th>
-                                <th class="px-3 py-3 text-center">Aksi</th>
+                                <th class="px-4 py-2.5 font-semibold tracking-wider border-r border-blue-500 text-center">Kode</th>
+                                <th class="px-4 py-2.5 font-semibold tracking-wider border-r border-blue-500 w-[35%]">Nama Barang</th>
+                                <th class="px-4 py-2.5 font-semibold tracking-wider border-r border-blue-500 text-center">Dus</th>
+                                <th class="px-4 py-2.5 font-semibold tracking-wider border-r border-blue-500 text-right">Harga / Dus</th>
+                                <th class="px-4 py-2.5 font-semibold tracking-wider border-r border-blue-500 text-right">Subtotal</th>
+                                <th class="px-4 py-2.5 font-semibold tracking-wider text-center">Aksi</th>
                              </tr>
                         </thead>
                         <tbody id="loadproduk" class="divide-y divide-slate-100 bg-white">
@@ -108,8 +108,8 @@
                         </tbody>
                         <tfoot class="bg-slate-50 border-t border-slate-200 sticky bottom-0 z-10">
                             <tr>
-                                <td colspan="4" class="px-4 py-3 text-right font-bold text-slate-700">SUBTOTAL</td>
-                                <td class="px-4 py-3 text-right font-bold text-slate-800" id="subtotal">Rp 0</td>
+                                <td colspan="4" class="px-4 py-3 text-right font-bold text-slate-700 uppercase tracking-widest text-xs">SUBTOTAL</td>
+                                <td class="px-4 py-3 text-right font-bold text-slate-800 text-base" id="subtotal">Rp 0</td>
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -617,8 +617,8 @@
                 });
             } else {
                 let produk = `
-                    <tr id="index_${index}">
-                        <td>
+                    <tr id="index_${index}" class="hover:bg-slate-50 transition-colors border-b border-slate-100">
+                        <td class="px-4 py-2.5 text-slate-700 font-medium">
                             <input type="hidden" name="kode_produk[]" value="${kode_produk}" class="kode_produk"/>
                             <input type="hidden" name="status_promosi_produk[]" value="0"/>
                             <input type="hidden" name="kode_kategori_diskon[]" class="kode_kategori_diskon" value="${kode_kategori_diskon}"/>
@@ -627,28 +627,23 @@
                             <input type="hidden" name="isi_pcs_pack_produk[]" value="${isi_pcs_pack}"/>
                             ${kode_produk}
                         </td>
-                        <td>${nama_produk}</td>
-                        <td class="text-center">
+                        <td class="px-4 py-2.5 text-slate-700 font-medium text-wrap">${nama_produk}</td>
+                        <td class="px-4 py-2.5 text-center text-slate-700 font-medium">
                            ${jmldus}
                         </td>
-                        <td class="text-end">
+                        <td class="px-4 py-2.5 text-right text-slate-700 font-medium">
                            ${convertToRupiah(hargadus)}
                            <input type="hidden" name="harga_dus_produk[]" value="${hargadus}"/>
                         </td>
-                        <td class="text-end">
+                        <td class="px-4 py-2.5 text-right text-slate-800 font-bold">
                             ${convertToRupiah(subtotal)}
                             <input type="hidden" name="subtotal[]" class="subtotal" value="${subtotal}"/>
                         </td>
-                        <td class="text-center">
-                           <div class="d-flex">
-                              <div>
-                                 <a href="#" key="${index}" class="edit me-2"><i class="ti ti-edit text-success"></i></a>
-                              </div>
-                              <div>
-                                 <a href="#" key="${index}" class="delete"><i class="ti ti-trash text-danger"></i></a>
-                              </div>
+                        <td class="px-4 py-2.5 text-center">
+                           <div class="flex items-center justify-center gap-2">
+                                 <a href="#" key="${index}" class="edit flex items-center justify-center w-8 h-8 rounded-full bg-green-50 text-green-600 hover:bg-green-100 transition-colors"><i class="ti ti-edit"></i></a>
+                                 <a href="#" key="${index}" class="delete flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors"><i class="ti ti-trash"></i></a>
                            </div>
-
                         </td>
                     </tr>
                 `;
@@ -773,8 +768,8 @@
             let subtotal = (parseInt(jmldus) * parseInt(hargadus));
 
             let newRow = `
-                    <tr id="index_${index}">
-                        <td>
+                    <tr id="index_${index}" class="hover:bg-slate-50 transition-colors border-b border-slate-100">
+                        <td class="px-4 py-2.5 text-slate-700 font-medium">
                             <input type="hidden" name="kode_produk[]" value="${kode_produk}" class="kode_produk"/>
                             <input type="hidden" name="status_promosi_produk[]" value="0"/>
                             <input type="hidden" name="kode_kategori_diskon[]" class="kode_kategori_diskon" value="${kode_kategori_diskon}"/>
@@ -783,28 +778,23 @@
                             <input type="hidden" name="isi_pcs_pack_produk[]" value="${isi_pcs_pack}"/>
                             ${kode_produk}
                         </td>
-                        <td>${nama_produk}</td>
-                        <td class="text-center">
+                        <td class="px-4 py-2.5 text-slate-700 font-medium text-wrap">${nama_produk}</td>
+                        <td class="px-4 py-2.5 text-center text-slate-700 font-medium">
                            ${jmldus}
                         </td>
-                        <td class="text-end">
+                        <td class="px-4 py-2.5 text-right text-slate-700 font-medium">
                            ${convertToRupiah(hargadus)}
                            <input type="hidden" name="harga_dus_produk[]" value="${hargadus}"/>
                         </td>
-                        <td class="text-end">
+                        <td class="px-4 py-2.5 text-right text-slate-800 font-bold">
                             <input type="hidden" name="subtotal[]" class="subtotal" value="${subtotal}"/>
                             ${convertToRupiah(subtotal)}
                         </td>
-                        <td class="text-center">
-                           <div class="d-flex">
-                              <div>
-                                 <a href="#" key="${index}" class="edit me-2"><i class="ti ti-edit text-success"></i></a>
-                              </div>
-                              <div>
-                                 <a href="#" key="${index}" class="delete"><i class="ti ti-trash text-danger"></i></a>
-                              </div>
+                        <td class="px-4 py-2.5 text-center">
+                           <div class="flex items-center justify-center gap-2">
+                                 <a href="#" key="${index}" class="edit flex items-center justify-center w-8 h-8 rounded-full bg-green-50 text-green-600 hover:bg-green-100 transition-colors"><i class="ti ti-edit"></i></a>
+                                 <a href="#" key="${index}" class="delete flex items-center justify-center w-8 h-8 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors"><i class="ti ti-trash"></i></a>
                            </div>
-
                         </td>
                     </tr>
                 `;
