@@ -279,7 +279,7 @@
                         <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
                             <h5 class="section-title mb-0 border-0 p-0 text-primary"><i class="ti ti-history me-2"></i>Pembayaran</h5>
                              @can('pembayaranpembelianmarketing.create')
-                                @if ($pembelian->status == '0' && (round($total_jumlah) - $historibayar->sum('jumlah')) > 0 )
+                                @if ((round($total_jumlah) - $historibayar->sum('jumlah')) > 0 )
                                     <a href="#" class="btn btn-primary btn-sm rounded-pill px-3 py-1" id="btnCreateBayar" style="font-size: 0.75rem;">
                                         <i class="ti ti-plus me-1"></i>Baru
                                     </a>
