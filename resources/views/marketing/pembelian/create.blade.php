@@ -419,7 +419,6 @@
             e.preventDefault();
             let kode_supplier = $(this).attr('kode_supplier');
             getSupplier(kode_supplier);
-            $("#loadproduk").html('');
             $("#potongan_swan").val(0);
             $("#potongan_aida").val(0);
             $("#potongan_sp").val(0);
