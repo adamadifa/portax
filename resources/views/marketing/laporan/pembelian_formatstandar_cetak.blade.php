@@ -61,7 +61,11 @@
                             $rowspan = count($details);
                             $total_faktur = 0;
                             foreach ($details as $d) {
-                                $total_faktur += $d->subtotal;
+                                $d__dpp = $d->subtotal;
+                                $d__dpp_lain = $d__dpp * (11/12);
+                                $d__ppn = $d__dpp_lain * 0.12;
+                                $d__jumlah = $d__dpp + $d__ppn;
+                                $total_faktur += $d__jumlah;
                             }
                             $grand_total_keseluruhan += $total_faktur;
                         @endphp

@@ -149,8 +149,13 @@
                   <div class="w-full md:w-auto flex flex-col md:flex-row items-center justify-end gap-1 border-t md:border-t-0 md:border-l border-slate-200/60 pt-2 md:pt-0 md:pl-4">
                        <div class="inline-flex rounded-md shadow-sm isolate" role="group">
                            @can('pembelianmarketing.show')
-                            <a href="{{ route('pembelianmarketing.show', Crypt::encrypt($d->no_bukti)) }}" class="group relative w-8 h-8 flex items-center justify-center bg-white text-blue-600 hover:bg-blue-50 border-y border-l border-slate-200 rounded-l-lg hover:z-10 transition-all" title="Detail">
+                            <a href="{{ route('pembelianmarketing.show', Crypt::encrypt($d->no_bukti)) }}" class="group relative w-8 h-8 flex items-center justify-center bg-white text-blue-600 hover:bg-blue-50 border border-slate-200 rounded-l-lg hover:z-10 transition-all" title="Detail">
                                 <i class="ti ti-file-description text-xs"></i>
+                            </a>
+                           @endcan
+                           @can('pembelianmarketing.edit')
+                            <a href="{{ route('pembelianmarketing.edit', Crypt::encrypt($d->no_bukti)) }}" class="group relative w-8 h-8 flex items-center justify-center bg-white text-orange-600 hover:bg-orange-50 border-y border-r border-slate-200 hover:z-10 transition-all" title="Edit">
+                                <i class="ti ti-edit text-xs"></i>
                             </a>
                            @endcan
                             @can('pembelianmarketing.delete')
