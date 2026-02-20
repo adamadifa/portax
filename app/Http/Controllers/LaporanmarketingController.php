@@ -19,6 +19,8 @@ use App\Models\Dpb;
 use App\Models\Dpbdriverhelper;
 use App\Models\Driverhelper;
 use App\Models\Historibayarpenjualan;
+use App\Models\Historibayarpembelianmarketing;
+use App\Models\SupplierMarketing;
 use App\Models\Kategorikomisi;
 use App\Models\Kendaraan;
 use App\Models\Movefaktur;
@@ -215,6 +217,86 @@ class LaporanmarketingController extends Controller
         }
         
         return view('marketing.laporan.pembelian_formatsatubaris_cetak', $data);
+    }
+
+    public function cetakkartuhutang(Request $request)
+    {
+        $user = User::findOrFail(auth()->user()->id);
+        $roles_access_all_cabang = config('global.roles_access_all_cabang');
+
+        $query = Pembelianmarketing::query();
+        $query->select(
+            'marketing_pembelian.no_bukti',
+            'marketing_pembelian.tanggal',
+            'marketing_pembelian.kode_supplier',
+            'supplier_marketing.nama_supplier',
+            DB::raw('IFNULL(totalhutang, 0) as totalhutang'),
+            DB::raw('IFNULL(totalhutang, 0) - IFNULL(jmlbayarbulanlalu, 0) as sisapiutang'),
+            DB::raw('IFNULL(jmlbayarbulanlalu, 0) as jmlbayarbulanlalu'),
+            DB::raw('IFNULL(jmlbayarbulanini, 0) as jmlbayarbulanini'),
+            DB::raw('IFNULL(pmbbulanini, 0) as pmbbulanini')
+        );
+        $query->leftJoin('supplier_marketing', 'marketing_pembelian.kode_supplier', '=', 'supplier_marketing.kode_supplier');
+        $query->leftJoin(
+            DB::raw("(
+                SELECT marketing_pembelian_detail.no_bukti,
+                SUM(subtotal) as totalhutang,
+                IF(marketing_pembelian.tanggal BETWEEN '$request->dari' AND '$request->sampai', SUM(subtotal), 0) as pmbbulanini
+                FROM marketing_pembelian_detail
+                INNER JOIN marketing_pembelian ON marketing_pembelian_detail.no_bukti = marketing_pembelian.no_bukti
+                GROUP BY marketing_pembelian_detail.no_bukti
+            ) detailpembelian"),
+            function ($join) {
+                $join->on('marketing_pembelian.no_bukti', '=', 'detailpembelian.no_bukti');
+            }
+        );
+        $query->leftJoin(
+            DB::raw("(
+                SELECT no_bukti_pembelian as no_bukti,
+                SUM(IF(tanggal < '$request->dari', jumlah, 0)) as jmlbayarbulanlalu,
+                SUM(IF(tanggal BETWEEN '$request->dari' AND '$request->sampai', jumlah, 0)) as jmlbayarbulanini
+                FROM marketing_pembelian_historibayar
+                GROUP BY no_bukti_pembelian
+            ) historibayar"),
+            function ($join) {
+                $join->on('marketing_pembelian.no_bukti', '=', 'historibayar.no_bukti');
+            }
+        );
+
+        $query->where('marketing_pembelian.tanggal', '<=', $request->sampai);
+        $query->whereRaw("IFNULL(totalhutang, 0) - IFNULL(jmlbayarbulanlalu, 0) != 0");
+
+        if (!empty($request->kode_supplier)) {
+            $query->where('marketing_pembelian.kode_supplier', $request->kode_supplier);
+        }
+
+        if (!in_array($user->roles, $roles_access_all_cabang)) {
+            $query->where('marketing_pembelian.kode_cabang', $user->kode_cabang);
+        } else {
+            if (!empty($request->kode_cabang)) {
+                $query->where('marketing_pembelian.kode_cabang', $request->kode_cabang);
+            }
+        }
+
+        $query->orderBy('marketing_pembelian.kode_supplier');
+        $query->orderBy('marketing_pembelian.tanggal');
+        $query->orderBy('marketing_pembelian.no_bukti');
+
+        $supplier = !empty($request->kode_supplier)
+            ? SupplierMarketing::where('kode_supplier', $request->kode_supplier)->first()
+            : null;
+
+        $data['kartuhutang'] = $query->get();
+        $data['dari'] = $request->dari;
+        $data['sampai'] = $request->sampai;
+        $data['supplier'] = $supplier;
+
+        if (isset($_POST['exportButton'])) {
+            header("Content-type: application/vnd-ms-excel");
+            header("Content-Disposition: attachment; filename=Laporan Kartu Hutang $request->dari-$request->sampai.xls");
+        }
+
+        return view('marketing.laporan.kartuhutang_cetak', $data);
     }
 
     public function index()

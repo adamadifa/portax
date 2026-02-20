@@ -2046,6 +2046,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/laporanmarketing/cetakinsentifom', 'cetakinsentifom')->name('laporanmarketing.cetakinsentifom')->can('worksheetom.insentifom');
         Route::post('/laporanmarketing/cetakratiobs', 'cetakratiobs')->name('laporanmarketing.cetakratiobs')->can('worksheetom.ratiobs');
         Route::post('/laporanmarketing/cetakpembelian', 'cetakpembelian')->name('laporanmarketing.cetakpembelian')->can('mkt.pembelian');
+        Route::post('/laporanmarketing/cetakkartuhutang', 'cetakkartuhutang')->name('laporanmarketing.cetakkartuhutang')->can('mkt.kartuhutang');
     });
 
     Route::controller(LaporanaccountingController::class)->group(function () {

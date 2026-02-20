@@ -112,6 +112,14 @@
                         </button>
                     </li>
                 @endcan
+                @can('mkt.kartuhutang')
+                    <li class="nav-item" role="kartuhutang">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#kartuhutang"
+                            aria-controls="kartuhutang" aria-selected="false" tabindex="-1">
+                            Kartu Hutang
+                        </button>
+                    </li>
+                @endcan
             </ul>
             <div class="tab-content">
                 @can('mkt.penjualan')
@@ -187,6 +195,11 @@
                 @can('mkt.pembelian')
                     <div class="tab-pane fade" id="pembelian" role="tabpanel">
                         @include('marketing.laporan.pembelian')
+                    </div>
+                @endcan
+                @can('mkt.kartuhutang')
+                    <div class="tab-pane fade" id="kartuhutang" role="tabpanel">
+                        @include('marketing.laporan.kartuhutang')
                     </div>
                 @endcan
             </div>
