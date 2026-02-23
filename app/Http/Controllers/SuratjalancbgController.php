@@ -133,7 +133,7 @@ class SuratjalancbgController extends Controller
                 $pack = toNumber(!empty($jml_pack[$i]) ? $jml_pack[$i] : 0);
                 $pcs = toNumber(!empty($jml_pcs[$i]) ? $jml_pcs[$i] : 0);
 
-                $jumlah = ($dus * $isi_pcs_dus[$i]) + ($pack * $isi_pcs_pack[$i]) + $pcs;
+                $jumlah = ((float)$dus * (float)$isi_pcs_dus[$i]) + ((float)$pack * (float)$isi_pcs_pack[$i]) + (float)$pcs;
                 if (!empty($jumlah)) {
                     $detail[]   = [
                         'no_mutasi' => $no_suratjalan,
@@ -252,7 +252,7 @@ class SuratjalancbgController extends Controller
                 $pack = toNumber(!empty($jml_pack[$i]) ? $jml_pack[$i] : 0);
                 $pcs = toNumber(!empty($jml_pcs[$i]) ? $jml_pcs[$i] : 0);
 
-                $jumlah = ($dus * $isi_pcs_dus[$i]) + ($pack * $isi_pcs_pack[$i]) + $pcs;
+                $jumlah = ((float)$dus * (float)$isi_pcs_dus[$i]) + ((float)$pack * (float)$isi_pcs_pack[$i]) + (float)$pcs;
                 if (!empty($jumlah)) {
                     $detail[]   = [
                         'no_mutasi' => $no_mutasi,

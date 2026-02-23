@@ -78,7 +78,8 @@ function getfotoKaryawan($file)
 function toNumber($value)
 {
     if (!empty($value)) {
-        return str_replace([".", ","], ["", "."], $value);
+        $val = str_replace([".", ","], ["", "."], $value);
+        return is_numeric($val) ? $val : 0;
     } else {
         return 0;
     }
