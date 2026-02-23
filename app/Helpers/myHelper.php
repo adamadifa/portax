@@ -235,9 +235,12 @@ function getBeratliter($tanggal)
 function convertToduspackpcs($kode_produk, $jumlah)
 {
     $produk = Produk::where('kode_produk', $kode_produk)->first();
+    if (empty($produk->isi_pcs_dus)) {
+        return "0|0|0";
+    }
     $jml_dus = floor($jumlah / $produk->isi_pcs_dus);
     $sisa_dus = $jumlah % $produk->isi_pcs_dus;
-    if (!empty($produk->isi_pack_dus)) {
+    if (!empty($produk->isi_pcs_pack)) {
         $jml_pack = floor($sisa_dus / $produk->isi_pcs_pack);
         $sisa_pack = $sisa_dus % $produk->isi_pcs_pack;
     } else {
@@ -253,7 +256,9 @@ function convertToduspackpcs($kode_produk, $jumlah)
 
 function convertToduspackpcsv2($isi_pcs_dus, $isi_pcs_pack, $jumlah)
 {
-
+    if (empty($isi_pcs_dus)) {
+        return "0|0|0";
+    }
     $jml_dus = floor($jumlah / $isi_pcs_dus);
     $sisa_dus = $jumlah % $isi_pcs_dus;
     if (!empty($isi_pcs_pack)) {
@@ -271,7 +276,9 @@ function convertToduspackpcsv2($isi_pcs_dus, $isi_pcs_pack, $jumlah)
 
 function convertToduspackpcsv3($isi_pcs_dus, $isi_pcs_pack, $jumlah)
 {
-
+    if (empty($isi_pcs_dus)) {
+        return array(0, 0, 0);
+    }
     $jml_dus = floor($jumlah / $isi_pcs_dus);
     $sisa_dus = $jumlah % $isi_pcs_dus;
     if (!empty($isi_pcs_pack)) {

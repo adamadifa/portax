@@ -94,7 +94,9 @@ class SaldoawalgudangcabangController extends Controller
         }
 
         //Cek Apakah Sudah Ada Saldo Atau Belum
-        $ceksaldo = Saldoawalgudangcabang::count();
+        $ceksaldo = Saldoawalgudangcabang::where('kondisi', $request->kondisi)
+            ->where('kode_cabang', $kode_cabang)
+            ->count();
         // Cek Saldo Bulan Lalu
         $ceksaldobulanlalu = Saldoawalgudangcabang::where('bulan', $bulanlalu)->where('tahun', $tahunlalu)
             ->where('kode_cabang', $kode_cabang)
@@ -115,6 +117,8 @@ class SaldoawalgudangcabangController extends Controller
             $produk = Produk::selectRaw(
                 'produk.kode_produk,
                 nama_produk,
+                isi_pcs_dus,
+                isi_pcs_pack,
                 saldo_awal as saldo_akhir'
             )
                 ->where('status_aktif_produk', 1)
@@ -331,6 +335,74 @@ class SaldoawalgudangcabangController extends Controller
             ->get();
         $nama_bulan = config('global.nama_bulan');
         return view('gudangcabang.saldoawal.show', compact('saldo_awal', 'nama_bulan', 'detail'));
+    }
+
+    public function edit($kode_saldo_awal)
+    {
+        $kode_saldo_awal = Crypt::decrypt($kode_saldo_awal);
+        $data['saldo_awal'] = Saldoawalgudangcabang::where('kode_saldo_awal', $kode_saldo_awal)->first();
+        $data['detail'] = Detailsaldoawalgudangcabang::where('kode_saldo_awal', $kode_saldo_awal)
+            ->join('produk', 'gudang_cabang_saldoawal_detail.kode_produk', '=', 'produk.kode_produk')
+            ->select('gudang_cabang_saldoawal_detail.*', 'nama_produk', 'isi_pcs_dus', 'isi_pcs_pack')
+            ->get();
+
+        $data['list_bulan'] = config('global.list_bulan');
+        $data['nama_bulan'] = config('global.nama_bulan');
+        $data['start_year'] = config('global.start_year');
+        $cbg = new Cabang();
+        $cabang = $cbg->getCabang();
+        $data['cabang'] = $cabang;
+
+        return view('gudangcabang.saldoawal.edit', $data);
+    }
+
+    public function update($kode_saldo_awal, Request $request)
+    {
+        $kode_saldo_awal = Crypt::decrypt($kode_saldo_awal);
+        $kode_produk = $request->kode_produk;
+        $jml_dus = $request->jml_dus;
+        $jml_pack = $request->jml_pack;
+        $jml_pcs = $request->jml_pcs;
+        $isi_pcs_dus = $request->isi_pcs_dus;
+        $isi_pcs_pack = $request->isi_pcs_pack;
+
+        DB::beginTransaction();
+        try {
+            // Delete existing detail
+            Detailsaldoawalgudangcabang::where('kode_saldo_awal', $kode_saldo_awal)->delete();
+
+            $detail_saldo = [];
+            for ($i = 0; $i < count($kode_produk); $i++) {
+                $dus = toNumber(!empty($jml_dus[$i]) ? $jml_dus[$i] : 0);
+                $pack = toNumber(!empty($jml_pack[$i]) ? $jml_pack[$i] : 0);
+                $pcs = toNumber(!empty($jml_pcs[$i]) ? $jml_pcs[$i] : 0);
+                $jumlah = ((float)$dus * (float)$isi_pcs_dus[$i]) + ((float)$pack * (float)$isi_pcs_pack[$i]) + (float)$pcs;
+
+                $detail_saldo[] = [
+                    'kode_saldo_awal' => $kode_saldo_awal,
+                    'kode_produk' => $kode_produk[$i],
+                    'jumlah' => $jumlah,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ];
+            }
+
+            if (!empty($detail_saldo)) {
+                $chunks_buffer = array_chunk($detail_saldo, 5);
+                foreach ($chunks_buffer as $chunk_buffer) {
+                    Detailsaldoawalgudangcabang::insert($chunk_buffer);
+                }
+            } else {
+                DB::rollBack();
+                return Redirect::back()->with(messageError('Detail Saldo Kosong'));
+            }
+
+            DB::commit();
+            return Redirect::back()->with(messageSuccess('Data Berhasil Diupdate'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return Redirect::back()->with(messageError($e->getMessage()));
+        }
     }
 
     public function destroy($kode_saldo_awal)

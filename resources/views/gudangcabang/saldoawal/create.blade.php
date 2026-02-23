@@ -188,7 +188,7 @@
                     },
                     cache: false,
                     success: function(respond) {
-                        if (respond === '1') {
+                        if (respond == '1') {
                             Swal.fire({
                                 title: "Oops!",
                                 text: "Saldo Bulan Sebelumnya Belum di input !",

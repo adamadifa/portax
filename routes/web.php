@@ -1044,6 +1044,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/sagudangcabang', 'store')->name('sagudangcabang.store')->can('sagudangcabang.store');
         Route::delete('/sagudangcabang/{kode_saldo_awal}', 'destroy')->name('sagudangcabang.delete')->can('sagudangcabang.delete');
         Route::get('/sagudangcabang/{kode_saldo_awal}/show', 'show')->name('sagudangcabang.show')->can('sagudangcabang.show');
+        Route::get('/sagudangcabang/{kode_saldo_awal}/edit', 'edit')->name('sagudangcabang.edit')->can('sagudangcabang.edit');
+        Route::put('/sagudangcabang/{kode_saldo_awal}', 'update')->name('sagudangcabang.update')->can('sagudangcabang.update');
         //AJAX REQUEST
         Route::post('/sagudangcabang/getdetailsaldo', 'getdetailsaldo')->name('sagudangcabang.getdetailsaldo');
     });

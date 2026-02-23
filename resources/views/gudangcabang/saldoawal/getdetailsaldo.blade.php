@@ -32,9 +32,10 @@
                 <input type="hidden" name="jml_pack[]" value="{{ formatAngka($jumlah_pack) }}">
                 <span class="text-slate-600 text-sm text-right block">{{ formatAngka($jumlah_pack) }}</span>
             @else
-                <input type="text" name="jml_pack[]" value="{{ formatAngka($jumlah_pack) }}"
-                    style="width: 80px;"
-                    class="px-2 py-1.5 bg-white border border-slate-300 rounded text-sm text-right focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors money">
+                <input type="text" name="jml_pack[]"
+                    value="{{ !empty($d->isi_pcs_pack) ? formatAngka($jumlah_pack) : '-' }}" style="width: 80px;"
+                    class="px-2 py-1.5 {{ empty($d->isi_pcs_pack) ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white text-slate-700 focus:border-[#003d9e] focus:ring-[#003d9e]' }} border border-slate-300 rounded text-sm text-right focus:outline-none focus:ring-1 transition-colors money"
+                    {{ empty($d->isi_pcs_pack) ? 'readonly' : '' }}>
             @endif
         </td>
         <td class="px-2 py-1.5" style="width: 90px;">

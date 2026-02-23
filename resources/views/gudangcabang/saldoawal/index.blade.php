@@ -213,6 +213,12 @@
                                             <i class="fas fa-eye text-xs"></i>
                                         </button>
                                     @endcan
+                                    @can('sagudangcabang.edit')
+                                        <button class="btnEdit w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
+                                            kode_saldo_awal="{{ Crypt::encrypt($d->kode_saldo_awal) }}" title="Edit">
+                                            <i class="fas fa-edit text-xs"></i>
+                                        </button>
+                                    @endcan
                                     @can('sagudangcabang.delete')
                                         <form method="POST" name="deleteform" class="deleteform inline-block"
                                             action="{{ route('sagudangcabang.delete', Crypt::encrypt($d->kode_saldo_awal)) }}">
@@ -333,6 +339,13 @@
             var kode_saldo_awal = $(this).attr("kode_saldo_awal");
             e.preventDefault();
             openModal('/sagudangcabang/' + kode_saldo_awal + '/show');
+        });
+
+        // Edit button
+        $(".btnEdit").click(function(e) {
+            var kode_saldo_awal = $(this).attr("kode_saldo_awal");
+            e.preventDefault();
+            openModal('/sagudangcabang/' + kode_saldo_awal + '/edit');
         });
 
         // Expose close function to be called from inside loaded content if needed

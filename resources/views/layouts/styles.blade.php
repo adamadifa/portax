@@ -236,6 +236,12 @@
     .flatpickr-monthDropdown-months {
         color: #fff !important;
         font-weight: 700 !important;
+        background: transparent !important;
+    }
+
+    .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
+        background-color: #fff !important;
+        color: #334155 !important;
     }
 
     .numInputWrapper input.cur-year {
