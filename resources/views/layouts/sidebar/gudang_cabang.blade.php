@@ -1,9 +1,9 @@
-{{-- @if (auth()->user()->hasAnyPermission($gudang_cabang_permission))
+@if (auth()->user()->hasAnyPermission($gudang_cabang_permission))
     <li class="menu-item {{ request()->is($gudang_cabang_request) ? 'open' : '' }}">
 
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon ti ti-building-warehouse"></i>
-            <div>Gudang Cabang</div>
+            <div>Gudang</div>
         </a>
 
         <ul class="menu-sub">
@@ -14,27 +14,27 @@
                     </a>
                 </li>
             @endif
-            @if (auth()->user()->hasAnyPermission(['suratjalancabang.index']))
-                <li class="menu-item {{ request()->is(['suratjalancabang']) ? 'active' : '' }}">
-                    <a href="{{ route('suratjalancabang.index') }}" class="menu-link">
+            @if (auth()->user()->hasAnyPermission(['suratjalancbg.index']))
+                <li class="menu-item {{ request()->is(['suratjalancbg', 'suratjalancbg/*']) ? 'active' : '' }}">
+                    <a href="{{ route('suratjalancbg.index') }}" class="menu-link">
                         <div>Surat Jalan</div>
                     </a>
                 </li>
             @endif
-            @if (auth()->user()->hasAnyPermission(['transitin.index']))
+            <!-- @if (auth()->user()->hasAnyPermission(['transitin.index']))
                 <li class="menu-item {{ request()->is(['transitin']) ? 'active' : '' }}">
                     <a href="{{ route('transitin.index') }}" class="menu-link">
                         <div>Transit IN</div>
                     </a>
                 </li>
-            @endif
-            @if (auth()->user()->hasAnyPermission(['dpb.index']))
+            @endif -->
+            <!-- @if (auth()->user()->hasAnyPermission(['dpb.index']))
                 <li class="menu-item {{ request()->is(['dpb']) ? 'active' : '' }}">
                     <a href="{{ route('dpb.index') }}" class="menu-link">
                         <div>DPB</div>
                     </a>
                 </li>
-            @endif
+            @endif -->
 
             @if (auth()->user()->hasAnyPermission(['reject.index']))
                 <li class="menu-item {{ request()->is(['reject']) ? 'active' : '' }}">
@@ -50,7 +50,7 @@
                     </a>
                 </li>
             @endif
-            @if (auth()->user()->hasAnyPermission(['kirimpusat.index']))
+            <!-- @if (auth()->user()->hasAnyPermission(['kirimpusat.index']))
                 <li class="menu-item {{ request()->is(['kirimpusat']) ? 'active' : '' }}">
                     <a href="{{ route('kirimpusat.index') }}" class="menu-link">
                         <div>Kirim Pusat</div>
@@ -64,7 +64,7 @@
                         <div>Penyesuaian</div>
                     </a>
                 </li>
-            @endif
+            @endif -->
 
             @if (auth()->user()->hasAnyPermission($gudang_cabang_laporan_permission))
                 <li class="menu-item {{ request()->is(['laporangudangcabang']) ? 'active' : '' }}">
@@ -75,4 +75,4 @@
             @endif
         </ul>
     </li>
-@endif --}}
+@endif

@@ -1,15 +1,16 @@
-<form action="{{ route('repackcbg.store') }}" method="POST" id="formRepack" autocomplete="off" aria-autocomplete="none" class="flex flex-col h-full">
+<form action="{{ route('suratjalancbg.update', Crypt::encrypt($suratjalan->no_mutasi)) }}" method="POST" id="formSuratjalan" autocomplete="off" aria-autocomplete="none" class="flex flex-col h-full">
     @csrf
+    @method('PUT')
     
     <!-- Modal Header -->
     <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-[#003d9e] to-blue-700">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-                <i class="fas fa-plus-circle text-white"></i>
+                <i class="fas fa-edit text-white text-sm"></i>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-white">Tambah Repack Gudang Cabang</h3>
-                <p class="text-blue-200 text-xs text-left">Form input data mutasi repack produk</p>
+                <h3 class="text-lg font-bold text-white">Edit Surat Jalan Gudang Cabang</h3>
+                <p class="text-blue-200 text-xs text-left">Update data mutasi surat jalan produk</p>
             </div>
         </div>
         <button type="button" class="btn-close-modal w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors" onclick="window.closeTailwindModal()">
@@ -26,7 +27,7 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fas fa-calendar-alt text-slate-400 text-xs"></i>
                 </div>
-                <input type="text" name="tanggal" id="tanggal" class="flatpickr-date w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 transition-all font-medium" placeholder="Pilih Tanggal">
+                <input type="text" name="tanggal" id="tanggal" value="{{ $suratjalan->tanggal }}" class="flatpickr-date w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 transition-all font-medium" placeholder="Pilih Tanggal">
             </div>
 
             <!-- Cabang (Conditional) -->
@@ -42,7 +43,7 @@
                 <select name="kode_cabang" id="kode_cabang" class="w-full pl-10 pr-8 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none cursor-pointer font-medium text-slate-700">
                     <option value="">Pilih Cabang</option>
                     @foreach ($cabang as $c)
-                        <option value="{{ $c->kode_cabang }}">{{ strtoupper($c->nama_cabang) }}</option>
+                        <option value="{{ $c->kode_cabang }}" {{ $suratjalan->kode_cabang == $c->kode_cabang ? 'selected' : '' }}>{{ strtoupper($c->nama_cabang) }}</option>
                     @endforeach
                 </select>
             </div>
@@ -54,7 +55,7 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fas fa-file-alt text-slate-400 text-xs"></i>
                 </div>
-                <input type="text" name="keterangan" id="keterangan" class="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 transition-all font-medium" placeholder="Masukkan keterangan tambahan (opsional)">
+                <input type="text" name="keterangan" id="keterangan" value="{{ $suratjalan->keterangan }}" class="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 transition-all font-medium" placeholder="Masukkan keterangan tambahan (opsional)">
             </div>
         </div>
 
@@ -79,6 +80,11 @@
                     <tbody class="divide-y divide-slate-100">
                         @foreach ($produk as $d)
                             @php
+                                $jumlah = explode('|', convertToduspackpcsv2($d->isi_pcs_dus, $d->isi_pcs_pack, $d->jumlah));
+                                $jumlah_dus = $jumlah[0];
+                                $jumlah_pack = $jumlah[1];
+                                $jumlah_pcs = $jumlah[2];
+                                
                                 $hasPack = !empty($d->isi_pcs_pack);
                                 $packDisabledClass = !$hasPack ? 'bg-slate-50/70 text-slate-400 cursor-not-allowed placeholder:text-transparent' : 'bg-transparent text-slate-700 focus:bg-white focus:ring-1 focus:ring-[#003d9e]/50';
                                 $packReadOnlyAttr = !$hasPack ? 'readonly' : '';
@@ -94,13 +100,13 @@
                                     {{ $d->nama_produk }}
                                 </td>
                                 <td class="p-1 border-l border-slate-100">
-                                    <input type="text" class="w-full text-right px-2 py-2 text-sm font-bold bg-transparent border-0 focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_dus placeholder:text-slate-200" name="jml_dus[]" placeholder="0">
+                                    <input type="text" class="w-full text-right px-2 py-2 text-sm font-bold bg-transparent border-0 focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_dus" name="jml_dus[]" value="{{ formatAngka($jumlah_dus) }}" placeholder="0">
                                 </td>
                                 <td class="p-1 border-l border-slate-100 {{ !$hasPack ? 'bg-slate-50/50' : '' }}">
-                                    <input type="text" class="w-full text-right px-2 py-2 text-sm font-bold border-0 rounded transition-colors money jml_pack placeholder:text-slate-200 {{ $packDisabledClass }}" name="jml_pack[]" placeholder="{{ $hasPack ? '0' : '-' }}" {{ $packReadOnlyAttr }}>
+                                    <input type="text" class="w-full text-right px-2 py-2 text-sm font-bold border-0 rounded transition-colors money jml_pack placeholder:text-slate-200 {{ $packDisabledClass }}" name="jml_pack[]" value="{{ $hasPack ? formatAngka($jumlah_pack) : '-' }}" placeholder="{{ $hasPack ? '0' : '-' }}" {{ $packReadOnlyAttr }}>
                                 </td>
                                 <td class="p-1 border-l border-slate-100">
-                                    <input type="text" class="w-full text-right px-2 py-2 text-sm font-bold bg-transparent border-0 focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_pcs placeholder:text-slate-200" name="jml_pcs[]" placeholder="0">
+                                    <input type="text" class="w-full text-right px-2 py-2 text-sm font-bold bg-transparent border-0 focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_pcs" name="jml_pcs[]" value="{{ formatAngka($jumlah_pcs) }}" placeholder="0">
                                 </td>
                             </tr>
                         @endforeach
@@ -115,16 +121,16 @@
         <button type="button" class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-bold transition-colors flex items-center gap-2" onclick="window.closeTailwindModal()">
              Batal
         </button>
-        <button type="submit" class="bg-[#003d9e] hover:bg-blue-800 text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors shadow-md shadow-blue-200 flex items-center gap-2" id="btnSubmit">
-            <i class="fas fa-paper-plane text-[10px]"></i>
-            <span>Simpan Data</span>
+        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors shadow-md shadow-emerald-200 flex items-center gap-2" id="btnSubmit">
+            <i class="fas fa-check-circle text-[10px]"></i>
+            <span>Update Data</span>
         </button>
     </div>
 </form>
 
 <script>
     $(function() {
-        const form = $("#formRepack");
+        const form = $("#formSuratjalan");
         $(".money").maskMoney({
             thousands: '.',
             decimal: ',',
@@ -139,7 +145,8 @@
             }]
         });
 
-        form.on('submit', function(e) {
+        $(document).off('submit', '#formSuratjalan').on('submit', '#formSuratjalan', function(e) {
+            e.stopImmediatePropagation();
             const tanggal = $(this).find("#tanggal").val();
             const kode_cabang = $(this).find("#kode_cabang").val();
 
@@ -166,7 +173,7 @@
                 });
                 return false;
             } else {
-                $(this).find("#btnSubmit").prop('disabled', true).addClass('opacity-50 cursor-not-allowed').html('<i class="fas fa-circle-notch fa-spin"></i> Menyimpa...');
+                $(this).find("#btnSubmit").prop('disabled', true).addClass('opacity-50 cursor-not-allowed').html('<i class="fas fa-circle-notch fa-spin"></i> Memperbarui...');
                 return true;
             }
         });

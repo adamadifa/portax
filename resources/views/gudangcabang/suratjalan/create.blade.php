@@ -1,4 +1,4 @@
-<form action="{{ route('repackcbg.store') }}" method="POST" id="formRepack" autocomplete="off" aria-autocomplete="none" class="flex flex-col h-full">
+<form action="{{ route('suratjalancbg.store') }}" method="POST" id="formSuratjalan" autocomplete="off" aria-autocomplete="none" class="flex flex-col h-full">
     @csrf
     
     <!-- Modal Header -->
@@ -8,8 +8,8 @@
                 <i class="fas fa-plus-circle text-white"></i>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-white">Tambah Repack Gudang Cabang</h3>
-                <p class="text-blue-200 text-xs text-left">Form input data mutasi repack produk</p>
+                <h3 class="text-lg font-bold text-white">Tambah Surat Jalan Gudang Cabang</h3>
+                <p class="text-blue-200 text-xs text-left">Form input data mutasi surat jalan produk</p>
             </div>
         </div>
         <button type="button" class="btn-close-modal w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors" onclick="window.closeTailwindModal()">
@@ -124,7 +124,7 @@
 
 <script>
     $(function() {
-        const form = $("#formRepack");
+        const form = $("#formSuratjalan");
         $(".money").maskMoney({
             thousands: '.',
             decimal: ',',

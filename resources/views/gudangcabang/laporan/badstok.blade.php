@@ -1,134 +1,147 @@
-<form method="POST" action="{{ route('laporangudangcabang.cetakpersediaanbs') }}" id="frmLaporanbadstok" target="_blank">
-   @csrf
-   @hasanyrole($roles_show_cabang)
-      <div class="row">
-         <div class="col">
-            <x-select label="Pilih Cabang" name="kode_cabang_bs" :data="$cabang"
-               key="kode_cabang" textShow="nama_cabang" upperCase="true"
-               select2="select2Kodecabangbs" />
-         </div>
-      </div>
-   @endrole
-   <div class="row">
-      <div class="col">
-         <x-select label="Pilih Produk" name="kode_produk_bs" :data="$produk" key="kode_produk" textShow="nama_produk"
-            select2="select2Kodeprodukbs" showKey="true" upperCase="true" />
-      </div>
-   </div>
-   <div class="row">
-      <div class="col-lg-6 col-md-12 col-sm-12">
-         <x-input-with-icon icon="ti ti-calendar" label="Dari" name="dari" datepicker="flatpickr-date" />
-      </div>
-      <div class="col-lg-6 col-md-12 col-sm-12">
-         <x-input-with-icon icon="ti ti-calendar" label="Sampai" name="sampai" datepicker="flatpickr-date" />
-      </div>
-   </div>
-   <div class="row">
-      <div class="col-lg-10 col-md-12 col-sm-12">
-         <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButton">
-            <i class="ti ti-printer me-1"></i> Cetak
-         </button>
-      </div>
-      <div class="col-lg-2 col-md-12 col-sm-12">
-         <button type="submit" name="exportButton" class="btn btn-success w-100" id="exportButton">
-            <i class="ti ti-download"></i>
-         </button>
-      </div>
-   </div>
+<form method="POST" action="{{ route('laporangudangcabang.cetakpersediaanbs') }}" id="frmLaporanbadstok" target="_blank" class="space-y-3">
+    @csrf
+    <div class="space-y-2">
+        @hasanyrole($roles_show_cabang)
+            <div class="relative">
+                <select name="kode_cabang_bs" id="kode_cabang_bs" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodecabangbs">
+                    <option value="">Pilih Cabang</option>
+                    @foreach ($cabang as $d)
+                        <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endrole
+
+        <div class="relative text-left">
+            <select name="kode_produk_bs" id="kode_produk_bs" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodeprodukbs">
+                <option value="">Pilih Produk</option>
+                @foreach ($produk as $d)
+                    <option value="{{ $d->kode_produk }}">{{ $d->kode_produk }} - {{ textUpperCase($d->nama_produk) }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="relative">
+                <input type="text" name="dari" id="dari_bs" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Dari">
+            </div>
+            <div class="relative">
+                <input type="text" name="sampai" id="sampai_bs" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Sampai">
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-lg-10 col-md-12 col-sm-12">
+            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButton" style="background-color: #003d9e; border-color: #003d9e;">
+                <i class="ti ti-printer me-1 text-sm"></i> Cetak
+            </button>
+        </div>
+        <div class="col-lg-2 col-md-12 col-sm-12">
+            <button type="submit" name="exportButton" class="btn btn-success w-100" id="exportButton">
+                <i class="ti ti-download text-sm"></i>
+            </button>
+        </div>
+    </div>
 </form>
+
 @push('myscript')
-   <script>
-      $(function() {
-         const select2Kodecabangbs = $('.select2Kodecabangbs');
-         if (select2Kodecabangbs.length) {
-            select2Kodecabangbs.each(function() {
-               var $this = $(this);
-               $this.wrap('<div class="position-relative"></div>').select2({
-                  placeholder: 'Pilih Cabang',
-                  allowClear: true,
-                  dropdownParent: $this.parent()
-               });
-            });
-         }
-
-
-         const select2Kodeprodukbs = $('.select2Kodeprodukbs');
-         if (select2Kodeprodukbs.length) {
-            select2Kodeprodukbs.each(function() {
-               var $this = $(this);
-               $this.wrap('<div class="position-relative"></div>').select2({
-                  placeholder: 'Pilih Produk',
-                  dropdownParent: $this.parent(),
-                  allowClear: true
-               });
-            });
-         }
-         $("#frmLaporanbadstok").submit(function() {
-            const kode_produk = $(this).find("#kode_produk_bs").val();
-            const dari = $(this).find("#dari").val();
-            const sampai = $(this).find("#sampai").val();
-            const kode_cabang = $(this).find("#kode_cabang_bs").val();
-            var start = new Date(dari);
-            var end = new Date(sampai);
-            if (kode_cabang == "") {
-               Swal.fire({
-                  title: "Oops!",
-                  text: 'Kode Cabang Harus Diisi !',
-                  icon: "warning",
-                  showConfirmButton: true,
-                  didClose: (e) => {
-                     $(this).find("#kode_cabang").focus();
-                  },
-               });
-
-               return false;
-            } else if (kode_produk == "") {
-               Swal.fire({
-                  title: "Oops!",
-                  text: 'Kode Produk Harus Diisi !',
-                  icon: "warning",
-                  showConfirmButton: true,
-                  didClose: (e) => {
-                     $(this).find("#kode_produk").focus();
-                  },
-               });
-
-               return false;
-            } else if (dari == "") {
-               Swal.fire({
-                  title: "Oops!",
-                  text: 'Periode Dari Harus Diisi !',
-                  icon: "warning",
-                  showConfirmButton: true,
-                  didClose: (e) => {
-                     $(this).find("#dari").focus();
-                  },
-               });
-               return false;
-            } else if (sampai == "") {
-               Swal.fire({
-                  title: "Oops!",
-                  text: 'Periode Sampai Harus Diisi !',
-                  icon: "warning",
-                  showConfirmButton: true,
-                  didClose: (e) => {
-                     $(this).find("#sampai").focus();
-                  },
-               });
-               return false;
-            } else if (start.getTime() > end.getTime()) {
-               Swal.fire({
-                  title: "Oops!",
-                  text: 'Periode Tidak Valid !, Periode Sampai Harus Lebih Akhir dari Periode Dari',
-                  icon: "warning",
-                  showConfirmButton: true,
-                  didClose: (e) => {
-                     $(this).find("#sampai").focus();
-                  },
-               });
-               return false;
+    <script>
+        $(function() {
+            const form = $("#frmLaporanbadstok");
+            const select2Kodecabangbs = form.find('.select2Kodecabangbs');
+            if (select2Kodecabangbs.length) {
+                select2Kodecabangbs.each(function() {
+                    var $this = $(this);
+                    $this.wrap('<div class="position-relative"></div>').select2({
+                        placeholder: 'Pilih Cabang',
+                        allowClear: true,
+                        dropdownParent: $this.parent()
+                    });
+                });
             }
-         });
-      });
-   </script>
+
+            const select2Kodeprodukbs = form.find('.select2Kodeprodukbs');
+            if (select2Kodeprodukbs.length) {
+                select2Kodeprodukbs.each(function() {
+                    var $this = $(this);
+                    $this.wrap('<div class="position-relative"></div>').select2({
+                        placeholder: 'Pilih Produk',
+                        allowClear: true,
+                        dropdownParent: $this.parent()
+                    });
+                });
+            }
+
+            form.submit(function() {
+                const kode_produk = form.find("#kode_produk_bs").val();
+                const dari = form.find("#dari_bs").val();
+                const sampai = form.find("#sampai_bs").val();
+                const kode_cabang = form.find("#kode_cabang_bs").val();
+                var start = new Date(dari);
+                var end = new Date(sampai);
+
+                @hasanyrole($roles_show_cabang)
+                if (kode_cabang == "") {
+                    Swal.fire({
+                        title: "Oops!",
+                        text: 'Kode Cabang Harus Diisi !',
+                        icon: "warning",
+                        showConfirmButton: true,
+                        didClose: (e) => {
+                            form.find("#kode_cabang_bs").focus();
+                        },
+                    });
+                    return false;
+                }
+                @endrole
+
+                if (kode_produk == "") {
+                    Swal.fire({
+                        title: "Oops!",
+                        text: 'Kode Produk Harus Diisi !',
+                        icon: "warning",
+                        showConfirmButton: true,
+                        didClose: (e) => {
+                            form.find("#kode_produk_bs").focus();
+                        },
+                    });
+                    return false;
+                } else if (dari == "") {
+                    Swal.fire({
+                        title: "Oops!",
+                        text: 'Periode Dari Harus Diisi !',
+                        icon: "warning",
+                        showConfirmButton: true,
+                        didClose: (e) => {
+                            form.find("#dari_bs").focus();
+                        },
+                    });
+                    return false;
+                } else if (sampai == "") {
+                    Swal.fire({
+                        title: "Oops!",
+                        text: 'Periode Sampai Harus Diisi !',
+                        icon: "warning",
+                        showConfirmButton: true,
+                        didClose: (e) => {
+                            form.find("#sampai_bs").focus();
+                        },
+                    });
+                    return false;
+                } else if (start.getTime() > end.getTime()) {
+                    Swal.fire({
+                        title: "Oops!",
+                        text: 'Periode Tidak Valid !, Periode Sampai Harus Lebih Akhir dari Periode Dari',
+                        icon: "warning",
+                        showConfirmButton: true,
+                        didClose: (e) => {
+                            form.find("#sampai_bs").focus();
+                        },
+                    });
+                    return false;
+                }
+            });
+        });
+    </script>
 @endpush

@@ -36,8 +36,8 @@
                         <th rowspan="2">SALESMAN</th>
                         <th rowspan="2">JENIS MUTASI</th>
                         <th rowspan="2" style="width:5%">KETERANGAN</th>
-                        <th colspan="6" class="green">PENERIMAAN</th>
-                        <th colspan="8" class="red">PENGELUARAN</th>
+                        <th colspan="3" class="green">PENERIMAAN</th>
+                        <th colspan="5" class="red">PENGELUARAN</th>
                         <th rowspan="2">SALDO AKHIR</th>
                         <th colspan="3" rowspan="2">SALDO AKHIR</th>
                         <th rowspan="3">TANGGAL INPUT</th>
@@ -47,25 +47,19 @@
                         <th>SURAT JALAN / NO FAKTUR</th>
                         <th>TGL KIRIM</th>
                         <th>NO BUKTI</th>
-                        <th class="green">PUSAT</th>
-                        <th class="green">TRANSIT IN</th>
+                        <th class="green">SURAT JALAN</th>
                         <th class="green">RETUR</th>
-                        <th class="green">LAIN LAIN</th>
                         <th class="green">REPACK</th>
-                        <th class="green">PENYESUAIAN</th>
                         <th class="red">PENJUALAN</th>
                         <th class="red">PROMOSI</th>
                         <th class="red">REJECT PASAR</th>
                         <th class="red">REJECT MOBIL</th>
                         <th class="red">REJECT GUDANG</th>
-                        <th class="red">TRANSIT OUT</th>
-                        <th class="red">LAIN LAIN</th>
-                        <th class="red">PENYESUAIAN</th>
                     </tr>
                     <tr>
                         <th colspan="6"></th>
                         <th>SALDO AWAL</th>
-                        <th colspan="14"></th>
+                        <th colspan="8"></th>
                         <th class="right">
                             @if ($ceksaldo != null)
                                 {{ formatAngkaDesimal($saldo_awal) }}
@@ -234,23 +228,14 @@
                             <td>{{ $d->keterangan }}</td>
                             <!-- Penerimaan-->
                             <td class="right">{{ !empty($d->pusat) ? formatAngkaDesimal($pusat) : '' }}</td>
-                            <td class="right">{{ !empty($d->transit_in) ? formatAngkaDesimal($transit_in) : '' }}</td>
                             <td class="right">{{ !empty($d->retur) ? formatAngkaDesimal($retur) : '' }}</td>
-                            <td class="right">{{ !empty($jml_lainlain_in) ? formatAngkaDesimal($lainlain_in) : '' }}</td>
                             <td class="right">{{ !empty($d->repack) ? formatAngkaDesimal($repack) : '' }}</td>
-                            <td class="right">{{ !empty($d->penyesuaian_in) ? formatAngkaDesimal($penyesuaian_in) : '' }}
-                            </td>
 
                             <td class="right">{{ !empty($d->penjualan) ? formatAngkaDesimal($penjualan) : '' }}</td>
                             <td class="right">{{ !empty($d->promosi) ? formatAngkaDesimal($promosi) : '' }}</td>
                             <td class="right">{{ !empty($d->reject_pasar) ? formatAngkaDesimal($reject_pasar) : '' }}</td>
                             <td class="right">{{ !empty($d->reject_mobil) ? formatAngkaDesimal($reject_mobil) : '' }}</td>
-                            <td class="right">{{ !empty($d->reject_gudang) ? formatAngkaDesimal($reject_gudang) : '' }}
-                            </td>
-                            <td class="right">{{ !empty($d->transit_out) ? formatAngkaDesimal($transit_out) : '' }}</td>
-                            <td class="right">{{ !empty($jml_lainlain_out) ? formatAngkaDesimal($lainlain_out) : '' }}</td>
-                            <td class="right">
-                                {{ !empty($d->penyesuaian_out) ? formatAngkaDesimal($penyesuaian_out) : '' }}</td>
+                            <td class="right">{{ !empty($d->reject_gudang) ? formatAngkaDesimal($reject_gudang) : '' }}</td>
                             <td class="right {{ $color_sa }}">
                                 {{ !empty($saldo_akhir_jumlah) ? formatAngkaDesimal($saldo_akhir_desimal) : '' }}</td>
                             <td class="right {{ $color_sa }}">{{ formatAngka($saldo_akhir_dus) }}</td>
@@ -283,20 +268,14 @@
                     <tr>
                         <th colspan="7">TOTAL</th>
                         <th class="right">{{ formatAngkaDesimal($total_pusat_desimal) }}</th>
-                        <th class="right">{{ formatAngkaDesimal($total_transit_in_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_retur_desimal) }}</th>
-                        <th class="right">{{ formatAngkaDesimal($total_lainlain_in_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_repack_desimal) }}</th>
-                        <th class="right">{{ formatAngkaDesimal($total_penyesuaian_in_desimal) }}</th>
 
                         <th class="right">{{ formatAngkaDesimal($total_penjualan_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_promosi_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_reject_pasar_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_reject_mobil_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_reject_gudang_desimal) }}</th>
-                        <th class="right">{{ formatAngkaDesimal($total_transit_out_desimal) }}</th>
-                        <th class="right">{{ formatAngkaDesimal($total_lainlain_out_desimal) }}</th>
-                        <th class="right">{{ formatAngkaDesimal($total_penyesuaian_out_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($saldo_akhir_desimal) }}</th>
                         <th class="right">{{ formatAngka($saldo_akhir_dus) }}</th>
                         <th class="right">{{ formatAngka($saldo_akhir_pack) }}</th>

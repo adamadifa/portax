@@ -1,20 +1,20 @@
 @extends('layouts.app')
-@section('titlepage', 'Reject')
+@section('titlepage', 'Surat Jalan')
 
 @section('content')
 @section('navigasi')
-   <span>Reject</span>
+   <span>Surat Jalan</span>
 @endsection
     <!-- Page Header -->
     <div class="mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-            <h2 class="text-2xl font-bold text-slate-800">Reject Gudang Cabang</h2>
-            <p class="text-slate-500 text-sm">Kelola data mutasi reject produk di gudang cabang.</p>
+            <h2 class="text-2xl font-bold text-slate-800">Surat Jalan Gudang Cabang</h2>
+            <p class="text-slate-500 text-sm">Kelola data mutasi surat jalan produk di gudang cabang.</p>
         </div>
-        @can('reject.create')
+        @can('suratjalancbg.create')
             <a href="#" id="btnCreate" class="bg-[#003d9e] hover:bg-blue-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-sm shadow-blue-200">
                 <i class="fas fa-plus"></i>
-                <span>Tambah Reject</span>
+                <span>Tambah Surat Jalan</span>
             </a>
         @endcan
     </div>
@@ -90,7 +90,7 @@
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <!-- Search & Filter / Toolbar -->
         <div class="p-3 border-b border-slate-100 bg-slate-50/50">
-            <form action="{{ route('reject.index') }}" class="grid grid-cols-1 md:grid-cols-12 gap-x-3 gap-y-1" id="formSearch">
+            <form action="{{ route('suratjalancbg.index') }}" class="grid grid-cols-1 md:grid-cols-12 gap-x-3 gap-y-1" id="formSearch">
                 
                 @php $userHasCabang = false; @endphp
                 @hasanyrole($roles_show_cabang)
@@ -98,7 +98,7 @@
                 @endhasanyrole
 
                 <!-- Dari -->
-                <div class="{{ $userHasCabang ? 'md:col-span-2' : 'md:col-span-3' }} relative">
+                <div class="{{ $userHasCabang ? 'md:col-span-3' : 'md:col-span-5' }} relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-calendar-alt text-slate-400"></i>
                     </div>
@@ -106,7 +106,7 @@
                 </div>
 
                 <!-- Sampai -->
-                <div class="{{ $userHasCabang ? 'md:col-span-2' : 'md:col-span-3' }} relative">
+                <div class="{{ $userHasCabang ? 'md:col-span-3' : 'md:col-span-6' }} relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-calendar-alt text-slate-400"></i>
                     </div>
@@ -115,7 +115,7 @@
 
                 <!-- Cabang (Conditional) -->
                 @if($userHasCabang)
-                <div class="md:col-span-4 relative">
+                <div class="md:col-span-5 relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
                         <i class="fas fa-building text-slate-400"></i>
                     </div>
@@ -128,24 +128,8 @@
                 </div>
                 @endif
 
-                <!-- Jenis Mutasi -->
-                <div class="{{ $userHasCabang ? 'md:col-span-3' : 'md:col-span-5' }} relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-exchange-alt text-slate-400"></i>
-                    </div>
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <i class="fas fa-chevron-down text-slate-400 text-xs"></i>
-                    </div>
-                    <select name="jenis_mutasi_search" class="w-full pl-10 pr-8 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 appearance-none transition-all font-medium">
-                        <option value="">Jenis Mutasi</option>
-                        <option value="RG" {{ Request('jenis_mutasi_search') == 'RG' ? 'selected' : '' }}>REJECT GUDANG</option>
-                        <option value="RM" {{ Request('jenis_mutasi_search') == 'RM' ? 'selected' : '' }}>REJECT MOBIL</option>
-                        <option value="RP" {{ Request('jenis_mutasi_search') == 'RP' ? 'selected' : '' }}>REJECT PASAR</option>
-                    </select>
-                </div>
-
                 <!-- Search Button (Icon Only) -->
-                <div class="md:col-span-1">
+                <div class="md:col-span-1 md:col-start-12">
                     <button type="submit" class="h-full w-full py-2 bg-[#003d9e] hover:bg-blue-800 text-white rounded-lg font-medium text-sm transition-colors shadow-sm shadow-blue-200 flex items-center justify-center">
                         <i class="fas fa-search"></i>
                     </button>
@@ -162,39 +146,35 @@
                         <th class="px-4 py-3">Tanggal</th>
                         <th class="px-4 py-3">Cabang</th>
                         <th class="px-4 py-3">Keterangan</th>
-                        <th class="px-4 py-3">Jenis Mutasi</th>
                         <th class="px-4 py-3 text-right">#</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    @forelse ($reject as $d)
+                    @forelse ($suratjalan as $d)
                         <tr class="hover:bg-slate-50/80 transition-colors group">
                             <td class="px-4 py-3">
                                 <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-mono font-medium border border-slate-200">{{ $d->no_mutasi }}</span>
                             </td>
                             <td class="px-4 py-3 text-slate-600 text-sm whitespace-nowrap">{{ date('d-m-Y', strtotime($d->tanggal)) }}</td>
                             <td class="px-4 py-3 text-slate-800 font-medium text-sm whitespace-nowrap">{{ textUpperCase($d->nama_cabang) }}</td>
-                            <td class="px-4 py-3 text-slate-600 text-sm whitespace-nowrap">{{ !empty($d->no_surat_jalan) ? $d->no_surat_jalan : $d->keterangan }}</td>
-                            <td class="px-4 py-3">
-                                <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-medium border border-slate-200">{{ $d->jenis_mutasi }}</span>
-                            </td>
+                            <td class="px-4 py-3 text-slate-600 text-sm whitespace-nowrap">{{ $d->keterangan }}</td>
                             <td class="px-4 py-3 text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    @can('reject.edit')
+                                    @can('suratjalancbg.edit')
                                         <button class="btnEdit w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
                                             no_mutasi="{{ Crypt::encrypt($d->no_mutasi) }}" title="Edit">
                                             <i class="fas fa-edit text-xs"></i>
                                         </button>
                                     @endcan
-                                    @can('reject.show')
+                                    @can('suratjalancbg.show')
                                         <button class="btnShow w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
                                             no_mutasi="{{ Crypt::encrypt($d->no_mutasi) }}" title="Detail">
                                             <i class="fas fa-eye text-xs"></i>
                                         </button>
                                     @endcan
-                                    @can('reject.delete')
+                                    @can('suratjalancbg.delete')
                                         <form method="POST" name="deleteform" class="deleteform inline-block"
-                                            action="{{ route('reject.delete', Crypt::encrypt($d->no_mutasi)) }}">
+                                            action="{{ route('suratjalancbg.delete', Crypt::encrypt($d->no_mutasi)) }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="delete-confirm w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-600 hover:bg-red-100 transition-colors" title="Delete">
@@ -207,10 +187,10 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-slate-400">
+                            <td colspan="5" class="px-6 py-12 text-center text-slate-400">
                                 <div class="flex flex-col items-center justify-center">
                                     <i class="far fa-folder-open text-4xl mb-3 text-slate-300"></i>
-                                    <p>Tidak ada data mutasi reject ditemukan.</p>
+                                    <p>Tidak ada data mutasi surat jalan ditemukan.</p>
                                 </div>
                             </td>
                         </tr>
@@ -222,20 +202,19 @@
         <!-- Pagination -->
         <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="text-xs text-slate-500">
-                @if($reject->total() > 0)
-                    Showing {{ $reject->firstItem() }} to {{ $reject->lastItem() }} of {{ $reject->total() }} entries
+                @if($suratjalan->total() > 0)
+                    Showing {{ $suratjalan->firstItem() }} to {{ $suratjalan->lastItem() }} of {{ $suratjalan->total() }} entries
                 @else
                     Showing 0 entries
                 @endif
             </div>
             <div>
-                {{ $reject->links('vendor.pagination.tailwind') }}
+                {{ $suratjalan->links('vendor.pagination.tailwind') }}
             </div>
         </div>
     </div>
-<x-modal-form id="modal" size="modal-lg" show="loadmodal" title="" />
 
-<!-- Tailwind Modal Implementation for Show -->
+<!-- Tailwind Modal Implementation for Show/Create -->
 <div id="tailwindModal" class="fixed inset-0 z-[1060] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <!-- Background backdrop -->
     <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300 ease-out opacity-0" id="modalBackdrop"></div>
@@ -257,6 +236,47 @@
 @endsection
 @push('myscript')
 <script>
+   // --- Global Tailwind Modal Functions ---
+   window.openTailwindModal = function() {
+       const backdrop = document.getElementById('modalBackdrop');
+       const panel = document.getElementById('modalPanel');
+       const modal = document.getElementById('tailwindModal');
+       
+       // Show container
+       modal.classList.remove('hidden');
+       
+       // Trigger reflow
+       void modal.offsetWidth;
+       
+       // Animate in
+       backdrop.classList.remove('opacity-0');
+       panel.classList.remove('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
+   };
+
+   window.closeTailwindModal = function() {
+       const backdrop = document.getElementById('modalBackdrop');
+       const panel = document.getElementById('modalPanel');
+       const modal = document.getElementById('tailwindModal');
+       
+       // Animate out
+       backdrop.classList.add('opacity-0');
+       panel.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
+       
+       // Hide container after animation
+       setTimeout(() => {
+           modal.classList.add('hidden');
+           document.getElementById('modalContent').innerHTML = `
+               <div class="flex justify-center p-8">
+                   <i class="fas fa-circle-notch fa-spin text-[#003d9e] text-2xl"></i>
+               </div>
+           `;
+       }, 300);
+   };
+
+   // Close modal when clicking backdrop
+   document.getElementById('modalBackdrop').addEventListener('click', window.closeTailwindModal);
+
+
    $(function() {
       const select2Kodecabangsearch = $('.select2Kodecabangsearch');
       if (select2Kodecabangsearch.length) {
@@ -270,73 +290,24 @@
          });
       }
 
-      function loading() {
-         $("#loadmodal").html(`<div class="sk-wave sk-primary" style="margin:auto">
-            <div class="sk-wave-rect"></div>
-            <div class="sk-wave-rect"></div>
-            <div class="sk-wave-rect"></div>
-            <div class="sk-wave-rect"></div>
-            <div class="sk-wave-rect"></div>
-            </div>`);
-      };
       $("#btnCreate").click(function(e) {
          e.preventDefault();
-         openTailwindModal(`/reject/create`);
+         window.openTailwindModal();
+         $("#modalContent").load(`/suratjalancbg/create`);
       });
-
-      // Tailwind Modal functions
-      const tailwindModal = document.getElementById('tailwindModal');
-      const tailwindBackdrop = document.getElementById('modalBackdrop');
-      const tailwindPanel = document.getElementById('modalPanel');
-      const tailwindContent = document.getElementById('modalContent');
-
-      function openTailwindModal(url) {
-         tailwindModal.classList.remove('hidden');
-         // Animate in
-         setTimeout(() => {
-               tailwindBackdrop.classList.remove('opacity-0');
-               tailwindPanel.classList.remove('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
-               tailwindPanel.classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
-         }, 10);
-
-         // Load content
-         $("#modalContent").html('<div class="flex justify-center p-8"><i class="fas fa-circle-notch fa-spin text-[#003d9e] text-2xl"></i></div>');
-         $("#modalContent").load(url);
-      }
-
-      function closeTailwindModal() {
-         // Animate out
-         tailwindBackdrop.classList.add('opacity-0');
-         tailwindPanel.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
-         tailwindPanel.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-0', 'sm:scale-95');
-
-         setTimeout(() => {
-               tailwindModal.classList.add('hidden');
-         }, 300);
-      }
-
-      // Close on backdrop click
-      if (tailwindBackdrop) {
-         tailwindBackdrop.addEventListener('click', closeTailwindModal);
-      }
-      
-      // Expose close function globally
-      window.closeTailwindModal = closeTailwindModal;
 
       $(".btnShow").click(function(e) {
          e.preventDefault();
          var no_mutasi = $(this).attr("no_mutasi");
-         openTailwindModal(`/reject/${no_mutasi}/show`);
+         window.openTailwindModal();
+         $("#modalContent").load(`/suratjalancbg/${no_mutasi}/show`);
       });
 
       $(".btnEdit").click(function(e) {
          e.preventDefault();
          var no_mutasi = $(this).attr("no_mutasi");
-         e.preventDefault();
-         loading();
-         $("#modal").modal("show");
-         $(".modal-title").text("Edit Reject");
-         $("#loadmodal").load(`/reject/${no_mutasi}/edit`);
+         window.openTailwindModal();
+         $("#modalContent").load(`/suratjalancbg/${no_mutasi}/edit`);
       });
    });
 </script>

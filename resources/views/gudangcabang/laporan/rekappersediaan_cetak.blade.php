@@ -38,26 +38,20 @@
                         <th rowspan="2">KODE</th>
                         <th rowspan="2">PRODUK</th>
                         <th rowspan="2">SALDO AWAL</th>
-                        <th colspan="6" class="green">PENERIMAAN</th>
-                        <th colspan="8" class="red">PENGELUARAN</th>
+                        <th colspan="3" class="green">PENERIMAAN</th>
+                        <th colspan="5" class="red">PENGELUARAN</th>
                         <th rowspan="2">SALDO AKHIR</th>
                         <th colspan="3">SALDO AKHIR</th>
                     </tr>
                     <tr>
-                        <th class="green">PUSAT</th>
-                        <th class="green">TRANSIT IN</th>
+                        <th class="green">SURAT JALAN</th>
                         <th class="green">RETUR</th>
-                        <th class="green">LAIN LAIN</th>
                         <th class="green">REPACK</th>
-                        <th class="green">PENYESUAIAN</th>
                         <th class="red">PENJUALAN</th>
                         <th class="red">PROMOSI</th>
                         <th class="red">REJECT PASAR</th>
                         <th class="red">REJECT MOBIL</th>
                         <th class="red">REJECT GUDANG</th>
-                        <th class="red">TRANSIT OUT</th>
-                        <th class="red">LAIN LAIN</th>
-                        <th class="red">PENYESUAIAN</th>
                         <th>DUS</th>
                         <th>PACK</th>
                         <th>PCS</th>
@@ -109,21 +103,15 @@
                             <td>{{ $d->kode_produk }}</td>
                             <td>{{ textUpperCase($d->nama_produk) }}</td>
                             <td class="right">{{ formatAngkaDesimal($saldo_awal) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($pusat) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($transit_in) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($retur) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($lainlain_in) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($repack) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($penyesuaian_in) }}</td>
+                             <td class="right">{{ formatAngkaDesimal($pusat) }}</td>
+                             <td class="right">{{ formatAngkaDesimal($retur) }}</td>
+                             <td class="right">{{ formatAngkaDesimal($repack) }}</td>
 
-                            <td class="right">{{ formatAngkaDesimal($penjualan) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($promosi) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($reject_pasar) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($reject_mobil) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($reject_gudang) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($transit_out) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($lainlain_out) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($penyesuaian_out) }}</td>
+                             <td class="right">{{ formatAngkaDesimal($penjualan) }}</td>
+                             <td class="right">{{ formatAngkaDesimal($promosi) }}</td>
+                             <td class="right">{{ formatAngkaDesimal($reject_pasar) }}</td>
+                             <td class="right">{{ formatAngkaDesimal($reject_mobil) }}</td>
+                             <td class="right">{{ formatAngkaDesimal($reject_gudang) }}</td>
                             <td class="right">{{ formatAngkaDesimal($saldo_akhir_desimal) }}</td>
                             <td class="right">{{ formatAngka($saldo_akhir_dus) }}</td>
                             <td class="right">{{ formatAngka($saldo_akhir_pack) }}</td>
@@ -149,8 +137,8 @@
                     <th rowspan="2">KODE</th>
                     <th rowspan="2">PRODUK</th>
                     <th rowspan="2">SALDO AWAL</th>
-                    <th colspan="4" class="green">PENERIMAAN</th>
-                    <th colspan="3" class="red">PENGELUARAN</th>
+                    <th colspan="3" class="green">PENERIMAAN</th>
+                    <th colspan="2" class="red">PENGELUARAN</th>
                     <th rowspan="2">SALDO AKHIR</th>
                     <th colspan="3">SALDO AKHIR</th>
                 </tr>
@@ -158,10 +146,8 @@
                     <th class="green">REJECT PASAR</th>
                     <th class="green">REJECT MOBIL</th>
                     <th class="green">REJECT GUDANG</th>
-                    <th class="green">PENYESUAIAN</th>
-                    <th class="red">KIRIM PUSAT</th>
+                    <th class="red">SURAT JALAN</th>
                     <th class="red">REPACK</th>
-                    <th class="red">PENYESUAIAN</th>
                     <th>DUS</th>
                     <th>PACK</th>
                     <th>PCS</th>
@@ -198,10 +184,8 @@
                         <td class="right">{{ formatAngkaDesimal($reject_pasar_bs) }}</td>
                         <td class="right">{{ formatAngkaDesimal($reject_mobil_bs) }}</td>
                         <td class="right">{{ formatAngkaDesimal($reject_gudang_bs) }}</td>
-                        <td class="right">{{ formatAngkaDesimal($penyesuaian_in_bs) }}</td>
                         <td class="right">{{ formatAngkaDesimal($kirim_pusat_bs) }}</td>
                         <td class="right">{{ formatAngkaDesimal($repack_bs) }}</td>
-                        <td class="right">{{ formatAngkaDesimal($penyesuaian_out_bs) }}</td>
                         <td class="right">{{ formatAngkaDesimal($saldo_akhir_desimal_bs) }}</td>
                         <td class="right">{{ formatAngka($saldo_akhir_dus_bs) }}</td>
                         <td class="right">{{ formatAngka($saldo_akhir_pack_bs) }}</td>

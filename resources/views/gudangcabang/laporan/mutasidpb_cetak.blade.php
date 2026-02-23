@@ -32,12 +32,11 @@
                 <thead>
                     <tr>
                         <th rowspan="2">TANGGAL</th>
-                        <th class="green" rowspan="2">PUSAT</th>
+                        <th class="green" rowspan="2">SURAT JALAN</th>
                         <th class="red" rowspan="2">PENGAMBILAN</th>
                         <th class="green" rowspan="2">PENGEMBALIAN</th>
                         <th class="red" colspan="3">REJECT</th>
                         <th class="green" rowspan="2">REPACK</th>
-                        <th colspan="2">PENYESUAIAN</th>
                         <th rowspan="2">SALDO AKHIR</th>
                     </tr>
                     <tr>
@@ -45,12 +44,10 @@
                         <th class="red">REJECT MOBIL</th>
                         <th class="red">REJECT GUDANG</th>
 
-                        <th class="green">MASUK</th>
-                        <th class="red">KELUAR</th>
                     </tr>
                     <tr>
                         <th>SALDO AWAL</th>
-                        <th colspan="9"></th>
+                        <th colspan="7"></th>
                         <th class="right">{{ formatAngkaDesimal($saldo_awal) }}</th>
                     </tr>
                 </thead>
@@ -105,8 +102,6 @@
                             <td class="right">{{ formatAngkaDesimal($reject_mobil) }}</td>
                             <td class="right">{{ formatAngkaDesimal($reject_gudang) }}</td>
                             <td class="right">{{ formatAngkaDesimal($repack) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($penyesuaian_in) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($penyesuaian_out) }}</td>
                             <td class="right">{{ formatAngkaDesimal($saldo_akhir_desimal) }}</td>
                         </tr>
                     @endforeach
@@ -131,8 +126,6 @@
                         <th class="right">{{ formatAngkaDesimal($total_reject_mobil_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_reject_gudang_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_repack_desimal) }}</th>
-                        <th class="right">{{ formatAngkaDesimal($total_penyesuaian_in_desimal) }}</th>
-                        <th class="right">{{ formatAngkaDesimal($total_penyesuaian_out_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($saldo_akhir_desimal) }}</th>
                     </tr>
                 </tfoot>

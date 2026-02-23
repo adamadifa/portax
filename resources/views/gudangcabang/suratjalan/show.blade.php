@@ -5,8 +5,8 @@
             <i class="fas fa-file-alt text-white"></i>
         </div>
         <div>
-            <h3 class="text-lg font-bold text-white">Detail Repack</h3>
-            <p class="text-blue-200 text-xs">{{ $mutasi->no_mutasi }}</p>
+            <h3 class="text-lg font-bold text-white">Detail Surat Jalan</h3>
+            <p class="text-blue-200 text-xs text-left">{{ $mutasi->no_mutasi }}</p>
         </div>
     </div>
     <button onclick="window.closeTailwindModal()" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors">
@@ -15,7 +15,7 @@
 </div>
 
 <!-- Info Cards -->
-<div class="p-6">
+<div class="p-6 text-left">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 mb-6">
         <!-- Kolom Kiri -->
         <table class="w-full text-sm">
@@ -47,7 +47,7 @@
     </div>
 
     <!-- Detail Table -->
-    <div class="border border-slate-200 rounded-lg overflow-hidden">
+    <div class="border border-slate-200 rounded-lg overflow-hidden relative z-10 shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
@@ -72,9 +72,9 @@
                         @endphp
                         <tr class="hover:bg-slate-50/80 transition-colors">
                             <td class="px-4 py-2.5">
-                                <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-mono font-medium border border-slate-200">{{ $d->kode_produk }}</span>
+                                <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-mono font-medium border border-slate-200 leading-none inline-block">{{ $d->kode_produk }}</span>
                             </td>
-                            <td class="px-4 py-2.5 text-sm text-slate-700 font-medium text-left">{{ $d->nama_produk }}</td>
+                            <td class="px-4 py-2.5 text-sm text-slate-700 font-medium text-left leading-tight">{{ $d->nama_produk }}</td>
                             <td class="px-4 py-2.5 text-sm text-slate-600 text-right border-l border-slate-100">{{ formatAngka($jumlah_dus) }}</td>
                             <td class="px-4 py-2.5 text-sm text-slate-600 text-right border-l border-slate-100">{{ formatAngka($jumlah_pack) }}</td>
                             <td class="px-4 py-2.5 text-sm text-slate-600 text-right border-l border-slate-100">{{ formatAngka($jumlah_pcs) }}</td>

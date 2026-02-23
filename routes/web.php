@@ -163,6 +163,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SuratjalanangkutanController;
 use App\Http\Controllers\SuratjalanController;
 use App\Http\Controllers\SupplierMarketingController;
+use App\Http\Controllers\SuratjalancbgController;
 use App\Http\Controllers\SuratperingatanController;
 use App\Http\Controllers\TargetkomisiController;
 use App\Http\Controllers\TicketController;
@@ -1005,6 +1006,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/repackcbg', 'store')->name('repackcbg.store')->can('repackcbg.store');
         Route::put('/repackcbg/{no_mutasi}', 'update')->name('repackcbg.update')->can('repackcbg.update');
         Route::delete('/repackcbg/{no_mutasi}', 'destroy')->name('repackcbg.delete')->can('repackcbg.delete');
+    });
+
+    Route::controller(SuratjalancbgController::class)->group(function () {
+        Route::get('/suratjalancbg', 'index')->name('suratjalancbg.index')->can('suratjalancbg.index');
+        Route::get('/suratjalancbg/create', 'create')->name('suratjalancbg.create')->can('suratjalancbg.create');
+        Route::get('/suratjalancbg/{no_mutasi}/show', 'show')->name('suratjalancbg.show')->can('suratjalancbg.show');
+        Route::get('/suratjalancbg/{no_mutasi}/edit', 'edit')->name('suratjalancbg.edit')->can('suratjalancbg.edit');
+        Route::post('/suratjalancbg', 'store')->name('suratjalancbg.store')->can('suratjalancbg.store');
+        Route::put('/suratjalancbg/{no_mutasi}', 'update')->name('suratjalancbg.update')->can('suratjalancbg.update');
+        Route::delete('/suratjalancbg/{no_mutasi}', 'destroy')->name('suratjalancbg.delete')->can('suratjalancbg.delete');
     });
 
     Route::controller(KirimpusatController::class)->group(function () {

@@ -1,28 +1,34 @@
-<form method="POST" action="{{ route('laporangudangcabang.cetakrekonsiliasibj') }}" id="frmRekonsiliasibj" target="_blank">
+<form method="POST" action="{{ route('laporangudangcabang.cetakrekonsiliasibj') }}" id="frmRekonsiliasibj" target="_blank" class="space-y-3">
     @csrf
-    @hasanyrole($roles_show_cabang)
-        <div class="row">
-            <div class="col">
-                <x-select label="Pilih Cabang" name="kode_cabang_rekonsiliasi" :data="$cabang" key="kode_cabang" textShow="nama_cabang" upperCase="true"
-                    select2="select2Kodecabangrekonsiliasi" />
+    <div class="space-y-2">
+        @hasanyrole($roles_show_cabang)
+            <div class="relative">
+                <select name="kode_cabang_rekonsiliasi" id="kode_cabang_rekonsiliasi" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodecabangrekonsiliasi">
+                    <option value="">Pilih Cabang</option>
+                    @foreach ($cabang as $d)
+                        <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endrole
+
+        <div class="relative text-left">
+            <select name="kode_salesman" id="kode_salesman_rekonsiliasi" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodesalesmanrekonsiliasi">
+                <option value="">Pilih Salesman</option>
+            </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="relative">
+                <input type="text" name="dari" id="dari_rekonsiliasi" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Dari">
+            </div>
+            <div class="relative">
+                <input type="text" name="sampai" id="sampai_rekonsiliasi" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Sampai">
             </div>
         </div>
-    @endrole
-    <div class="form-group mb-3">
-        <select name="kode_salesman" id="kode_salesman_rekonsiliasi" class="select2Kodesalesmanrekonsiliasi form-select">
-        </select>
-    </div>
-    <div class="row">
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Dari" name="dari" datepicker="flatpickr-date" />
-        </div>
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Sampai" name="sampai" datepicker="flatpickr-date" />
-        </div>
-    </div>
-    <div class="row mb-3">
-        <div class="col">
-            <select name="jenis_rekonsiliasi" id="jenis_rekonsiliasi" class="form-select">
+
+        <div class="relative">
+            <select name="jenis_rekonsiliasi" id="jenis_rekonsiliasi" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none form-select">
                 <option value="">Jenis Rekonsiliasi</option>
                 <option value="1">Penjualan</option>
                 <option value="2">Retur</option>
@@ -30,24 +36,26 @@
             </select>
         </div>
     </div>
-    <div class="row">
+
+    <div class="row mt-2">
         <div class="col-lg-10 col-md-12 col-sm-12">
-            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButton">
-                <i class="ti ti-printer me-1"></i> Cetak
+            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButton" style="background-color: #003d9e; border-color: #003d9e;">
+                <i class="ti ti-printer me-1 text-sm"></i> Cetak
             </button>
         </div>
         <div class="col-lg-2 col-md-12 col-sm-12">
             <button type="submit" name="exportButton" class="btn btn-success w-100" id="exportButton">
-                <i class="ti ti-download"></i>
+                <i class="ti ti-download text-sm"></i>
             </button>
         </div>
     </div>
 </form>
+
 @push('myscript')
     <script>
         $(function() {
-            const formRekonsiliasibj = $('#frmRekonsiliasibj');
-            const select2Kodecabangrekonsiliasi = $('.select2Kodecabangrekonsiliasi');
+            const form = $("#frmRekonsiliasibj");
+            const select2Kodecabangrekonsiliasi = form.find('.select2Kodecabangrekonsiliasi');
             if (select2Kodecabangrekonsiliasi.length) {
                 select2Kodecabangrekonsiliasi.each(function() {
                     var $this = $(this);
@@ -59,7 +67,7 @@
                 });
             }
 
-            const select2Kodesalesmanrekonsiliasi = $(".select2Kodesalesmanrekonsiliasi");
+            const select2Kodesalesmanrekonsiliasi = form.find(".select2Kodesalesmanrekonsiliasi");
             if (select2Kodesalesmanrekonsiliasi.length) {
                 select2Kodesalesmanrekonsiliasi.each(function() {
                     var $this = $(this);
@@ -72,8 +80,7 @@
             }
 
             function getsalesmanbyCabang() {
-                var kode_cabang = formRekonsiliasibj.find("#kode_cabang_rekonsiliasi").val();
-                //alert(selected);
+                var kode_cabang = form.find("#kode_cabang_rekonsiliasi").val();
                 $.ajax({
                     type: 'POST',
                     url: '/salesman/getsalesmanbycabang',
@@ -83,24 +90,26 @@
                     },
                     cache: false,
                     success: function(respond) {
-                        console.log(respond);
-                        formRekonsiliasibj.find("#kode_salesman_rekonsiliasi").html(respond);
+                        form.find("#kode_salesman_rekonsiliasi").html(respond);
                     }
                 });
             }
 
             getsalesmanbyCabang();
-            formRekonsiliasibj.find("#kode_cabang_rekonsiliasi").change(function(e) {
+            form.find("#kode_cabang_rekonsiliasi").change(function(e) {
                 getsalesmanbyCabang();
             });
 
-            $("#frmRekonsiliasibj").submit(function() {
-                const kode_produk = $(this).find("#kode_produk_mutasidpb").val();
-                const dari = $(this).find("#dari").val();
-                const sampai = $(this).find("#sampai").val();
-                const kode_cabang = $(this).find("#kode_cabang_mutasidpb").val();
+            form.submit(function() {
+                const kode_salesman = form.find("#kode_salesman_rekonsiliasi").val();
+                const dari = form.find("#dari_rekonsiliasi").val();
+                const sampai = form.find("#sampai_rekonsiliasi").val();
+                const kode_cabang = form.find("#kode_cabang_rekonsiliasi").val();
+                const jenis_rekonsiliasi = form.find("#jenis_rekonsiliasi").val();
                 var start = new Date(dari);
                 var end = new Date(sampai);
+
+                @hasanyrole($roles_show_cabang)
                 if (kode_cabang == "") {
                     Swal.fire({
                         title: "Oops!",
@@ -108,31 +117,21 @@
                         icon: "warning",
                         showConfirmButton: true,
                         didClose: (e) => {
-                            $(this).find("#kode_cabang").focus();
+                            form.find("#kode_cabang_rekonsiliasi").focus();
                         },
                     });
-
                     return false;
-                } else if (kode_produk == "") {
-                    Swal.fire({
-                        title: "Oops!",
-                        text: 'Kode Produk Harus Diisi !',
-                        icon: "warning",
-                        showConfirmButton: true,
-                        didClose: (e) => {
-                            $(this).find("#kode_produk").focus();
-                        },
-                    });
+                }
+                @endrole
 
-                    return false;
-                } else if (dari == "") {
+                if (dari == "") {
                     Swal.fire({
                         title: "Oops!",
                         text: 'Periode Dari Harus Diisi !',
                         icon: "warning",
                         showConfirmButton: true,
                         didClose: (e) => {
-                            $(this).find("#dari").focus();
+                            form.find("#dari_rekonsiliasi").focus();
                         },
                     });
                     return false;
@@ -143,7 +142,7 @@
                         icon: "warning",
                         showConfirmButton: true,
                         didClose: (e) => {
-                            $(this).find("#sampai").focus();
+                            form.find("#sampai_rekonsiliasi").focus();
                         },
                     });
                     return false;
@@ -154,7 +153,18 @@
                         icon: "warning",
                         showConfirmButton: true,
                         didClose: (e) => {
-                            $(this).find("#sampai").focus();
+                            form.find("#sampai_rekonsiliasi").focus();
+                        },
+                    });
+                    return false;
+                } else if (jenis_rekonsiliasi == "") {
+                    Swal.fire({
+                        title: "Oops!",
+                        text: 'Jenis Rekonsiliasi Harus Diisi !',
+                        icon: "warning",
+                        showConfirmButton: true,
+                        didClose: (e) => {
+                            form.find("#jenis_rekonsiliasi").focus();
                         },
                     });
                     return false;
