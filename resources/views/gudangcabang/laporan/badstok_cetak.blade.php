@@ -32,7 +32,6 @@
                 <thead>
                     <tr>
                         <th rowspan="2">TANGGAL</th>
-                        <th rowspan="2"> NO. BUKTI</th>
                         <th rowspan="2">JENIS MUTASI</th>
                         <th rowspan="2">KETERANGAN</th>
                         <th colspan="1" class="green">PENERIMAAN</th>
@@ -48,7 +47,7 @@
                         <th class="red">REPACK</th>
                     </tr>
                     <tr>
-                        <th colspan="3"></th>
+                        <th colspan="2"></th>
                         <th>SALDO AWAL</th>
                         <th colspan="3"></th>
                         <th style="text-align: right">
@@ -112,7 +111,6 @@
                         @endphp
                         <tr>
                             <td>{{ DateToIndo($d->tanggal) }}</td>
-                            <td>{{ $d->jenis_mutasi == 'SJ' ? $d->no_surat_jalan : $d->no_mutasi }}</td>
                             <td>{{ $d->jenis_mutasi == 'SJ' ? 'PENERIMAAN SJ' : $d->nama_jenis_mutasi }}</td>
                             <td>{{ $d->keterangan }}</td>
                             <td class="right">{{ formatAngkaDesimal($jml_penerimaan / $produk->isi_pcs_dus) }}</td>
@@ -136,7 +134,7 @@
                         $total_repack_desimal = $total_repack / $produk->isi_pcs_dus;
                     @endphp
                     <tr>
-                        <th colspan="4">TOTAL</th>
+                        <th colspan="3">TOTAL</th>
                         <th class="right">{{ formatAngkaDesimal($total_reject_pasar_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_kirim_pusat_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_repack_desimal) }}</th>

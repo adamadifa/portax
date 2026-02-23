@@ -35,6 +35,7 @@ use App\Http\Controllers\DpbController;
 use App\Http\Controllers\DriverhelperController;
 use App\Http\Controllers\FsthpController;
 use App\Http\Controllers\GajiController;
+use App\Http\Controllers\GantibaranggudangcabangController;
 use App\Http\Controllers\HargaawalhppController;
 use App\Http\Controllers\HargaController;
 use App\Http\Controllers\HargaSupplierController;
@@ -1006,6 +1007,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/repackcbg', 'store')->name('repackcbg.store')->can('repackcbg.store');
         Route::put('/repackcbg/{no_mutasi}', 'update')->name('repackcbg.update')->can('repackcbg.update');
         Route::delete('/repackcbg/{no_mutasi}', 'destroy')->name('repackcbg.delete')->can('repackcbg.delete');
+    });
+
+    Route::controller(GantibaranggudangcabangController::class)->group(function () {
+        Route::get('/gantibarangcbg', 'index')->name('gantibarangcbg.index')->can('gantibarangcbg.index');
+        Route::get('/gantibarangcbg/create', 'create')->name('gantibarangcbg.create')->can('gantibarangcbg.create');
+        Route::get('/gantibarangcbg/{no_mutasi}/show', 'show')->name('gantibarangcbg.show')->can('gantibarangcbg.show');
+        Route::get('/gantibarangcbg/{no_mutasi}/edit', 'edit')->name('gantibarangcbg.edit')->can('gantibarangcbg.edit');
+        Route::post('/gantibarangcbg', 'store')->name('gantibarangcbg.store')->can('gantibarangcbg.store');
+        Route::put('/gantibarangcbg/{no_mutasi}', 'update')->name('gantibarangcbg.update')->can('gantibarangcbg.update');
+        Route::delete('/gantibarangcbg/{no_mutasi}', 'destroy')->name('gantibarangcbg.delete')->can('gantibarangcbg.delete');
     });
 
     Route::controller(SuratjalancbgController::class)->group(function () {

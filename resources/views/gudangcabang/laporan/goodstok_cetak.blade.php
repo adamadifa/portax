@@ -32,8 +32,7 @@
                 <thead>
                     <tr>
                         <th rowspan="2">TANGGAL</th>
-                        <th colspan="3">BUKTI</th>
-                        <th rowspan="2">SALESMAN</th>
+                        <th rowspan="2">SURAT JALAN / NO FAKTUR</th>
                         <th rowspan="2">JENIS MUTASI</th>
                         <th rowspan="2" style="width:5%">KETERANGAN</th>
                         <th colspan="4" class="green">PENERIMAAN</th>
@@ -44,9 +43,6 @@
                         <th rowspan="3">TANGGAL UPDATE</th>
                     </tr>
                     <tr>
-                        <th>SURAT JALAN / NO FAKTUR</th>
-                        <th>TGL KIRIM</th>
-                        <th>NO BUKTI</th>
                         <th class="green">PEMBELIAN</th>
                         <th class="green">RETUR</th>
                         <th class="green">REPACK</th>
@@ -57,7 +53,7 @@
                         <th class="red">LAIN-LAIN</th>
                     </tr>
                     <tr>
-                        <th colspan="6"></th>
+                        <th colspan="3"></th>
                         <th>SALDO AWAL</th>
                         <th colspan="8"></th>
                         <th class="right">
@@ -174,21 +170,9 @@
                                     {{ $d->no_surat_jalan }}
                                 @endif
                             </td>
-                            <!--Tanggal Kirim-->
-                            <td>{{ DateToIndo($d->tanggal_kirim) }}</td>
-                            <!-- No. Bukti -->
-                            <td>
-                                @if (in_array($d->jenis_mutasi, ['RG', 'RM', 'RP', 'PY', 'PB', 'RK']))
-                                    {{ $d->no_mutasi }}
-                                @else
-                                    {{ $d->no_dpb }}
-                                @endif
-                            </td>
-                            <!-- Nama Selsman-->
-                            <td>{{ $d->nama_salesman }}</td>
                             <!-- Jenis Mutasi-->
                             <td>
-                                {{ $d->jenis_mutasi == 'SJ' ? 'PENERIMAAN SJ' : $d->nama_jenis_mutasi }}
+                                {{ $d->jenis_mutasi == 'SJ' ? 'PEMBELIAN' : $d->nama_jenis_mutasi }}
                                 @if (in_array($d->jenis_mutasi, ['TI', 'TO']))
                                     <b style="color:#23a7e0">{{ $d->no_mutasi }}</b>
                                 @endif
@@ -233,7 +217,7 @@
                         $total_lainlain_out_desimal = $total_lainlain_out / $produk->isi_pcs_dus;
                     @endphp
                     <tr>
-                        <th colspan="7">TOTAL</th>
+                        <th colspan="4">TOTAL</th>
                         <th class="right">{{ formatAngkaDesimal($total_pusat_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_retur_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_repack_desimal) }}</th>
@@ -257,7 +241,7 @@
 <script>
     $(".freeze-table").freezeTable({
         'scrollable': true,
-        'columnNum': 5,
+        'columnNum': 2,
         'shadow': true,
     });
 </script>

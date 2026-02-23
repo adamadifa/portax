@@ -50,6 +50,13 @@
                     </a>
                 </li>
             @endif
+            @if (auth()->user()->hasAnyPermission(['gantibarangcbg.index']))
+                <li class="menu-item {{ request()->is(['gantibarangcbg']) ? 'active' : '' }}">
+                    <a href="{{ route('gantibarangcbg.index') }}" class="menu-link">
+                        <div>Ganti Barang</div>
+                    </a>
+                </li>
+            @endif
             <!-- @if (auth()->user()->hasAnyPermission(['kirimpusat.index']))
                 <li class="menu-item {{ request()->is(['kirimpusat']) ? 'active' : '' }}">
                     <a href="{{ route('kirimpusat.index') }}" class="menu-link">
