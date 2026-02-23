@@ -59,7 +59,7 @@
                     <tr>
                         <th colspan="6"></th>
                         <th>SALDO AWAL</th>
-                        <th colspan="10"></th>
+                        <th colspan="8"></th>
                         <th class="right">
                             @if ($ceksaldo != null)
                                 {{ formatAngkaDesimal($saldo_awal) }}
@@ -104,53 +104,28 @@
                             $transit_in = $d->transit_in / $d->isi_pcs_dus;
                             $retur = $d->retur / $d->isi_pcs_dus;
                             //Lain Lain IN
-                            if ($d->jenis_mutasi == 'HK') {
-                                $jml_lainlain_in = $d->hutang_kirim;
-                            } elseif ($d->jenis_mutasi == 'PT') {
-                                $jml_lainlain_in = $d->pelunasan_ttr;
-                            } elseif ($d->jenis_mutasi == 'PB') {
-                                $jml_lainlain_in = $d->penyesuaian_bad;
-                            } else {
-                                $jml_lainlain_in = 0;
-                            }
+                            $jml_lainlain_in = $d->hutang_kirim + $d->pelunasan_ttr + $d->penyesuaian_bad + $d->transit_in + $d->penyesuaian_in;
 
                             $lainlain_in = $jml_lainlain_in / $d->isi_pcs_dus;
                             $repack = $d->repack / $d->isi_pcs_dus;
-                            $penyesuaian_in = $d->penyesuaian_in / $d->isi_pcs_dus;
 
-                            $jml_penerimaan = $d->pusat + $d->transit_in + $d->retur + $jml_lainlain_in + $d->repack + $d->penyesuaian_in;
+                            $jml_penerimaan = $d->pusat + $d->retur + $jml_lainlain_in + $d->repack;
 
                             //Pengeluaran
                             $penjualan = $d->penjualan / $d->isi_pcs_dus;
                             $promosi = $d->promosi / $d->isi_pcs_dus;
-                            $reject_pasar = $d->reject_pasar / $d->isi_pcs_dus;
-                            $reject_mobil = $d->reject_mobil / $d->isi_pcs_dus;
-                            $reject_gudang = $d->reject_gudang / $d->isi_pcs_dus;
-                            $transit_out = $d->transit_out / $d->isi_pcs_dus;
+                            $reject_pasar = ($d->reject_pasar + $d->reject_mobil + $d->reject_gudang) / $d->isi_pcs_dus;
 
                             //Lain Lain OUT
-                            if ($d->jenis_mutasi == 'TR') {
-                                $jml_lainlain_out = $d->ttr;
-                            } elseif ($d->jenis_mutasi == 'GB') {
-                                $jml_lainlain_out = $d->ganti_barang;
-                            } elseif ($d->jenis_mutasi == 'PH') {
-                                $jml_lainlain_out = $d->pelunasan_hutangkirim;
-                            } else {
-                                $jml_lainlain_out = 0;
-                            }
+                            $jml_lainlain_out = $d->ttr + $d->ganti_barang + $d->pelunasan_hutangkirim + $d->transit_out + $d->penyesuaian_out;
 
                             $lainlain_out = $jml_lainlain_out / $d->isi_pcs_dus;
-                            $penyesuaian_out = $d->penyesuaian_out / $d->isi_pcs_dus;
 
                             $jml_pengeluaran =
                                 $d->penjualan +
                                 $d->promosi +
-                                $d->reject_pasar +
-                                $d->reject_mobil +
-                                $d->reject_gudang +
-                                $d->transit_out +
-                                $jml_lainlain_out +
-                                $d->penyesuaian_out;
+                                ($d->reject_pasar + $d->reject_mobil + $d->reject_gudang) +
+                                $jml_lainlain_out;
 
                             $saldo_akhir_jumlah = $saldo_akhir_jumlah + $jml_penerimaan - $jml_pengeluaran;
                             $saldo_akhir_real = $saldo_akhir_real + $jml_penerimaan - $jml_pengeluaran;
@@ -178,12 +153,8 @@
 
                             $total_penjualan += $d->penjualan;
                             $total_promosi += $d->promosi;
-                            $total_reject_pasar += $d->reject_pasar;
-                            $total_reject_mobil += $d->reject_mobil;
-                            $total_reject_gudang += $d->reject_gudang;
-                            $total_transit_out += $d->transit_out;
+                            $total_reject_pasar += ($d->reject_pasar + $d->reject_mobil + $d->reject_gudang);
                             $total_lainlain_out += $jml_lainlain_out;
-                            $total_penyesuaian_out = $d->penyesuaian_out;
                         @endphp
                         <tr>
                             <td>{{ DateToIndo($d->tanggal) }}</td>
@@ -259,11 +230,7 @@
                         $total_penjualan_desimal = $total_penjualan / $produk->isi_pcs_dus;
                         $total_promosi_desimal = $total_promosi / $produk->isi_pcs_dus;
                         $total_reject_pasar_desimal = $total_reject_pasar / $produk->isi_pcs_dus;
-                        $total_reject_mobil_desimal = $total_reject_mobil / $produk->isi_pcs_dus;
-                        $total_reject_gudang_desimal = $total_reject_gudang / $produk->isi_pcs_dus;
-                        $total_transit_out_desimal = $total_transit_out / $produk->isi_pcs_dus;
                         $total_lainlain_out_desimal = $total_lainlain_out / $produk->isi_pcs_dus;
-                        $total_penyesuaian_out_desimal = $total_penyesuaian_out / $produk->isi_pcs_dus;
                     @endphp
                     <tr>
                         <th colspan="7">TOTAL</th>

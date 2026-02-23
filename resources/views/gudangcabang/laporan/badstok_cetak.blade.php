@@ -50,7 +50,7 @@
                     <tr>
                         <th colspan="3"></th>
                         <th>SALDO AWAL</th>
-                        <th colspan="5"></th>
+                        <th colspan="3"></th>
                         <th style="text-align: right">
                             @if ($ceksaldo != null)
                                 {{ formatAngkaDesimal($saldo_awal) }}
@@ -89,16 +89,7 @@
 
                             $jml_penerimaan = $d->reject_pasar + $d->reject_mobil + $d->reject_gudang + $d->penyesuaian_bad_in;
                             $jml_pengeluaran = $d->kirim_pusat + $d->repack + $d->penyesuaian_bad_out;
-                            // echo $saldo_akhir_jumlah .
-                            //     '+' .
-                            //     $jml_penerimaan .
-                            //     '-' .
-                            //     $jml_pengeluaran .
-                            //     '=' .
-                            //     $saldo_akhir_jumlah +
-                            //     $jml_penerimaan -
-                            //     $jml_pengeluaran .
-                            //     '<br>';
+
                             $saldo_akhir_jumlah = $saldo_akhir_jumlah + $jml_penerimaan - $jml_pengeluaran;
                             $saldo_akhir_real = $saldo_akhir_real + $jml_penerimaan - $jml_pengeluaran;
                             $saldo_akhir_jumlah = $saldo_akhir_jumlah < 0 ? $saldo_akhir_jumlah * -1 : $saldo_akhir_jumlah;
@@ -115,22 +106,18 @@
                                 $color_sa = 'red';
                             }
 
-                            $total_reject_pasar += $d->reject_pasar;
-                            $total_reject_mobil += $d->reject_mobil;
-                            $total_reject_gudang += $d->reject_gudang;
-                            $total_penyesuaian_in += $d->penyesuaian_bad_in;
+                            $total_reject_pasar += $jml_penerimaan;
                             $total_kirim_pusat += $d->kirim_pusat;
-                            $total_repack += $d->repack;
-                            $total_penyesuaian_out += $d->penyesuaian_bad_out;
+                            $total_repack += ($d->repack + $d->penyesuaian_bad_out);
                         @endphp
                         <tr>
                             <td>{{ DateToIndo($d->tanggal) }}</td>
                             <td>{{ $d->jenis_mutasi == 'SJ' ? $d->no_surat_jalan : $d->no_mutasi }}</td>
                             <td>{{ $d->jenis_mutasi == 'SJ' ? 'PENERIMAAN SJ' : $d->nama_jenis_mutasi }}</td>
                             <td>{{ $d->keterangan }}</td>
-                            <td class="right">{{ formatAngkaDesimal($reject_pasar) }}</td>
+                            <td class="right">{{ formatAngkaDesimal($jml_penerimaan / $produk->isi_pcs_dus) }}</td>
                             <td class="right">{{ formatAngkaDesimal($kirim_pusat) }}</td>
-                            <td class="right">{{ formatAngkaDesimal($repack) }}</td>
+                            <td class="right">{{ formatAngkaDesimal(($d->repack + $d->penyesuaian_bad_out) / $produk->isi_pcs_dus) }}</td>
                             <td class="right {{ $color_sa }}">
                                 {{ !empty($saldo_akhir_jumlah) ? formatAngkaDesimal($saldo_akhir_desimal) : '' }}
                             </td>
@@ -145,12 +132,8 @@
                 <tfoot>
                     @php
                         $total_reject_pasar_desimal = $total_reject_pasar / $produk->isi_pcs_dus;
-                        $total_reject_mobil_desimal = $total_reject_mobil / $produk->isi_pcs_dus;
-                        $total_reject_gudang_desimal = $total_reject_gudang / $produk->isi_pcs_dus;
-                        $total_penyesuaian_in_desimal = $total_penyesuaian_in / $produk->isi_pcs_dus;
                         $total_kirim_pusat_desimal = $total_kirim_pusat / $produk->isi_pcs_dus;
                         $total_repack_desimal = $total_repack / $produk->isi_pcs_dus;
-                        $total_penyesuaian_out_desimal = $total_penyesuaian_out / $produk->isi_pcs_dus;
                     @endphp
                     <tr>
                         <th colspan="4">TOTAL</th>
@@ -158,7 +141,10 @@
                         <th class="right">{{ formatAngkaDesimal($total_kirim_pusat_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_repack_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($saldo_akhir_desimal) }}</th>
-                        <th colspan="5"></th>
+                        <th class="right">{{ formatAngka($saldo_akhir_dus) }}</th>
+                        <th class="right">{{ formatAngka($saldo_akhir_pack) }}</th>
+                        <th class="right">{{ formatAngka($saldo_akhir_pcs) }}</th>
+                        <th colspan="2"></th>
                     </tr>
                 </tfoot>
             </table>

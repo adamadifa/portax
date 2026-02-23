@@ -64,27 +64,20 @@
                             $pusat = $d->pusat / $d->isi_pcs_dus;
                             $transit_in = $d->transit_in / $d->isi_pcs_dus;
                             $retur = $d->retur / $d->isi_pcs_dus;
-                            $jml_lainlain_in = $d->hutang_kirim + $d->pelunasan_ttr + $d->penyesuaian_bad;
+                            $jml_lainlain_in = $d->hutang_kirim + $d->pelunasan_ttr + $d->penyesuaian_bad + $d->transit_in + $d->penyesuaian_in;
                             $lainlain_in = $jml_lainlain_in / $d->isi_pcs_dus;
                             $repack = $d->repack / $d->isi_pcs_dus;
-                            $penyesuaian_in = $d->penyesuaian_in / $d->isi_pcs_dus;
                             $jml_penerimaan = $d->pusat + $d->transit_in + $d->retur + $jml_lainlain_in + $d->repack + $d->penyesuaian_in;
 
                             $penjualan = $d->penjualan / $d->isi_pcs_dus;
                             $promosi = $d->promosi / $d->isi_pcs_dus;
-                            $reject_pasar = $d->reject_pasar / $d->isi_pcs_dus;
-                            $reject_mobil = $d->reject_mobil / $d->isi_pcs_dus;
-                            $reject_gudang = $d->reject_gudang / $d->isi_pcs_dus;
-                            $transit_out = $d->transit_out / $d->isi_pcs_dus;
-                            $jml_lainlain_out = $d->pelunasan_hutangkirim + $d->ganti_barang + $d->ttr;
+                            $reject_pasar = ($d->reject_pasar + $d->reject_mobil + $d->reject_gudang) / $d->isi_pcs_dus;
+                            $jml_lainlain_out = $d->pelunasan_hutangkirim + $d->ganti_barang + $d->ttr + $d->transit_out + $d->penyesuaian_out;
                             $lainlain_out = $jml_lainlain_out / $d->isi_pcs_dus;
-                            $penyesuaian_out = $d->penyesuaian_out / $d->isi_pcs_dus;
                             $jml_pengeluaran =
                                 $d->penjualan +
                                 $d->promosi +
-                                $d->reject_pasar +
-                                $d->reject_mobil +
-                                $d->reject_gudang +
+                                ($d->reject_pasar + $d->reject_mobil + $d->reject_gudang) +
                                 $d->transit_out +
                                 $jml_lainlain_out +
                                 $d->penyesuaian_out;
@@ -179,9 +172,9 @@
                         <td>{{ $d->kode_produk }}</td>
                         <td>{{ $d->nama_produk }}</td>
                         <td class="right">{{ formatAngkaDesimal($saldo_awal_bs) }}</td>
-                        <td class="right">{{ formatAngkaDesimal($reject_pasar_bs) }}</td>
+                        <td class="right">{{ formatAngkaDesimal($jml_penerimaan_bs / $d->isi_pcs_dus) }}</td>
                         <td class="right">{{ formatAngkaDesimal($kirim_pusat_bs) }}</td>
-                        <td class="right">{{ formatAngkaDesimal($repack_bs) }}</td>
+                        <td class="right">{{ formatAngkaDesimal(($d->repack + $d->penyesuaian_bad_out) / $d->isi_pcs_dus) }}</td>
                         <td class="right">{{ formatAngkaDesimal($saldo_akhir_desimal_bs) }}</td>
                         <td class="right">{{ formatAngka($saldo_akhir_dus_bs) }}</td>
                         <td class="right">{{ formatAngka($saldo_akhir_pack_bs) }}</td>

@@ -70,7 +70,7 @@ class LaporangudangcabangController extends Controller
             DB::raw("SUM(IF(gudang_cabang_mutasi.jenis_mutasi='RK',gudang_cabang_mutasi_detail.jumlah,0))  as repack"),
             DB::raw("SUM(IF(gudang_cabang_mutasi.jenis_mutasi='PY' AND in_out_good='I',gudang_cabang_mutasi_detail.jumlah,0))  as penyesuaian_in"),
 
-            DB::raw("SUM(IF(gudang_cabang_mutasi.jenis_mutasi='PJ',IFNULL(marketing_penjualan.jml_penjualan,0),0))  as penjualan"),
+            DB::raw("0 as penjualan"),
             DB::raw("SUM(IF(gudang_cabang_mutasi.jenis_mutasi='PR',gudang_cabang_mutasi_detail.jumlah,0))  as promosi"),
             DB::raw("SUM(IF(gudang_cabang_mutasi.jenis_mutasi='RP',gudang_cabang_mutasi_detail.jumlah,0))  as reject_pasar"),
             DB::raw("SUM(IF(gudang_cabang_mutasi.jenis_mutasi='RM',gudang_cabang_mutasi_detail.jumlah,0))  as reject_mobil"),
@@ -87,21 +87,7 @@ class LaporangudangcabangController extends Controller
         $query->leftJoin('gudang_jadi_mutasi', 'gudang_cabang_mutasi.no_mutasi', '=', 'gudang_jadi_mutasi.no_mutasi');
         $query->leftJoin('gudang_cabang_dpb', 'gudang_cabang_mutasi.no_dpb', '=', 'gudang_cabang_dpb.no_dpb');
         $query->leftJoin('salesman', 'gudang_cabang_dpb.kode_salesman', '=', 'salesman.kode_salesman');
-        $query->leftJoin(
-            DB::raw("(
-                SELECT tanggal, kode_salesman, kode_produk, SUM(jumlah) as jml_penjualan
-                FROM marketing_penjualan_detail
-                INNER JOIN marketing_penjualan ON marketing_penjualan_detail.no_faktur = marketing_penjualan.no_faktur
-                INNER JOIN produk_harga ON marketing_penjualan_detail.kode_harga = produk_harga.kode_harga
-                WHERE status_batal = 0
-                GROUP BY tanggal, kode_salesman, kode_produk
-            ) marketing_penjualan"),
-            function ($join) {
-                $join->on('gudang_cabang_mutasi.tanggal', '=', 'marketing_penjualan.tanggal')
-                    ->on('salesman.kode_salesman', '=', 'marketing_penjualan.kode_salesman')
-                    ->on('gudang_cabang_mutasi_detail.kode_produk', '=', 'marketing_penjualan.kode_produk');
-            }
-        );
+
 
 
         $query->whereBetween('gudang_cabang_mutasi.tanggal', [$request->dari, $request->sampai]);
@@ -129,7 +115,67 @@ class LaporangudangcabangController extends Controller
             'gudang_cabang_mutasi.updated_at'
 
         );
-        $data['mutasi'] = $query->get();
+        $mutasi = $query->get();
+
+        // Query marketing sales grouped by date for this product and cabang
+        $marketing_sales = DB::table('marketing_penjualan_detail')
+            ->select(
+                DB::raw("marketing_penjualan.tanggal"),
+                DB::raw("SUM(marketing_penjualan_detail.jumlah) as penjualan")
+            )
+            ->join('marketing_penjualan', 'marketing_penjualan_detail.no_faktur', '=', 'marketing_penjualan.no_faktur')
+            ->join('produk_harga', 'marketing_penjualan_detail.kode_harga', '=', 'produk_harga.kode_harga')
+            ->where('produk_harga.kode_produk', $request->kode_produk_gs)
+            ->where('produk_harga.kode_cabang', $kode_cabang)
+            ->where('marketing_penjualan.status_batal', 0)
+            ->whereBetween('marketing_penjualan.tanggal', [$request->dari, $request->sampai])
+            ->groupBy('marketing_penjualan.tanggal')
+            ->get();
+
+        // Get product info for isi_pcs_dus and isi_pcs_pack
+        $produkInfo = Produk::where('kode_produk', $request->kode_produk_gs)->first();
+
+        // Inject marketing sales as synthetic "PENJUALAN" rows
+        foreach ($marketing_sales as $sale) {
+            $row = new \stdClass();
+            $row->no_mutasi = null;
+            $row->tanggal = $sale->tanggal;
+            $row->jenis_mutasi = 'PJ';
+            $row->no_surat_jalan = null;
+            $row->no_dok = null;
+            $row->tanggal_kirim = null;
+            $row->no_dpb = null;
+            $row->nama_salesman = null;
+            $row->nama_jenis_mutasi = 'PENJUALAN';
+            $row->keterangan = null;
+            $row->isi_pcs_dus = $produkInfo->isi_pcs_dus;
+            $row->isi_pcs_pack = $produkInfo->isi_pcs_pack;
+            $row->in_out_good = 'O';
+            $row->created_at = null;
+            $row->updated_at = null;
+            $row->pusat = 0;
+            $row->transit_in = 0;
+            $row->retur = 0;
+            $row->hutang_kirim = 0;
+            $row->pelunasan_ttr = 0;
+            $row->penyesuaian_bad = 0;
+            $row->repack = 0;
+            $row->penyesuaian_in = 0;
+            $row->penjualan = $sale->penjualan;
+            $row->promosi = 0;
+            $row->reject_pasar = 0;
+            $row->reject_mobil = 0;
+            $row->reject_gudang = 0;
+            $row->transit_out = 0;
+            $row->ttr = 0;
+            $row->ganti_barang = 0;
+            $row->pelunasan_hutangkirim = 0;
+            $row->penyesuaian_out = 0;
+            $mutasi->push($row);
+        }
+
+        // Sort by date
+        $data['mutasi'] = $mutasi->sortBy('tanggal')->values();
 
 
         $saldo_awal = Detailsaldoawalgudangcabang::select('gudang_cabang_saldoawal_detail.kode_produk', 'isi_pcs_dus', 'isi_pcs_pack', 'jumlah')
