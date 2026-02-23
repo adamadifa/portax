@@ -481,7 +481,7 @@ class DpbController extends Controller
             DB::raw("SUM(IF(jenis_mutasi='HK',jumlah,0)) as jml_hutangkirim"),
             DB::raw("SUM(IF(jenis_mutasi='PT',jumlah,0)) as jml_pelunasanttr"),
 
-            DB::raw("SUM(IF(jenis_mutasi='PJ',jumlah,0)) as jml_penjualan"),
+            DB::raw("IFNULL(pj_marketing.total_sales, 0) as jml_penjualan"),
             DB::raw("SUM(IF(jenis_mutasi='GB',jumlah,0)) as jml_gantibarang"),
             DB::raw("SUM(IF(jenis_mutasi='PH',jumlah,0)) as jml_pelunasanhutangkirim"),
             DB::raw("SUM(IF(jenis_mutasi='TR',jumlah,0)) as jml_ttr"),
@@ -490,9 +490,22 @@ class DpbController extends Controller
         )
             ->join('produk', 'gudang_cabang_mutasi_detail.kode_produk', '=', 'produk.kode_produk')
             ->join('gudang_cabang_mutasi', 'gudang_cabang_mutasi_detail.no_mutasi', '=', 'gudang_cabang_mutasi.no_mutasi')
-            ->where('no_dpb', $no_dpb)
+            ->leftJoin('gudang_cabang_dpb', 'gudang_cabang_mutasi.no_dpb', '=', 'gudang_cabang_dpb.no_dpb')
+            ->leftJoin(DB::raw("(
+                SELECT tanggal, kode_salesman, kode_produk, SUM(jumlah) as total_sales
+                FROM marketing_penjualan_detail
+                INNER JOIN marketing_penjualan ON marketing_penjualan_detail.no_faktur = marketing_penjualan.no_faktur
+                INNER JOIN produk_harga ON marketing_penjualan_detail.kode_harga = produk_harga.kode_harga
+                WHERE status_batal = 0
+                GROUP BY tanggal, kode_salesman, kode_produk
+            ) pj_marketing"), function ($join) {
+                $join->on('gudang_cabang_dpb.tanggal_ambil', '=', 'pj_marketing.tanggal')
+                    ->on('gudang_cabang_dpb.kode_salesman', '=', 'pj_marketing.kode_salesman')
+                    ->on('gudang_cabang_mutasi_detail.kode_produk', '=', 'pj_marketing.kode_produk');
+            })
+            ->where('gudang_cabang_mutasi.no_dpb', $no_dpb)
             ->orderBy('gudang_cabang_mutasi_detail.kode_produk')
-            ->groupBy('gudang_cabang_mutasi_detail.kode_produk', 'nama_produk', 'isi_pcs_dus', 'isi_pack_dus', 'isi_pcs_pack')
+            ->groupBy('gudang_cabang_mutasi_detail.kode_produk', 'nama_produk', 'isi_pcs_dus', 'isi_pack_dus', 'isi_pcs_pack', 'pj_marketing.total_sales')
             ->get();
 
         return view('gudangcabang.dpb.getdetailmutasidpb', $data);
