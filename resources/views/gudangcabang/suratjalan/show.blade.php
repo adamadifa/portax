@@ -21,6 +21,10 @@
         <table class="w-full text-sm">
             <tbody>
                 <tr class="border-b border-slate-100">
+                    <td class="py-2.5 pr-4 text-slate-400 font-medium w-32 text-left">No. Surat Jalan</td>
+                    <td class="py-2.5 text-slate-700 font-bold text-left underline decoration-blue-200 underline-offset-4">{{ $mutasi->no_surat_jalan }}</td>
+                </tr>
+                <tr class="border-b border-slate-100">
                     <td class="py-2.5 pr-4 text-slate-400 font-medium w-32 text-left">Tanggal</td>
                     <td class="py-2.5 text-slate-700 font-semibold text-left">{{ DateToIndo($mutasi->tanggal) }}</td>
                 </tr>

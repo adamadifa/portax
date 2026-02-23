@@ -143,6 +143,7 @@
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 font-semibold">
                         <th class="px-4 py-3">No. Mutasi</th>
+                        <th class="px-4 py-3">No. Surat Jalan</th>
                         <th class="px-4 py-3">Tanggal</th>
                         <th class="px-4 py-3">Cabang</th>
                         <th class="px-4 py-3">Keterangan</th>
@@ -155,6 +156,7 @@
                             <td class="px-4 py-3">
                                 <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-mono font-medium border border-slate-200">{{ $d->no_mutasi }}</span>
                             </td>
+                            <td class="px-4 py-3 text-slate-700 font-bold text-sm whitespace-nowrap">{{ $d->no_surat_jalan }}</td>
                             <td class="px-4 py-3 text-slate-600 text-sm whitespace-nowrap">{{ date('d-m-Y', strtotime($d->tanggal)) }}</td>
                             <td class="px-4 py-3 text-slate-800 font-medium text-sm whitespace-nowrap">{{ textUpperCase($d->nama_cabang) }}</td>
                             <td class="px-4 py-3 text-slate-600 text-sm whitespace-nowrap">{{ $d->keterangan }}</td>
@@ -187,7 +189,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center text-slate-400">
+                            <td colspan="6" class="px-6 py-12 text-center text-slate-400">
                                 <div class="flex flex-col items-center justify-center">
                                     <i class="far fa-folder-open text-4xl mb-3 text-slate-300"></i>
                                     <p>Tidak ada data mutasi surat jalan ditemukan.</p>

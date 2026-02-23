@@ -20,6 +20,15 @@
     <!-- Info Cards / Form Inputs Group -->
     <div class="p-6 pb-2 text-left">
         <div class="flex flex-col gap-y-4 mb-6 relative z-20">
+            <!-- No Surat Jalan -->
+            <div class="relative">
+                <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-slate-600 z-10">No. Surat Jalan <span class="text-red-500">*</span></label>
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-barcode text-slate-400 text-xs"></i>
+                </div>
+                <input type="text" name="no_surat_jalan" id="no_surat_jalan" class="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 transition-all font-medium uppercase" placeholder="Masukkan Nomor Surat Jalan">
+            </div>
+
             <!-- Tanggal -->
             <div class="relative">
                 <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-slate-600 z-10">Tanggal <span class="text-red-500">*</span></label>
@@ -140,10 +149,22 @@
         });
 
         form.on('submit', function(e) {
+            const no_surat_jalan = $(this).find("#no_surat_jalan").val();
             const tanggal = $(this).find("#tanggal").val();
             const kode_cabang = $(this).find("#kode_cabang").val();
 
-            if (tanggal == "") {
+            if (no_surat_jalan == "") {
+                Swal.fire({
+                    title: "Oops!",
+                    text: "No. Surat Jalan Harus Diisi !",
+                    icon: "warning",
+                    showConfirmButton: true,
+                    didClose: () => {
+                        $(this).find("#no_surat_jalan").focus();
+                    },
+                });
+                return false;
+            } else if (tanggal == "") {
                 Swal.fire({
                     title: "Oops!",
                     text: "Tanggal Harus Diisi !",

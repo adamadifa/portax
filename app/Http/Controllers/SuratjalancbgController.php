@@ -97,6 +97,7 @@ class SuratjalancbgController extends Controller
         } else {
             $kode_cabang = auth()->user()->kode_cabang;
             $request->validate([
+                'no_surat_jalan' => 'required',
                 'tanggal' => 'required'
             ]);
         }
@@ -149,6 +150,7 @@ class SuratjalancbgController extends Controller
 
             Mutasigudangcabang::create([
                 'no_mutasi'  => $no_suratjalan,
+                'no_surat_jalan' => $request->no_surat_jalan,
                 'tanggal' => $request->tanggal,
                 'kode_cabang' => $kode_cabang,
                 'kondisi' => 'G',
@@ -189,6 +191,7 @@ class SuratjalancbgController extends Controller
             ->where('status_aktif_produk', 1)->get();
         $data['suratjalan'] = Mutasigudangcabang::select(
             'no_mutasi',
+            'no_surat_jalan',
             'tanggal',
             'gudang_cabang_mutasi.jenis_mutasi',
             'keterangan',
@@ -216,6 +219,7 @@ class SuratjalancbgController extends Controller
         } else {
             $kode_cabang = auth()->user()->kode_cabang;
             $request->validate([
+                'no_surat_jalan' => 'required',
                 'tanggal' => 'required'
             ]);
         }
@@ -269,6 +273,7 @@ class SuratjalancbgController extends Controller
             Detailmutasigudangcabang::where('no_mutasi', $no_mutasi)->delete();
 
             Mutasigudangcabang::where('no_mutasi', $no_mutasi)->update([
+                'no_surat_jalan' => $request->no_surat_jalan,
                 'tanggal' => $request->tanggal,
                 'kode_cabang' => $kode_cabang,
                 'keterangan' => $request->keterangan,
@@ -288,7 +293,7 @@ class SuratjalancbgController extends Controller
     public function show($no_mutasi)
     {
         $no_mutasi = Crypt::decrypt($no_mutasi);
-        $data['mutasi'] = Mutasigudangcabang::select('no_mutasi', 'tanggal', 'gudang_cabang_jenis_mutasi.jenis_mutasi', 'keterangan', 'nama_cabang')
+        $data['mutasi'] = Mutasigudangcabang::select('no_mutasi', 'no_surat_jalan', 'tanggal', 'gudang_cabang_jenis_mutasi.jenis_mutasi', 'keterangan', 'nama_cabang')
             ->join('gudang_cabang_jenis_mutasi', 'gudang_cabang_mutasi.jenis_mutasi', '=', 'gudang_cabang_jenis_mutasi.kode_jenis_mutasi')
             ->join('cabang', 'gudang_cabang_mutasi.kode_cabang', '=', 'cabang.kode_cabang')
             ->where('no_mutasi', $no_mutasi)

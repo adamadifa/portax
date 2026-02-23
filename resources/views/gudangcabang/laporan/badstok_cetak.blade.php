@@ -35,8 +35,8 @@
                         <th rowspan="2"> NO. BUKTI</th>
                         <th rowspan="2">JENIS MUTASI</th>
                         <th rowspan="2">KETERANGAN</th>
-                        <th colspan="3" class="green">PENERIMAAN</th>
-                        <th colspan="2" class="red">PENGELUARAN</th>
+                        <th colspan="4" class="green">PENERIMAAN</th>
+                        <th colspan="3" class="red">PENGELUARAN</th>
                         <th rowspan="2">SALDO AKHIR</th>
                         <th colspan="3" rowspan="2">SALDO AKHIR</th>
                         <th rowspan="3">TANGGAL INPUT</th>
@@ -46,13 +46,15 @@
                         <th class="green">REJECT PASAR</th>
                         <th class="green">REJECT MOBIL</th>
                         <th class="green">REJECT GUDANG</th>
+                        <th class="green">PENYESUAIAN</th>
                         <th class="red">SURAT JALAN</th>
                         <th class="red">REPACK</th>
+                        <th class="red">PENYESUAIAN</th>
                     </tr>
                     <tr>
                         <th colspan="4"></th>
                         <th>SALDO AWAL</th>
-                        <th colspan="4"></th>
+                        <th colspan="6"></th>
                         <th style="text-align: right">
                             @if ($ceksaldo != null)
                                 {{ formatAngkaDesimal($saldo_awal) }}
@@ -127,14 +129,16 @@
                         @endphp
                         <tr>
                             <td>{{ DateToIndo($d->tanggal) }}</td>
-                            <td>{{ $d->jenis_mutasi == 'SJ' ? $d->keterangan : $d->no_mutasi }}</td>
+                            <td>{{ $d->jenis_mutasi == 'SJ' ? $d->no_surat_jalan : $d->no_mutasi }}</td>
                             <td>{{ $d->jenis_mutasi == 'SJ' ? 'PENERIMAAN SJ' : $d->nama_jenis_mutasi }}</td>
                             <td>{{ $d->keterangan }}</td>
                             <td class="right">{{ formatAngkaDesimal($reject_pasar) }}</td>
                             <td class="right">{{ formatAngkaDesimal($reject_mobil) }}</td>
                             <td class="right">{{ formatAngkaDesimal($reject_gudang) }}</td>
+                            <td class="right">{{ formatAngkaDesimal($penyesuaian_in) }}</td>
                             <td class="right">{{ formatAngkaDesimal($kirim_pusat) }}</td>
                             <td class="right">{{ formatAngkaDesimal($repack) }}</td>
+                            <td class="right">{{ formatAngkaDesimal($penyesuaian_out) }}</td>
                             <td class="right {{ $color_sa }}">
                                 {{ !empty($saldo_akhir_jumlah) ? formatAngkaDesimal($saldo_akhir_desimal) : '' }}
                             </td>
@@ -157,12 +161,14 @@
                         $total_penyesuaian_out_desimal = $total_penyesuaian_out / $produk->isi_pcs_dus;
                     @endphp
                     <tr>
-                        <th colspan="4">TOTAL</th>
+                        <th colspan="5">TOTAL</th>
                         <th class="right">{{ formatAngkaDesimal($total_reject_pasar_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_reject_mobil_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_reject_gudang_desimal) }}</th>
+                        <th class="right">{{ formatAngkaDesimal($total_penyesuaian_in_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_kirim_pusat_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($total_repack_desimal) }}</th>
+                        <th class="right">{{ formatAngkaDesimal($total_penyesuaian_out_desimal) }}</th>
                         <th class="right">{{ formatAngkaDesimal($saldo_akhir_desimal) }}</th>
                         <th colspan="5"></th>
                     </tr>
