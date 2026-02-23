@@ -200,7 +200,7 @@
                                         @endif
                                     @endif
                                 @elseif ($d->jenis_mutasi == 'SJ')
-                                    {{ $d->no_mutasi }} / {{ $d->no_dok }}
+                                    {{ $d->keterangan }}
                                 @endif
                             </td>
                             <!--Tanggal Kirim-->
@@ -217,7 +217,7 @@
                             <td>{{ $d->nama_salesman }}</td>
                             <!-- Jenis Mutasi-->
                             <td>
-                                {{ $d->jenis_mutasi == 'SJ' ? 'PENERIMAAN PUSAT' : $d->nama_jenis_mutasi }}
+                                {{ $d->jenis_mutasi == 'SJ' ? 'PENERIMAAN SJ' : $d->nama_jenis_mutasi }}
                                 @if (in_array($d->jenis_mutasi, ['TI', 'TO']))
                                     <b style="color:#23a7e0">{{ $d->no_mutasi }}</b>
                                 @endif

@@ -127,8 +127,8 @@
                         @endphp
                         <tr>
                             <td>{{ DateToIndo($d->tanggal) }}</td>
-                            <td>{{ $d->no_mutasi }}</td>
-                            <td>{{ $d->nama_jenis_mutasi }}</td>
+                            <td>{{ $d->jenis_mutasi == 'SJ' ? $d->keterangan : $d->no_mutasi }}</td>
+                            <td>{{ $d->jenis_mutasi == 'SJ' ? 'PENERIMAAN SJ' : $d->nama_jenis_mutasi }}</td>
                             <td>{{ $d->keterangan }}</td>
                             <td class="right">{{ formatAngkaDesimal($reject_pasar) }}</td>
                             <td class="right">{{ formatAngkaDesimal($reject_mobil) }}</td>
