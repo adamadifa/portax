@@ -120,13 +120,13 @@
                 </li>
             @endif --}}
 
-            {{-- @if (auth()->user()->hasAnyPermission(['mutasibank.index']))
+            @if (auth()->user()->hasAnyPermission(['mutasibank.index']))
                 <li class="menu-item {{ request()->is(['mutasibank', 'samutasibank']) ? 'active' : '' }}">
                     <a href="{{ route('mutasibank.index') }}" class="menu-link">
                         <div>Mutasi Bank</div>
                     </a>
                 </li>
-            @endif --}}
+            @endif
 
             {{-- @if (auth()->user()->hasAnyPermission(['pjp.index', 'pembayaranpjp.index']))
                 <li class="menu-item {{ request()->is(['pjp', 'pembayaranpjp']) ? 'active' : '' }}">
