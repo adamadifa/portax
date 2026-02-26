@@ -1,20 +1,19 @@
 @if (auth()->user()->hasAnyPermission(['mutasibank.index', 'samutasibank.index']))
-    <ul class="nav nav-tabs" role="tablist">
-
+    <div class="flex flex-wrap gap-1 -mb-px">
         @can('samutasibank.index')
-            <li class="nav-item" role="presentation">
-                <a href="{{ route('samutasibank.index') }}" class="nav-link {{ request()->is(['samutasibank']) ? 'active' : '' }}">
-                    <i class="tf-icons ti ti-file-description ti-md me-1"></i> Saldo Awal
-                </a>
-            </li>
+            <a href="{{ route('samutasibank.index') }}" 
+               class="flex items-center gap-2 px-4 py-3 text-sm font-bold transition-all border-b-2 {{ request()->is(['samutasibank']) ? 'border-[#003d9e] text-[#003d9e]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }}">
+                <i class="ti ti-database-heart text-lg"></i>
+                <span>Saldo Awal</span>
+            </a>
         @endcan
 
         @can('mutasibank.index')
-            <li class="nav-item" role="presentation">
-                <a href="{{ route('mutasibank.index') }}" class="nav-link {{ request()->is(['mutasibank']) ? 'active' : '' }}">
-                    <i class="tf-icons ti ti-file-description ti-md me-1"></i> Mutasi Bank
-                </a>
-            </li>
+            <a href="{{ route('mutasibank.index') }}" 
+               class="flex items-center gap-2 px-4 py-3 text-sm font-bold transition-all border-b-2 {{ request()->is(['mutasibank']) ? 'border-[#003d9e] text-[#003d9e]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }}">
+                <i class="ti ti-file-description text-lg"></i>
+                <span>Mutasi Bank</span>
+            </a>
         @endcan
-    </ul>
+    </div>
 @endif

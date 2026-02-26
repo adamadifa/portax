@@ -40,7 +40,7 @@ class SaldoawalledgerController extends Controller
                 $query->where('cabang.kode_regional', auth()->user()->kode_regional);
             } else {
                 $query->where('bank.kode_cabang', auth()->user()->kode_cabang);
-                $query->where('nama_bank', 'not like', '%giro%');
+                $query->where('nama_bank', 'like', '%PT%');
             }
         }
         $query->join('bank', 'keuangan_ledger_saldoawal.kode_bank', '=', 'bank.kode_bank');
