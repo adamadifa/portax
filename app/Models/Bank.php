@@ -71,7 +71,7 @@ class Bank extends Model
                 $query->where('bank.kode_cabang', '!=', 'PST');
             } else {
                 $query->where('bank.kode_cabang', auth()->user()->kode_cabang);
-                $query->where('nama_bank', 'not like', '%giro%');
+                $query->where('nama_bank', 'like', '%PT%');
             }
         }
 
