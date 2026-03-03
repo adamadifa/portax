@@ -236,9 +236,9 @@
     <!-- End Filter Section Card -->
 
     <!-- Card List Container -->
-    <div class="flex flex-col gap-2 mt-3">
+    <div class="flex flex-col gap-2 mt-3 overflow-x-auto pb-2">
         @forelse ($retur as $d)
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 hover:shadow-md transition-shadow flex flex-col md:flex-row items-start md:items-center gap-3 relative">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 hover:shadow-md transition-shadow flex flex-col md:flex-row items-start md:items-center gap-3 relative min-w-max">
                 
                 <!-- 1. Identitas (Left Fixed) -->
                 <div class="flex items-start gap-3 w-full md:w-72 md:shrink-0 border-b md:border-b-0 md:border-r md:border-slate-200/60 pb-2 md:pb-0 md:pr-4">
@@ -252,7 +252,7 @@
                             <span class="font-bold text-slate-800 text-sm truncate" title="{{ $d->no_retur }}">{{ $d->no_retur }}</span>
                         </div>
                         <div class="text-xs text-slate-500 font-medium mb-1">
-                            {{ DateToIndo($d->tanggal) }}
+                            {{ date('d-m-Y', strtotime($d->tanggal)) }}
                         </div>
                          <h4 class="font-bold text-slate-700 text-sm truncate" title="{{ $d->nama_pelanggan }}">
                              {{ textUpperCase($d->nama_pelanggan) }}
@@ -304,7 +304,7 @@
                 </div>
 
                 <!-- 3. Actions -->
-                <div class="w-full md:w-auto flex flex-col md:flex-row items-center justify-end gap-1 border-t md:border-t-0 md:border-l border-slate-200/60 pt-2 md:pt-0 md:pl-4">
+                <div class="w-full md:w-auto flex flex-col md:flex-row items-center justify-end gap-1 border-t md:border-t-0 md:border-l border-slate-200/60 pt-2 md:pt-0 md:pl-4 bg-white z-10 sticky right-0">
                     
                      <div class="inline-flex rounded-md shadow-sm isolate" role="group">
                         

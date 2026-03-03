@@ -135,23 +135,23 @@
                              $jml_dus_sp = 0;
                              $jml_dus_sambal = 0;
                              foreach($val as $v){
-                                 if($v->kode_kategori_diskon == "D002"){
+                                 if($v->kode_kategori_diskon == "D002" && $v->status_promosi != 1){
                                      $jml_dus_aida += $v->jumlah / $v->isi_pcs_dus;
                                  }
 
-                                 if($v->kode_kategori_diskon == "D001"){
+                                 if($v->kode_kategori_diskon == "D001" && $v->status_promosi != 1){
                                      $jml_dus_swan += $v->jumlah / $v->isi_pcs_dus;
                                  }
 
-                                 if($v->kode_kategori_diskon == "D003"){
+                                 if($v->kode_kategori_diskon == "D003" && $v->status_promosi != 1){
                                      $jml_dus_stick += $v->jumlah / $v->isi_pcs_dus;
                                  }
 
-                                 if($v->kode_kategori_diskon == "D009"){
+                                 if($v->kode_kategori_diskon == "D009" && $v->status_promosi != 1){
                                      $jml_dus_sp += $v->jumlah / $v->isi_pcs_dus;
                                  }
 
-                                 if($v->kode_kategori_diskon == "D005"){
+                                 if($v->kode_kategori_diskon == "D005" && $v->status_promosi != 1){
                                      $jml_dus_sambal += $v->jumlah / $v->isi_pcs_dus;
                                  }
                              }
@@ -178,33 +178,42 @@
                              $total_teoritis = $teoritis_swan + $teoritis_sp;
 
                         @endphp
+                        @php
+                            $first_non_promosi_index = -1;
+                            foreach ($val as $idx => $item) {
+                                if ($item->status_promosi != 1) {
+                                    $first_non_promosi_index = $idx;
+                                    break;
+                                }
+                            }
+                        @endphp
                         @foreach ($val as $k => $d)
                             @php
                                 $diskon = 0;
                                 $qty_dus_this_row = $d->jumlah / $d->isi_pcs_dus;
-                                if ($d->kode_kategori_diskon == "D002" && $jml_dus_aida > 0) {
+                                if ($d->kode_kategori_diskon == "D002" && $jml_dus_aida > 0 && $d->status_promosi != 1) {
                                     $diskon = (($qty_dus_this_row / $jml_dus_aida) * $d->potongan_aida) * (100/111);
                                 }
 
-                                if ($d->kode_kategori_diskon == "D001" && $jml_dus_swan > 0) {
+                                if ($d->kode_kategori_diskon == "D001" && $jml_dus_swan > 0 && $d->status_promosi != 1) {
                                     $proporsi_swan = $total_teoritis > 0 ? ($teoritis_swan / $total_teoritis) : ($jml_dus_swan / ($jml_dus_swan + $jml_dus_sp));
                                     $diskon = (($qty_dus_this_row / $jml_dus_swan) * ($d->potongan_swan * $proporsi_swan)) * (100/111);
                                 }
 
-                                if ($d->kode_kategori_diskon == "D003" && $jml_dus_stick > 0) {
+                                if ($d->kode_kategori_diskon == "D003" && $jml_dus_stick > 0 && $d->status_promosi != 1) {
                                     $diskon = (($qty_dus_this_row / $jml_dus_stick) * $d->potongan_stick) * (100/111);
                                 }
 
-                                if ($d->kode_kategori_diskon == "D009" && $jml_dus_sp > 0) {
+                                if ($d->kode_kategori_diskon == "D009" && $jml_dus_sp > 0 && $d->status_promosi != 1) {
                                     $proporsi_sp = $total_teoritis > 0 ? ($teoritis_sp / $total_teoritis) : ($jml_dus_sp / ($jml_dus_swan + $jml_dus_sp));
                                     $diskon = (($qty_dus_this_row / $jml_dus_sp) * ($d->potongan_swan * $proporsi_sp)) * (100/111);
                                 }
 
-                                if ($d->kode_kategori_diskon == "D005" && $jml_dus_sambal > 0) {
+                                if ($d->kode_kategori_diskon == "D005" && $jml_dus_sambal > 0 && $d->status_promosi != 1) {
                                     $diskon = (($qty_dus_this_row / $jml_dus_sambal) * $d->potongan_sambal) * (100/111);
                                 }
 
-                                if ($k == 0) {
+                                if ($k == $first_non_promosi_index && $first_non_promosi_index != -1) {
                                     $diskon += ($d->potongan_istimewa * (100/111));
                                 }
                             @endphp
