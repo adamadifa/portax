@@ -130,22 +130,24 @@
                     @foreach ($arr as $key => $val)
                         @php
                             $cat_qty = [];
-                            foreach ($val as $v) {
-                                if ($v->status_promosi != 1 && !empty($v->kode_kategori_diskon)) {
-                                    if (!isset($cat_qty[$v->kode_kategori_diskon])) {
-                                        $cat_qty[$v->kode_kategori_diskon] = 0;
-                                    }
-                                    $cat_qty[$v->kode_kategori_diskon] += $v->jumlah / $v->isi_pcs_dus;
-                                }
-                            }
-
                             $cat_diskon_rate = [];
-                            foreach ($cat_qty as $kode_cat => $total_qty) {
-                                $rule = $produk_diskon->where('kode_kategori_diskon', $kode_cat)
-                                    ->where('min_qty', '<=', $total_qty)
-                                    ->where('max_qty', '>=', $total_qty)
-                                    ->first();
-                                $cat_diskon_rate[$kode_cat] = $rule ? ($val[0]->jenis_transaksi == 'T' ? $rule->diskon + $rule->diskon_tunai : $rule->diskon) : 0;
+                            if (!empty($val[0]->potongan)) {
+                                foreach ($val as $v) {
+                                    if ($v->status_promosi != 1 && !empty($v->kode_kategori_diskon)) {
+                                        if (!isset($cat_qty[$v->kode_kategori_diskon])) {
+                                            $cat_qty[$v->kode_kategori_diskon] = 0;
+                                        }
+                                        $cat_qty[$v->kode_kategori_diskon] += $v->jumlah / $v->isi_pcs_dus;
+                                    }
+                                }
+
+                                foreach ($cat_qty as $kode_cat => $total_qty) {
+                                    $rule = $produk_diskon->where('kode_kategori_diskon', $kode_cat)
+                                        ->where('min_qty', '<=', $total_qty)
+                                        ->where('max_qty', '>=', $total_qty)
+                                        ->first();
+                                    $cat_diskon_rate[$kode_cat] = $rule ? ($val[0]->jenis_transaksi == 'T' ? $rule->diskon + $rule->diskon_tunai : $rule->diskon) : 0;
+                                }
                             }
 
                             $first_non_promosi_index = -1;
