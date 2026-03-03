@@ -142,9 +142,10 @@
                                 }
 
                                 foreach ($cat_qty as $kode_cat => $total_qty) {
+                                    $total_qty_floored = floor($total_qty);
                                     $rule = $produk_diskon->where('kode_kategori_diskon', $kode_cat)
-                                        ->where('min_qty', '<=', $total_qty)
-                                        ->where('max_qty', '>=', $total_qty)
+                                        ->where('min_qty', '<=', $total_qty_floored)
+                                        ->where('max_qty', '>=', $total_qty_floored)
                                         ->first();
                                     $cat_diskon_rate[$kode_cat] = $rule ? ($val[0]->jenis_transaksi == 'T' ? $rule->diskon + $rule->diskon_tunai : $rule->diskon) : 0;
                                 }
@@ -161,13 +162,13 @@
                         @foreach ($val as $k => $d)
                             @php
                                 $diskon = 0;
-                                $qty_dus_this_row = $d->jumlah / $d->isi_pcs_dus;
+                                $qty_dus_floored = floor($d->jumlah / $d->isi_pcs_dus);
                                 if ($d->status_promosi != 1 && !empty($d->kode_kategori_diskon)) {
                                     $rate = $cat_diskon_rate[$d->kode_kategori_diskon] ?? 0;
                                     if ($d->kode_produk == 'BP500') {
                                         $rate += 2000;
                                     }
-                                    $diskon = ($qty_dus_this_row * $rate) * (100 / 111);
+                                    $diskon = ($qty_dus_floored * $rate) * (100 / 111);
                                 }
 
                                 if ($k == $first_non_promosi_index && $first_non_promosi_index != -1) {
