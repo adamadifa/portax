@@ -380,6 +380,7 @@ class LaporanmarketingController extends Controller
             'salesman.nama_salesman',
             'klasifikasi',
             'nama_wilayah',
+            'produk.kode_produk',
             'produk.nama_produk',
             'marketing_penjualan_detail.jumlah',
             'marketing_penjualan_detail.harga_dus',

@@ -162,6 +162,9 @@
                                 $qty_dus_this_row = $d->jumlah / $d->isi_pcs_dus;
                                 if ($d->status_promosi != 1 && !empty($d->kode_kategori_diskon)) {
                                     $rate = $cat_diskon_rate[$d->kode_kategori_diskon] ?? 0;
+                                    if ($d->kode_produk == 'BP500') {
+                                        $rate += 2000;
+                                    }
                                     $diskon = ($qty_dus_this_row * $rate) * (100 / 111);
                                 }
 
