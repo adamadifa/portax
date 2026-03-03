@@ -459,6 +459,7 @@ class LaporanmarketingController extends Controller
         //dd($penjualan);
 
         $data['penjualan'] = $penjualan;
+        $data['produk_diskon'] = DB::table('produk_diskon')->get();
         $data['dari'] = $request->dari;
         $data['sampai'] = $request->sampai;
 
