@@ -71,7 +71,7 @@ class LaporangudangcabangController extends Controller
             DB::raw("SUM(IF(gudang_cabang_mutasi.jenis_mutasi='PY' AND in_out_good='I',gudang_cabang_mutasi_detail.jumlah,0))  as penyesuaian_in"),
 
             DB::raw("0 as penjualan"),
-            DB::raw("SUM(IF(gudang_cabang_mutasi.jenis_mutasi='PR',gudang_cabang_mutasi_detail.jumlah,0))  as promosi"),
+            DB::raw("0 as promosi"),
             DB::raw("SUM(IF(gudang_cabang_mutasi.jenis_mutasi='RP',gudang_cabang_mutasi_detail.jumlah,0))  as reject_pasar"),
             DB::raw("SUM(IF(gudang_cabang_mutasi.jenis_mutasi='RM',gudang_cabang_mutasi_detail.jumlah,0))  as reject_mobil"),
             DB::raw("SUM(IF(gudang_cabang_mutasi.jenis_mutasi='RG',gudang_cabang_mutasi_detail.jumlah,0))  as reject_gudang"),
@@ -123,11 +123,11 @@ class LaporangudangcabangController extends Controller
                 DB::raw("marketing_penjualan.tanggal"),
                 DB::raw("SUM(marketing_penjualan_detail.jumlah) as penjualan")
             )
-            ->join('marketing_penjualan', 'marketing_penjualan_detail.no_faktur', '=', 'marketing_penjualan.no_faktur')
-            ->join('produk_harga', 'marketing_penjualan_detail.kode_harga', '=', 'produk_harga.kode_harga')
+            ->join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
             ->where('produk_harga.kode_produk', $request->kode_produk_gs)
-            ->where('produk_harga.kode_cabang', $kode_cabang)
+            ->where('salesman.kode_cabang', $kode_cabang)
             ->where('marketing_penjualan.status_batal', 0)
+            ->where('marketing_penjualan_detail.status_promosi', '0')
             ->whereBetween('marketing_penjualan.tanggal', [$request->dari, $request->sampai])
             ->groupBy('marketing_penjualan.tanggal')
             ->get();
@@ -201,9 +201,9 @@ class LaporangudangcabangController extends Controller
                 SELECT kode_produk, SUM(jumlah) as total_sales
                 FROM marketing_penjualan_detail
                 INNER JOIN marketing_penjualan ON marketing_penjualan_detail.no_faktur = marketing_penjualan.no_faktur
-                INNER JOIN produk_harga ON marketing_penjualan_detail.kode_harga = produk_harga.kode_harga
-                WHERE status_batal = 0 AND tanggal >= '$start_date' AND tanggal < '$request->dari'
-                AND produk_harga.kode_cabang = '$kode_cabang'
+                INNER JOIN salesman ON marketing_penjualan.kode_salesman = salesman.kode_salesman
+                WHERE status_batal = 0 AND status_promosi = '0' AND tanggal >= '$start_date' AND tanggal < '$request->dari'
+                AND salesman.kode_cabang = '$kode_cabang'
                 GROUP BY kode_produk
             ) marketing_penjualan_sisa"), 'gudang_cabang_mutasi_detail.kode_produk', '=', 'marketing_penjualan_sisa.kode_produk')
             ->where('gudang_cabang_mutasi.tanggal', '>=', $start_date)
@@ -435,9 +435,9 @@ class LaporangudangcabangController extends Controller
                     SELECT kode_produk, SUM(jumlah) as total_sales
                     FROM marketing_penjualan_detail
                     INNER JOIN marketing_penjualan ON marketing_penjualan_detail.no_faktur = marketing_penjualan.no_faktur
-                    INNER JOIN produk_harga ON marketing_penjualan_detail.kode_harga = produk_harga.kode_harga
-                    WHERE status_batal = 0 AND tanggal >= '$start_date' AND tanggal < '$request->dari'
-                    AND produk_harga.kode_cabang = '$kode_cabang'
+                    INNER JOIN salesman ON marketing_penjualan.kode_salesman = salesman.kode_salesman
+                    WHERE status_batal = 0 AND status_promosi = '0' AND tanggal >= '$start_date' AND tanggal < '$request->dari'
+                    AND salesman.kode_cabang = '$kode_cabang'
                     GROUP BY kode_produk
                 ) marketing_penjualan_sisa ON gudang_cabang_mutasi_detail.kode_produk = marketing_penjualan_sisa.kode_produk
                 WHERE gudang_cabang_mutasi.tanggal >= '$start_date' AND gudang_cabang_mutasi.tanggal < '$request->dari'
@@ -462,7 +462,7 @@ class LaporangudangcabangController extends Controller
                 SUM(IF(gudang_cabang_mutasi.jenis_mutasi='RK',gudang_cabang_mutasi_detail.jumlah,0)) as repack,
                 SUM(IF(gudang_cabang_mutasi.jenis_mutasi='PY' AND in_out_good='I',gudang_cabang_mutasi_detail.jumlah,0)) as penyesuaian_in,
 
-                SUM(IF(gudang_cabang_mutasi.jenis_mutasi='PR',gudang_cabang_mutasi_detail.jumlah,0))  as promosi,
+                SUM(IF(gudang_cabang_mutasi.jenis_mutasi='PR',0,0))  as promosi,
                 SUM(IF(gudang_cabang_mutasi.jenis_mutasi='RP',gudang_cabang_mutasi_detail.jumlah,0))  as reject_pasar,
                 SUM(IF(gudang_cabang_mutasi.jenis_mutasi='RM',gudang_cabang_mutasi_detail.jumlah,0))  as reject_mobil,
                 SUM(IF(gudang_cabang_mutasi.jenis_mutasi='RG',gudang_cabang_mutasi_detail.jumlah,0))  as reject_gudang,
@@ -485,10 +485,9 @@ class LaporangudangcabangController extends Controller
             DB::raw("(
                 SELECT kode_produk, SUM(jumlah) as penjualan_marketing
                 FROM marketing_penjualan_detail
-                INNER JOIN marketing_penjualan ON marketing_penjualan_detail.no_faktur = marketing_penjualan.no_faktur
-                INNER JOIN produk_harga ON marketing_penjualan_detail.kode_harga = produk_harga.kode_harga
-                WHERE status_batal = 0 AND tanggal BETWEEN '$request->dari' AND '$request->sampai'
-                AND produk_harga.kode_cabang = '$kode_cabang'
+                INNER JOIN salesman ON marketing_penjualan.kode_salesman = salesman.kode_salesman
+                WHERE status_batal = 0 AND status_promosi='0' AND tanggal BETWEEN '$request->dari' AND '$request->sampai'
+                AND salesman.kode_cabang = '$kode_cabang'
                 GROUP BY kode_produk
             ) pj_marketing"), 'produk.kode_produk', '=', 'pj_marketing.kode_produk'
         );
