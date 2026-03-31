@@ -127,7 +127,7 @@ class LaporangudangcabangController extends Controller
             ->join('produk_harga', 'marketing_penjualan_detail.kode_harga', '=', 'produk_harga.kode_harga')
             ->join('produk', 'produk_harga.kode_produk', '=', 'produk.kode_produk')
             ->join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
-            ->where('produk_harga.kode_produk', $request->kode_produk_gs)
+            ->where('produk.kode_produk', $request->kode_produk_gs)
             ->where('salesman.kode_cabang', $kode_cabang)
             ->where('marketing_penjualan.status_batal', 0)
             ->where('marketing_penjualan_detail.status_promosi', '0')
@@ -488,6 +488,7 @@ class LaporangudangcabangController extends Controller
             DB::raw("(
                 SELECT kode_produk, SUM(jumlah) as penjualan_marketing
                 FROM marketing_penjualan_detail
+                INNER JOIN marketing_penjualan ON marketing_penjualan_detail.no_faktur = marketing_penjualan.no_faktur
                 INNER JOIN salesman ON marketing_penjualan.kode_salesman = salesman.kode_salesman
                 WHERE status_batal = 0 AND status_promosi='0' AND tanggal BETWEEN '$request->dari' AND '$request->sampai'
                 AND salesman.kode_cabang = '$kode_cabang'
