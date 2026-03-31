@@ -409,7 +409,7 @@ class LaporanmarketingController extends Controller
             'marketing_penjualan.status_batal',
             'marketing_penjualan.no_fak_new'
         );
-        $qpenjualan->addSelect(DB::raw('(SELECT SUM(subtotal) FROM marketing_penjualan_detail WHERE no_faktur = marketing_penjualan.no_faktur) as total_bruto'));
+        $qpenjualan->addSelect(DB::raw('(SELECT SUM(subtotal) FROM marketing_penjualan_detail WHERE no_faktur = marketing_penjualan.no_faktur AND status_promosi = "0") as total_bruto'));
 
 
         $qpenjualan->join('produk_harga', 'marketing_penjualan_detail.kode_harga', '=', 'produk_harga.kode_harga');
@@ -430,6 +430,7 @@ class LaporanmarketingController extends Controller
 
         $qpenjualan->whereBetween('marketing_penjualan.tanggal', [$request->dari, $request->sampai]);
         $qpenjualan->where('salesman.kode_cabang', $kode_cabang);
+        $qpenjualan->where('marketing_penjualan_detail.status_promosi', '0');
         if (!empty($request->kode_salesman)) {
             $qpenjualan->where('marketing_penjualan.kode_salesman', $request->kode_salesman);
         }
