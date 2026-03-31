@@ -201,13 +201,14 @@ class LaporangudangcabangController extends Controller
             ->join('produk', 'gudang_cabang_mutasi_detail.kode_produk', '=', 'produk.kode_produk')
             ->join('gudang_cabang_mutasi', 'gudang_cabang_mutasi_detail.no_mutasi', '=', 'gudang_cabang_mutasi.no_mutasi')
             ->leftJoin(DB::raw("(
-                SELECT kode_produk, SUM(jumlah) as total_sales
+                SELECT produk_harga.kode_produk, SUM(jumlah) as total_sales
                 FROM marketing_penjualan_detail
                 INNER JOIN marketing_penjualan ON marketing_penjualan_detail.no_faktur = marketing_penjualan.no_faktur
+                INNER JOIN produk_harga ON marketing_penjualan_detail.kode_harga = produk_harga.kode_harga
                 INNER JOIN salesman ON marketing_penjualan.kode_salesman = salesman.kode_salesman
                 WHERE status_batal = 0 AND status_promosi = '0' AND tanggal >= '$start_date' AND tanggal < '$request->dari'
                 AND salesman.kode_cabang = '$kode_cabang'
-                GROUP BY kode_produk
+                GROUP BY produk_harga.kode_produk
             ) marketing_penjualan_sisa"), 'gudang_cabang_mutasi_detail.kode_produk', '=', 'marketing_penjualan_sisa.kode_produk')
             ->where('gudang_cabang_mutasi.tanggal', '>=', $start_date)
             ->where('gudang_cabang_mutasi.tanggal', '<', $request->dari)
@@ -435,13 +436,14 @@ class LaporangudangcabangController extends Controller
                 FROM gudang_cabang_mutasi_detail
                 INNER JOIN gudang_cabang_mutasi ON gudang_cabang_mutasi_detail.no_mutasi = gudang_cabang_mutasi.no_mutasi
                 LEFT JOIN (
-                    SELECT kode_produk, SUM(jumlah) as total_sales
+                    SELECT produk_harga.kode_produk, SUM(jumlah) as total_sales
                     FROM marketing_penjualan_detail
                     INNER JOIN marketing_penjualan ON marketing_penjualan_detail.no_faktur = marketing_penjualan.no_faktur
+                    INNER JOIN produk_harga ON marketing_penjualan_detail.kode_harga = produk_harga.kode_harga
                     INNER JOIN salesman ON marketing_penjualan.kode_salesman = salesman.kode_salesman
                     WHERE status_batal = 0 AND status_promosi = '0' AND tanggal >= '$start_date' AND tanggal < '$request->dari'
                     AND salesman.kode_cabang = '$kode_cabang'
-                    GROUP BY kode_produk
+                    GROUP BY produk_harga.kode_produk
                 ) marketing_penjualan_sisa ON gudang_cabang_mutasi_detail.kode_produk = marketing_penjualan_sisa.kode_produk
                 WHERE gudang_cabang_mutasi.tanggal >= '$start_date' AND gudang_cabang_mutasi.tanggal < '$request->dari'
                 AND gudang_cabang_mutasi.kode_cabang = '$kode_cabang' AND in_out_good IS NOT NULL
@@ -486,13 +488,14 @@ class LaporangudangcabangController extends Controller
 
         $query->leftJoin(
             DB::raw("(
-                SELECT kode_produk, SUM(jumlah) as penjualan_marketing
+                SELECT produk_harga.kode_produk, SUM(jumlah) as penjualan_marketing
                 FROM marketing_penjualan_detail
                 INNER JOIN marketing_penjualan ON marketing_penjualan_detail.no_faktur = marketing_penjualan.no_faktur
+                INNER JOIN produk_harga ON marketing_penjualan_detail.kode_harga = produk_harga.kode_harga
                 INNER JOIN salesman ON marketing_penjualan.kode_salesman = salesman.kode_salesman
                 WHERE status_batal = 0 AND status_promosi='0' AND tanggal BETWEEN '$request->dari' AND '$request->sampai'
                 AND salesman.kode_cabang = '$kode_cabang'
-                GROUP BY kode_produk
+                GROUP BY produk_harga.kode_produk
             ) pj_marketing"), 'produk.kode_produk', '=', 'pj_marketing.kode_produk'
         );
         $query->where('status_aktif_produk', 1);
