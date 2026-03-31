@@ -121,10 +121,11 @@ class LaporangudangcabangController extends Controller
         $marketing_sales = DB::table('marketing_penjualan_detail')
             ->select(
                 DB::raw("marketing_penjualan.tanggal"),
-                DB::raw("SUM(marketing_penjualan_detail.jumlah) as penjualan")
+                DB::raw("SUM(marketing_penjualan_detail.jumlah) as penjualan")  
             )
             ->join('marketing_penjualan', 'marketing_penjualan_detail.no_faktur', '=', 'marketing_penjualan.no_faktur')
             ->join('produk_harga', 'marketing_penjualan_detail.kode_harga', '=', 'produk_harga.kode_harga')
+            ->join('produk', 'produk_harga.kode_produk', '=', 'produk.kode_produk')
             ->join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
             ->where('produk_harga.kode_produk', $request->kode_produk_gs)
             ->where('salesman.kode_cabang', $kode_cabang)
