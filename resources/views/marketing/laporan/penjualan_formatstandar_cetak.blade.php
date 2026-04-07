@@ -71,6 +71,7 @@
                         <th rowspan="2">Retur</th>
                         <th rowspan="2" class="green">Netto</th> --}}
                         <th rowspan="2" class="green">T/K</th>
+                        <th rowspan="2" class="green">Jenis Bayar</th>
                         <th rowspan="2" class="green">Created</th>
                         <th rowspan="2" class="green">Updated</th>
                         <th rowspan="2" class="green">User</th>
@@ -290,6 +291,7 @@
                                             TUNAI
                                         @endif
                                     </td>
+                                    <td rowspan="{{ count($val) }}" class="center">{{ strtoupper($d->jenis_bayar) }}</td>
                                     <td rowspan="{{ count($val) }}">{{ date('d-m-Y H:i:s', strtotime($d->created_at)) }}</td>
                                     <td rowspan="{{ count($val) }}">{{ date('d-m-Y H:i:s', strtotime($d->updated_at)) }}</td>
                                     <td rowspan="{{ count($val) }}"> {{ $d->nama_user }}</td>
@@ -306,7 +308,7 @@
                         <th class="right"></th>
                         <th class="right">{{ formatAngka($grand_total_ppn_global) }}</th>
                         <th class="right">{{ formatAngka($grand_total_jumlah_global) }}</th>
-                        <th colspan="4"></th>
+                        <th colspan="5"></th>
 
                     </tr>
                 </tfoot>

@@ -407,7 +407,8 @@ class LaporanmarketingController extends Controller
             'marketing_penjualan.updated_at',
             'users.name as nama_user',
             'marketing_penjualan.status_batal',
-            'marketing_penjualan.no_fak_new'
+            'marketing_penjualan.no_fak_new',
+            'marketing_penjualan.jenis_bayar'
         );
         $qpenjualan->addSelect(DB::raw('(SELECT SUM(subtotal) FROM marketing_penjualan_detail WHERE no_faktur = marketing_penjualan.no_faktur AND status_promosi = "0") as total_bruto'));
 
