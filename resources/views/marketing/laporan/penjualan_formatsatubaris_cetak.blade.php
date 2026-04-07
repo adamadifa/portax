@@ -69,6 +69,7 @@
                         <th rowspan="2">PPN</th>
                         <th rowspan="2">Netto</th>
                         <th rowspan="2">T/K</th>
+                        <th rowspan="2">Jenis Bayar</th>
                         <th rowspan="2">TOTAL BAYAR</th>
                         <th rowspan="2">Last Payment</th>
                         <th rowspan="2">KET</th>
@@ -170,6 +171,7 @@
                                     KREDIT
                                 @endif
                             </td>
+                            <td class="center">{{ strtoupper($d->jenis_bayar) }}</td>
                             <td class="right">{{ formatAngka($d->total_bayar) }}</td>
                             <td class="right">{{ formatIndo($d->lastpayment) }}</td>
                             <td style="background-color: {{ $color }}; color:white" class="center">

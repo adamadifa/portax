@@ -633,6 +633,7 @@ class LaporanmarketingController extends Controller
             'potongan',
             'ppn',
             'jenis_transaksi',
+            'marketing_penjualan.jenis_bayar',
             'status',
             'status_batal',
             ...$selectColumnkodeproduk
@@ -700,6 +701,7 @@ class LaporanmarketingController extends Controller
             'potongan',
             'ppn',
             'jenis_transaksi',
+            'marketing_penjualan.jenis_bayar',
             'status',
             'status_batal'
         );
