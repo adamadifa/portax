@@ -1,175 +1,144 @@
 <form action="{{ route('sakasbesar.store') }}" method="POST" id="formSaldoawalkasbesar">
     @csrf
-    <input type="hidden" name="cekgetsaldo" id="cekgetsaldo" value="0">
-    @hasanyrole($roles_show_cabang)
-        <x-select label="Cabang" name="kode_cabang" :data="$cabang" key="kode_cabang" textShow="nama_cabang" select2="select2Kodecabang"
-            upperCase="true" />
-    @endhasanyrole
-    <div class="form-group mb-3">
-        <select name="bulan" id="bulan" class="form-select">
-            <option value="">Bulan</option>
-            @foreach ($list_bulan as $d)
-                <option value="{{ $d['kode_bulan'] }}">{{ $d['nama_bulan'] }}</option>
-            @endforeach
-        </select>
+    
+    <style>
+         .select2-container .select2-selection--single {
+            height: 46px !important;
+            padding: 10px 12px !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 0.5rem !important;
+            background-color: #fff !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: normal !important;
+            padding-left: 0 !important;
+            color: #1e293b !important;
+            font-size: 0.875rem !important;
+            flex-grow: 1 !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 44px !important;
+            top: 1px !important;
+            right: 8px !important;
+        }
+    </style>
+
+    <!-- Header -->
+    <div class="border-b border-slate-200 pb-3 mb-3 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-slate-800">Buat Saldo Awal Kas Besar</h3>
+        <button type="button" class="text-slate-400 hover:text-slate-600 transition-colors" onclick="closeTailwindModal()">
+            <i class="fas fa-times text-xl"></i>
+        </button>
     </div>
-    <div class="form-group mb-3">
-        <select name="tahun" id="tahun" class="form-select">
-            <option value="">Tahun</option>
-            @for ($t = $start_year; $t <= date('Y'); $t++)
-                <option value="{{ $t }}">{{ $t }}</option>
-            @endfor
-        </select>
+
+    <div class="grid grid-cols-1 gap-4">
+        <!-- Cabang (Conditional) -->
+        @hasanyrole($roles_show_cabang)
+        <div class="relative">
+            <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Cabang <span class="text-red-500">*</span></label>
+            <select name="kode_cabang" id="kode_cabang" class="w-full select2 transition-all">
+                <option value="">Pilih Cabang</option>
+                @foreach ($cabang as $d)
+                    <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
+                @endforeach
+            </select>
+        </div>
+        @endhasanyrole
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Bulan -->
+            <div class="relative">
+                <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Bulan <span class="text-red-500">*</span></label>
+                <select name="bulan" id="bulan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none">
+                    <option value="">Pilih Bulan</option>
+                    @foreach ($list_bulan as $d)
+                        <option value="{{ $d['kode_bulan'] }}">{{ $d['nama_bulan'] }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Tahun -->
+            <div class="relative">
+                <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Tahun <span class="text-red-500">*</span></label>
+                <select name="tahun" id="tahun" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none">
+                    <option value="">Pilih Tahun</option>
+                    @for ($t = $start_year; $t <= date('Y'); $t++)
+                        <option value="{{ $t }}">{{ $t }}</option>
+                    @endfor
+                </select>
+            </div>
+        </div>
+
+        <!-- Jumlah Saldo -->
+        <div class="relative">
+            <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Jumlah Saldo <span class="text-red-500">*</span></label>
+            <input type="text" name="jumlah_saldo" id="jumlah_saldo"
+                class="money w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-right text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors"
+                placeholder="0">
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
+                <i class="ti ti-moneybag"></i>
+            </div>
+        </div>
     </div>
-    <div class="form-group mb-3">
-        <a class="btn btn-success w-100" href="#" id="getSaldo"><i class="ti ti-moneybag me-1"></i>Get Saldo</a>
-    </div>
-    <x-input-with-icon label="Uang Kertas" name="uang_kertas" align="right" money="true" icon="ti ti-moneybag" readonly />
-    <x-input-with-icon label="Uang Logam" name="uang_logam" align="right" money="true" icon="ti ti-moneybag" readonly />
-    <x-input-with-icon label="Transfer" name="transfer" align="right" money="true" icon="ti ti-moneybag" readonly />
-    <x-input-with-icon label="Giro" name="giro" align="right" money="true" icon="ti ti-moneybag" readonly />
-    <div class="form-group mb-3">
-        <button class="btn btn-primary w-100" id="btnSimpan"><i class="ti ti-send me-1"></i>Submit</button>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-end pt-3 border-t border-slate-100 mt-3 gap-2">
+        <button type="button" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors" onclick="closeTailwindModal()">Batal</button>
+        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-[#003d9e] hover:bg-blue-800 rounded-lg shadow-sm shadow-blue-200 transition-colors flex items-center gap-2">
+            <i class="fas fa-save"></i>
+            <span>Simpan Data</span>
+        </button>
     </div>
 </form>
+
 <script>
     $(function() {
-        const form = $("#formSaldoawalkasbesar");
-        $(".flatpickr-date").flatpickr();
+        $(".select2").select2({
+            dropdownParent: $('#tailwindModal'),
+            placeholder: 'Pilih Cabang',
+            allowClear: true
+        });
         $(".money").maskMoney();
+        
+        $("#formSaldoawalkasbesar").submit(function(e) {
+            let isValid = true;
+            // Reset errors
+            $("#formSaldoawalkasbesar .error-message").remove();
+            $("#formSaldoawalkasbesar input, #formSaldoawalkasbesar select").removeClass("!border-red-500 invalid-border").addClass("border-slate-300");
 
-        function convertToRupiah(number) {
-            if (number) {
-                var rupiah = "";
-                var numberrev = number
-                    .toString()
-                    .split("")
-                    .reverse()
-                    .join("");
-                for (var i = 0; i < numberrev.length; i++)
-                    if (i % 3 == 0) rupiah += numberrev.substr(i, 3) + ".";
-                return (
-                    rupiah
-                    .split("", rupiah.length - 1)
-                    .reverse()
-                    .join("")
-                );
-            } else {
-                return number;
+            function showError(field, message) {
+                $(field).removeClass("border-slate-300").addClass("!border-red-500 invalid-border");
+                let wrapper = $(field).closest('.relative');
+                if (wrapper.find('.error-message').length === 0) {
+                     wrapper.append(`<p class="text-red-500 text-[10px] mt-1 error-message font-medium"><i class="fas fa-exclamation-circle"></i> ${message}</p>`);
+                }
+                isValid = false;
             }
-        }
 
-        function buttonDisable() {
-            $("#btnSimpan, #getSaldo").prop('disabled', true);
-            $("#btnSimpan, #getSaldo").html(`
-            <div class="spinner-border spinner-border-sm text-white me-2" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            Loading..`);
-        }
+            @hasanyrole($roles_show_cabang)
+            let kode_cabang = $("#formSaldoawalkasbesar select[name='kode_cabang']");
+            if (kode_cabang.val() == "") showError(kode_cabang, "Pilih Cabang");
+            @endhasanyrole
 
-        function buttonEnable() {
-            $("#btnSimpan,#getSaldo").prop('disabled', false);
-            $("#btnSimpan").html(`<i class="ti ti-send me-1"></i>Submit`);
-            $("#getSaldo").html(`<i class="ti ti-moneybag me-1"></i>Get Saldo`);
-        }
-        const select2Kodecabang = $('.select2Kodecabang');
-        if (select2Kodecabang.length) {
-            select2Kodecabang.each(function() {
-                var $this = $(this);
-                $this.wrap('<div class="position-relative"></div>').select2({
-                    placeholder: 'Pilih  Cabang',
-                    allowClear: true,
-                    dropdownParent: $this.parent()
-                });
-            });
-        }
+            let bulan = $("#formSaldoawalkasbesar select[name='bulan']");
+            if (bulan.val() == "") showError(bulan, "Pilih Bulan");
 
-        function getsaldo() {
-            const kode_cabang = form.find("#kode_cabang").val();
-            const bulan = form.find("#bulan").val();
-            const tahun = form.find("#tahun").val();
-            if (kode_cabang == "") {
-                Swal.fire({
-                    title: "Oops!",
-                    text: "Cabang Harus Diisi !",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    didClose: (e) => {
-                        form.find("#kode_cabang").focus();
-                    },
-                });
-                return false;
-            } else if (bulan == "") {
-                Swal.fire({
-                    title: "Oops!",
-                    text: "Bulan Harus Diisi !",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    didClose: (e) => {
-                        form.find("#bulan").focus();
-                    },
-                });
-                return false;
-            } else if (tahun == "") {
-                Swal.fire({
-                    title: "Oops!",
-                    text: "Tahun Harus Diisi !",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    didClose: (e) => {
-                        form.find("#tahun").focus();
-                    },
-                });
-                return false;
-            } else {
-                buttonDisable();
-                form.find("#cekgetsaldo").val(1);
-                $.ajax({
-                    type: 'POST',
-                    url: '/sakasbesar/getsaldo',
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        bulan: bulan,
-                        tahun: tahun,
-                        kode_cabang: kode_cabang
-                    },
-                    cache: false,
-                    success: function(response) {
-                        form.find("#uang_kertas").val(convertToRupiah(response.data.uang_kertas));
-                        form.find("#uang_logam").val(convertToRupiah(response.data.uang_logam));
-                        form.find("#transfer").val(convertToRupiah(response.data.transfer));
-                        form.find("#giro").val(convertToRupiah(response.data.giro));
-                        buttonEnable();
-                    }
-                });
-            }
-        }
+            let tahun = $("#formSaldoawalkasbesar select[name='tahun']");
+            if (tahun.val() == "") showError(tahun, "Pilih Tahun");
 
-        $("#getSaldo").click(function(e) {
-            getsaldo();
+            let jumlah_saldo = $("#formSaldoawalkasbesar input[name='jumlah_saldo']");
+            if (jumlah_saldo.val() == "" || jumlah_saldo.val() == "0") showError(jumlah_saldo, "Jumlah Saldo harus diisi");
+
+            if (!isValid) e.preventDefault();
         });
 
-        form.find("#kode_cabang,#bulan,#tahun").change(function() {
-            form.find("#cekgetsaldo").val(0);
-        });
-
-        form.submit(function() {
-            const cekgetsaldo = form.find("#cekgetsaldo").val();
-            if (cekgetsaldo === '0') {
-                Swal.fire({
-                    title: "Oops!",
-                    text: "Silahkan Get Saldo Terlebih Dahulu !",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    didClose: (e) => {
-                        form.find("#getsaldo").focus();
-                    },
-                });
-                return false;
-            } else {
-                buttonDisable();
-            }
+        $("#formSaldoawalkasbesar input, #formSaldoawalkasbesar select").on('input change', function() {
+            $(this).removeClass("!border-red-500 invalid-border").addClass("border-slate-300");
+            $(this).closest('.relative').find('.error-message').remove();
         });
     });
 </script>

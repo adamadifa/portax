@@ -115,7 +115,7 @@
                 </tr>
             </thead>
             @php
-                $saldo_awal_val = $saldo_awal ? ($saldo_awal->uang_kertas + $saldo_awal->uang_logam + $saldo_awal->giro + $saldo_awal->transfer) : 0;
+                $saldo_awal_val = $saldo_awal ? $saldo_awal->jumlah_saldo : 0;
                 $saldo = $saldo_awal_val;
             @endphp
             <tbody>
@@ -130,6 +130,19 @@
                         $total_bank_pengeluaran[$bank->kode_bank] = 0;
                     }
                 @endphp
+                {{-- Saldo Awal Row --}}
+                <tr style="background-color: #f8fafc; font-weight: bold;">
+                    <td class="text-center">#</td>
+                    <td colspan="4" class="text-left">SALDO AWAL</td>
+                    @if (count($list_bank_pengeluaran) > 0)
+                        @foreach ($list_bank_pengeluaran as $bank)
+                            <td></td>
+                        @endforeach
+                    @else
+                        <td></td>
+                    @endif
+                    <td class="text-right">{{ formatAngka($saldo_awal_val) }}</td>
+                </tr>
                 @foreach ($saldokasbesar as $d)
                     @php
                         $total_harian_penerimaan = $d->penerimaan_tunai + $d->penerimaan_giro + $d->penerimaan_transfer;
