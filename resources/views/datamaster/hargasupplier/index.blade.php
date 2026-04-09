@@ -17,7 +17,7 @@
     </div>
 
     <!-- Content Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden max-w-5xl">
         <!-- Search & Filter / Toolbar -->
         <div class="p-4 border-b border-slate-100 bg-slate-50/50">
             @if (Session::get('success'))
