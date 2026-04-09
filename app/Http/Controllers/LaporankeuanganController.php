@@ -190,188 +190,87 @@ class LaporankeuanganController extends Controller
             $kode_cabang = $request->kode_cabang_saldokasbesar;
         }
 
-        $setoran_dari = $request->tahun . "-" . $request->bulan . "-01";
-        $setoran_sampai = date('Y-m-t', strtotime($setoran_dari));
-        $tgl_akhir_setoran = $setoran_sampai;
-        $tgl_awal_setoran = $setoran_dari;
-
-        $nextbulan = getbulandantahunberikutnya($request->bulan, $request->tahun, "bulan");
-        $nexttahun = getbulandantahunberikutnya($request->bulan, $request->tahun, "tahun");
-
-        $lastbulan = getbulandantahunlalu($request->bulan, $request->tahun, "bulan");
-        $lasttahun = getbulandantahunlalu($request->bulan, $request->tahun, "tahun");
-
-
-        //Jika Ada Setoran Omset Bulan Ini yang disetorkan di Bulan Berikutnya
-        $ceksetordibulanberikutnya = Setoranpusat::where('omset_bulan', $request->bulan)->where('omset_tahun', $request->tahun)
-            ->select('keuangan_ledger.tanggal as tanggal')
-            ->leftJoin('keuangan_ledger_setoranpusat', 'keuangan_setoranpusat.kode_setoran', '=', 'keuangan_ledger_setoranpusat.kode_setoran')
-            ->leftJoin('keuangan_ledger', 'keuangan_ledger_setoranpusat.no_bukti', '=', 'keuangan_ledger.no_bukti')
-            ->whereRaw('MONTH(keuangan_ledger.tanggal) = ' . $nextbulan)
-            ->whereRaw('YEAR(keuangan_ledger.tanggal) = ' . $nexttahun)
-            ->where('kode_cabang', $kode_cabang)
-            ->orderBy('keuangan_ledger.tanggal', 'desc')
-            ->first();
-
-        if ($ceksetordibulanberikutnya) {
-            $setoran_sampai = $ceksetordibulanberikutnya->tanggal;
-        }
-
-
-        //Jika Ada Setoran Omset Bulan Ini yang disetorkan di Bulan Lalu
-        $ceksetordibulanlalu = Setoranpusat::where('omset_bulan', $request->bulan)->where('omset_tahun', $request->tahun)
-            ->select('keuangan_ledger.tanggal as tanggal')
-            ->leftJoin('keuangan_ledger_setoranpusat', 'keuangan_setoranpusat.kode_setoran', '=', 'keuangan_ledger_setoranpusat.kode_setoran')
-            ->leftJoin('keuangan_ledger', 'keuangan_ledger_setoranpusat.no_bukti', '=', 'keuangan_ledger.no_bukti')
-            ->whereRaw('MONTH(keuangan_ledger.tanggal) = ' . $lastbulan)
-            ->whereRaw('YEAR(keuangan_ledger.tanggal) = ' . $lasttahun)
-            ->where('kode_cabang', $kode_cabang)
-            ->orderBy('keuangan_ledger.tanggal', 'desc')
-            ->first();
-
-        if ($ceksetordibulanlalu) {
-            $setoran_dari = $ceksetordibulanlalu->tanggal;
-        }
+        $dari = $request->tahun . "-" . $request->bulan . "-01";
+        $sampai = date('Y-m-t', strtotime($dari));
 
         $data['saldo_awal'] = Saldoawalkasbesar::where('kode_cabang', $kode_cabang)
             ->where('bulan', $request->bulan)
             ->where('tahun', $request->tahun)
             ->first();
 
+        // List Bank yang ada transaksinya untuk kategori Pengeluaran (PCB)
+        $list_bank_pengeluaran = DB::table('keuangan_ledger')
+            ->select('keuangan_ledger.kode_bank', 'bank.nama_bank')
+            ->join('coa', 'keuangan_ledger.kode_akun', '=', 'coa.kode_akun')
+            ->join('bank', 'keuangan_ledger.kode_bank', '=', 'bank.kode_bank')
+            ->where('coa.kode_transaksi', 'PCB')
+            ->where('coa.kode_cabang_coa', $kode_cabang)
+            ->whereBetween('keuangan_ledger.tanggal', [$dari, $sampai])
+            ->groupBy('keuangan_ledger.kode_bank', 'bank.nama_bank')
+            ->orderBy('bank.nama_bank')
+            ->get();
 
-        $q_lhp = Setoranpenjualan::select(
-            'keuangan_setoranpenjualan.tanggal as tanggal',
-            DB::raw("SUM(setoran_kertas) as lhp_kertas"),
-            DB::raw("SUM(setoran_logam) as lhp_logam"),
-            DB::raw("SUM(setoran_giro) as lhp_giro"),
-            DB::raw("SUM(setoran_transfer) as lhp_transfer"),
-            DB::raw("SUM(setoran_lainnya) as lhp_lainnya"),
-            DB::raw("SUM(giro_to_cash) as lhp_giro_to_cash"),
-            DB::raw("SUM(giro_to_transfer) as lhp_giro_to_transfer"),
-            DB::raw("0 as kurang_logam"),
-            DB::raw("0 as kurang_kertas"),
-            DB::raw("0 as lebih_logam"),
-            DB::raw("0 as lebih_kertas"),
-            DB::raw("0 as setoran_kertas"),
-            DB::raw("0 as setoran_logam"),
-            DB::raw("0 as setoran_giro"),
-            DB::raw("0 as setoran_transfer"),
-            DB::raw("0 as setoran_lainnya"),
-            DB::raw("0 as logamtokertas")
-        )
-            ->join('salesman', 'keuangan_setoranpenjualan.kode_salesman', '=', 'salesman.kode_salesman')
-            ->whereBetween('keuangan_setoranpenjualan.tanggal', [$tgl_awal_setoran, $tgl_akhir_setoran])
+        // Penerimaan dari marketing_penjualan_historibayar
+        $penerimaan = DB::table('marketing_penjualan_historibayar')
+            ->select(
+                'marketing_penjualan_historibayar.tanggal',
+                DB::raw("SUM(IF(jenis_bayar='TN', jumlah, 0)) as penerimaan_tunai"),
+                DB::raw("SUM(IF(jenis_bayar='GR', jumlah, 0)) as penerimaan_giro"),
+                DB::raw("SUM(IF(jenis_bayar='TR', jumlah, 0)) as penerimaan_transfer")
+            )
+            ->join('salesman', 'marketing_penjualan_historibayar.kode_salesman', '=', 'salesman.kode_salesman')
             ->where('salesman.kode_cabang', $kode_cabang)
-            ->groupBy('keuangan_setoranpenjualan.tanggal');
+            ->whereBetween('marketing_penjualan_historibayar.tanggal', [$dari, $sampai])
+            ->groupBy('marketing_penjualan_historibayar.tanggal')
+            ->get();
 
+        // Pengeluaran dari ledger dengan kode_transaksi PCB
+        $pengeluaran_query = DB::table('keuangan_ledger')
+            ->select(
+                'keuangan_ledger.tanggal',
+                'keuangan_ledger.kode_bank',
+                'keuangan_ledger.jumlah'
+            )
+            ->join('coa', 'keuangan_ledger.kode_akun', '=', 'coa.kode_akun')
+            ->where('coa.kode_transaksi', 'PCB')
+            ->where('coa.kode_cabang_coa', $kode_cabang)
+            ->whereBetween('keuangan_ledger.tanggal', [$dari, $sampai])
+            ->get();
 
+        // Grouping pengeluaran by date and bank
+        $pengeluaran_grouped = $pengeluaran_query->groupBy('tanggal')->map(function ($items_by_date) {
+            return $items_by_date->groupBy('kode_bank')->map(function ($items_by_bank) {
+                return $items_by_bank->sum('jumlah');
+            });
+        });
 
-        $q_kuranglebihsetor = Kuranglebihsetor::select(
-            'keuangan_kuranglebihsetor.tanggal as tanggal',
-            DB::raw("0 as lhp_kertas"),
-            DB::raw("0 as lhp_logam"),
-            DB::raw("0 as lhp_giro"),
-            DB::raw("0 as lhp_transfer"),
-            DB::raw("0 as lhp_lainnya"),
-            DB::raw("0 as lhp_giro_to_cash"),
-            DB::raw("0 as lhp_giro_to_transfer"),
-            DB::raw("SUM(IF(jenis_bayar='1',uang_logam,0)) as kurang_logam"),
-            DB::raw("SUM(IF(jenis_bayar='1',uang_kertas,0)) as kurang_kertas"),
-            DB::raw("SUM(IF(jenis_bayar='2',uang_logam,0)) as lebih_logam"),
-            DB::raw("SUM(IF(jenis_bayar='2',uang_kertas,0)) as lebih_kertas"),
-            DB::raw("0 as setoran_kertas"),
-            DB::raw("0 as setoran_logam"),
-            DB::raw("0 as setoran_giro"),
-            DB::raw("0 as setoran_transfer"),
-            DB::raw("0 as setoran_lainnya"),
-            DB::raw("0 as logamtokertas")
-        )
-            ->join('salesman', 'keuangan_kuranglebihsetor.kode_salesman', '=', 'salesman.kode_salesman')
-            ->whereBetween('tanggal', [$tgl_awal_setoran, $tgl_akhir_setoran])
-            ->where('salesman.kode_cabang', $kode_cabang)
-            ->groupBy('keuangan_kuranglebihsetor.tanggal');
+        // Merging all together
+        $all_dates = $penerimaan->pluck('tanggal')->merge($pengeluaran_query->pluck('tanggal'))->unique()->sort();
 
-        $q_setoranpusat = Setoranpusat::select(
-            'keuangan_setoranpusat.tanggal as tanggal',
-            DB::raw("0 as lhp_kertas"),
-            DB::raw("0 as lhp_logam"),
-            DB::raw("0 as lhp_giro"),
-            DB::raw("0 as lhp_transfer"),
-            DB::raw("0 as lhp_lainnya"),
-            DB::raw("0 as lhp_giro_to_cash"),
-            DB::raw("0 as lhp_giro_to_transfer"),
-            DB::raw("0 as kurang_logam"),
-            DB::raw("0 as kurang_kertas"),
-            DB::raw("0 as lebih_logam"),
-            DB::raw("0 as lebih_kertas"),
-            DB::raw("SUM(setoran_kertas) as setoran_kertas"),
-            DB::raw("SUM(setoran_logam) as setoran_logam"),
-            DB::raw("SUM(setoran_giro) as setoran_giro"),
-            DB::raw("SUM(setoran_transfer) as setoran_transfer"),
-            DB::raw("SUM(setoran_lainnya) as setoran_lainnya"),
-            DB::raw("0 as logamtokertas")
-        )
-            ->whereBetween('keuangan_setoranpusat.tanggal', [$setoran_dari, $setoran_sampai])
-            ->where('keuangan_setoranpusat.kode_cabang', $kode_cabang)
-            ->where('keuangan_setoranpusat.status', '1')
-            ->where('omset_bulan', $request->bulan)
-            ->where('omset_tahun', $request->tahun)
-            ->groupBy('keuangan_setoranpusat.tanggal');
+        $saldokasbesar = [];
+        foreach ($all_dates as $tanggal) {
+            $p = $penerimaan->where('tanggal', $tanggal)->first();
+            $o = $pengeluaran_grouped->get($tanggal);
 
+            $bank_data = [];
+            foreach ($list_bank_pengeluaran as $bank) {
+                $bank_data[$bank->kode_bank] = $o && isset($o[$bank->kode_bank]) ? $o[$bank->kode_bank] : 0;
+            }
 
-        $q_logamtokertas = Logamtokertas::select(
-            'keuangan_logamtokertas.tanggal',
-            DB::raw("0 as lhp_kertas"),
-            DB::raw("0 as lhp_logam"),
-            DB::raw("0 as lhp_giro"),
-            DB::raw("0 as lhp_transfer"),
-            DB::raw("0 as lhp_lainnya"),
-            DB::raw("0 as lhp_giro_to_cash"),
-            DB::raw("0 as lhp_giro_to_transfer"),
-            DB::raw("0 as kurang_logam"),
-            DB::raw("0 as kurang_kertas"),
-            DB::raw("0 as lebih_logam"),
-            DB::raw("0 as lebih_kertas"),
-            DB::raw("0 as setoran_kertas"),
-            DB::raw("0 as setoran_logam"),
-            DB::raw("0 as setoran_giro"),
-            DB::raw("0 as setoran_transfer"),
-            DB::raw("0 as setoran_lainnya"),
-            DB::raw("SUM(jumlah) as logamtokertas")
-        )
-            ->whereBetween('keuangan_logamtokertas.tanggal', [$setoran_dari, $tgl_akhir_setoran])
-            ->where('keuangan_logamtokertas.kode_cabang', $kode_cabang)
-            ->groupBy('keuangan_logamtokertas.tanggal');
+            $saldokasbesar[] = (object) [
+                'tanggal' => $tanggal,
+                'penerimaan_tunai' => $p ? $p->penerimaan_tunai : 0,
+                'penerimaan_giro' => $p ? $p->penerimaan_giro : 0,
+                'penerimaan_transfer' => $p ? $p->penerimaan_transfer : 0,
+                'pengeluaran_banks' => $bank_data
+            ];
+        }
 
-        $unionquery = $q_lhp->unionAll($q_kuranglebihsetor)->unionAll($q_setoranpusat)->unionAll($q_logamtokertas)->get();
+        $data['list_bank_pengeluaran'] = $list_bank_pengeluaran;
+        $data['saldokasbesar'] = $saldokasbesar;
 
-        $data['saldokasbesar'] = $unionquery->groupBy('tanggal')
-            ->map(function ($item) {
-                return [
-                    'tanggal' => $item->first()->tanggal,
-                    'lhp_kertas' => $item->sum('lhp_kertas'),
-                    'lhp_logam' => $item->sum('lhp_logam'),
-                    'lhp_giro' => $item->sum('lhp_giro'),
-                    'lhp_transfer' => $item->sum('lhp_transfer'),
-                    'lhp_lainnya' => $item->sum('lhp_lainnya'),
-                    'lhp_giro_to_cash' => $item->sum('lhp_giro_to_cash'),
-                    'lhp_giro_to_transfer' => $item->sum('lhp_giro_to_transfer'),
-                    'kurang_logam' => $item->sum('kurang_logam'),
-                    'kurang_kertas' => $item->sum('kurang_kertas'),
-                    'lebih_logam' => $item->sum('lebih_logam'),
-                    'lebih_kertas' => $item->sum('lebih_kertas'),
-                    'setoran_kertas' => $item->sum('setoran_kertas'),
-                    'setoran_logam' => $item->sum('setoran_logam'),
-                    'setoran_giro' => $item->sum('setoran_giro'),
-                    'setoran_transfer' => $item->sum('setoran_transfer'),
-                    'setoran_lainnya' => $item->sum('setoran_lainnya'),
-                    'logamtokertas' => $item->sum('logamtokertas'),
-
-                ];
-            })
-            ->sortBy('tanggal')
-            ->values()
-            ->all();
+        $month_audit = collect(config('global.list_bulan'))->where('kode_bulan', $request->bulan)->first();
+        $data['nama_bulan'] = is_array($month_audit) ? $month_audit['nama_bulan'] : $month_audit->nama_bulan;
         $data['bulan'] = $request->bulan;
         $data['tahun'] = $request->tahun;
         $data['cabang'] = Cabang::where('kode_cabang', $kode_cabang)->first();

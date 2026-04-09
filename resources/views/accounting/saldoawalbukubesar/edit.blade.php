@@ -36,6 +36,10 @@
                                     <th>Tahun</th>
                                     <td>{{ $saldoawalbukubesar->tahun }}</td>
                                 </tr>
+                                <tr>
+                                    <th>Cabang</th>
+                                    <td>{{ $saldoawalbukubesar->nama_cabang }}</td>
+                                </tr>
                             </table>
 
                         </div>

@@ -15,6 +15,7 @@ use App\Models\Ledger;
 use App\Models\Pembelian;
 use App\Models\Penjualan;
 use App\Models\Saldoawalbukubesar;
+use App\Models\Cabang;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -28,6 +29,7 @@ class SaldoawalbukubesarController extends Controller
         $data['nama_bulan'] = config('global.nama_bulan');
         $data['start_year'] = config('global.start_year');
         $query = Saldoawalbukubesar::query();
+        $query->join('cabang', 'bukubesar_saldoawal.kode_cabang', '=', 'cabang.kode_cabang');
         if ($request->has('bulan')) {
             $query->where('bulan', $request->bulan);
         }
@@ -36,8 +38,15 @@ class SaldoawalbukubesarController extends Controller
         } else {
             $query->where('tahun', date('Y'));
         }
+
+        if (!empty($request->kode_cabang)) {
+            $query->where('bukubesar_saldoawal.kode_cabang', $request->kode_cabang);
+        }
+
         $query->orderBy('bulan', 'asc');
         $data['saldoawalbukubesar'] = $query->get();
+        $cabang = new Cabang();
+        $data['cabang'] = $cabang->getCabang();
         return view('accounting.saldoawalbukubesar.index', $data);
     }
 
@@ -49,6 +58,8 @@ class SaldoawalbukubesarController extends Controller
         $data['coa'] = Coa::orderby('kode_akun', 'asc')
             ->whereNotIn('kode_akun', ['1', '0-0000'])
             ->get();
+        $cabang = new Cabang();
+        $data['cabang'] = $cabang->getCabang();
         return view('accounting.saldoawalbukubesar.create', $data);
     }
 
@@ -58,7 +69,8 @@ class SaldoawalbukubesarController extends Controller
         $data['list_bulan'] = config('global.list_bulan');
         $data['start_year'] = config('global.start_year');
         $data['nama_bulan'] = config('global.nama_bulan');
-        $data['saldoawalbukubesar'] = Saldoawalbukubesar::where('kode_saldo_awal', $kode_saldo_awal)->first();
+        $data['saldoawalbukubesar'] = Saldoawalbukubesar::join('cabang', 'bukubesar_saldoawal.kode_cabang', '=', 'cabang.kode_cabang')
+            ->where('kode_saldo_awal', $kode_saldo_awal)->first();
         $data['detailsaldoawalbukubesar'] = Detailsaldoawalbukubesar::join('coa', 'bukubesar_saldoawal_detail.kode_akun', '=', 'coa.kode_akun')->where('bukubesar_saldoawal_detail.kode_saldo_awal', $kode_saldo_awal)->get();
         return view('accounting.saldoawalbukubesar.show', $data);
     }
@@ -69,7 +81,8 @@ class SaldoawalbukubesarController extends Controller
         $data['list_bulan'] = config('global.list_bulan');
         $data['start_year'] = config('global.start_year');
         $data['nama_bulan'] = config('global.nama_bulan');
-        $data['saldoawalbukubesar'] = Saldoawalbukubesar::where('kode_saldo_awal', $kode_saldo_awal)->first();
+        $data['saldoawalbukubesar'] = Saldoawalbukubesar::join('cabang', 'bukubesar_saldoawal.kode_cabang', '=', 'cabang.kode_cabang')
+            ->where('kode_saldo_awal', $kode_saldo_awal)->first();
         $data['detailsaldoawalbukubesar'] = Detailsaldoawalbukubesar::join('coa', 'bukubesar_saldoawal_detail.kode_akun', '=', 'coa.kode_akun')->where('bukubesar_saldoawal_detail.kode_saldo_awal', $kode_saldo_awal)->get();
         $data['coa'] = Coa::orderby('kode_akun', 'asc')
             ->whereNotIn('kode_akun', ['1', '0-0000'])
@@ -82,17 +95,19 @@ class SaldoawalbukubesarController extends Controller
         $request->validate([
             'bulan' => 'required',
             'tahun' => 'required',
+            'kode_cabang' => 'required',
         ]);
 
         DB::beginTransaction();
 
-        $kode_saldo_awal = "SA" . $request->bulan . $request->tahun;
+        $kode_saldo_awal = "SA" . $request->kode_cabang . $request->bulan . $request->tahun;
         try {
             Saldoawalbukubesar::create([
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'tanggal' => $request->tahun . "-" . $request->bulan . "-01",
                 'bulan' => $request->bulan,
                 'tahun' => $request->tahun,
+                'kode_cabang' => $request->kode_cabang,
             ]);
 
             $kode_akun = $request->kode_akun;
@@ -137,11 +152,15 @@ class SaldoawalbukubesarController extends Controller
         }
 
         // Cek apakah saldo bulan sebelumnya sudah ada
-        $cek_saldo_bulan_sebelumnya = Saldoawalbukubesar::where('bulan', $bulan_sebelumnya)
+        $cek_saldo_sebelumnya = Saldoawalbukubesar::where('bulan', $bulan_sebelumnya)
             ->where('tahun', $tahun_sebelumnya)
+            ->where('kode_cabang', $request->kode_cabang)
             ->count();
 
-        if ($cek_saldo_bulan_sebelumnya == 0) {
+        // Cek apakah sudah ada data saldo awal sama sekali untuk cabang ini
+        $cek_data_saldo_awal = Saldoawalbukubesar::where('kode_cabang', $request->kode_cabang)->count();
+
+        if ($cek_saldo_sebelumnya == 0 && $cek_data_saldo_awal > 0) {
             $nama_bulan_sebelumnya = $nama_bulan[$bulan_sebelumnya * 1];
             return response()->json([
                 'success' => false,
@@ -180,6 +199,7 @@ class SaldoawalbukubesarController extends Controller
         );
         $saldoawal->where('bukubesar_saldoawal.bulan', $bulan);
         $saldoawal->where('bukubesar_saldoawal.tahun', $tahun);
+        $saldoawal->where('bukubesar_saldoawal.kode_cabang', $request->kode_cabang);
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
             $saldoawal->whereBetween('bukubesar_saldoawal_detail.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }

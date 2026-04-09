@@ -19,7 +19,18 @@
                     <div class="col-12">
                         <form action="{{ route('saldoawalbukubesar.index') }}">
                             <div class="row">
-                                <div class="col-lg-6 col-sm-12 col-md-12">
+                                <div class="col-lg-4 col-sm-12 col-md-12">
+                                    <div class="form-group mb-3">
+                                        <select name="kode_cabang" id="kode_cabang" class="form-select select2">
+                                            <option value="">Cabang</option>
+                                            @foreach ($cabang as $d)
+                                                <option {{ Request('kode_cabang') == $d->kode_cabang ? 'selected' : '' }}
+                                                    value="{{ $d->kode_cabang }}">{{ $d->nama_cabang }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-sm-12 col-md-12">
                                     <div class="form-group mb-3">
                                         <select name="bulan" id="bulan" class="form-select">
                                             <option value="">Bulan</option>
@@ -30,7 +41,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-lg-4 col-sm-12 col-md-12">
+                                <div class="col-lg-3 col-sm-12 col-md-12">
                                     <div class="form-group mb-3">
                                         <select name="tahun" id="tahun" class="form-select">
                                             <option value="">Tahun</option>
@@ -60,6 +71,7 @@
                                         <th>Kode</th>
                                         <th>Bulan</th>
                                         <th>Tahun</th>
+                                        <th>Cabang</th>
                                         <th>#</th>
                                     </tr>
                                 </thead>
@@ -69,6 +81,7 @@
                                             <td>{{ $d->kode_saldo_awal }}</td>
                                             <td>{{ $nama_bulan[$d->bulan] }}</td>
                                             <td>{{ $d->tahun }}</td>
+                                            <td>{{ $d->nama_cabang }}</td>
                                             <td>
                                                 <div class="d-flex">
                                                     @can('saldoawalbukubesar.show')

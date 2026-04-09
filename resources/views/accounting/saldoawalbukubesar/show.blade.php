@@ -14,6 +14,10 @@
                 <td>{{ $saldoawalbukubesar->tahun }}</td>
             </tr>
             <tr>
+                <th>Cabang</th>
+                <td>{{ $saldoawalbukubesar->nama_cabang }}</td>
+            </tr>
+            <tr>
                 <th>Tanggal</th>
                 <td>{{ date('d-m-Y', strtotime($saldoawalbukubesar->tanggal)) }}</td>
             </tr>

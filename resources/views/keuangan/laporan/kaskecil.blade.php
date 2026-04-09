@@ -1,135 +1,100 @@
-<form action="{{ route('laporankeuangan.cetakkaskecil') }}" id="formKaskecil" target="_blank" method="POST" class="space-y-3">
+<form action="{{ route('laporankeuangan.cetakkaskecil') }}" id="formKaskecil" target="_blank" method="POST"
+    class="space-y-3">
     @csrf
     @php
         $role_admin_pusat = ['admin pusat'];
     @endphp
-    <style>
-        .select2-container .select2-selection--single {
-            height: 46px !important;
-            padding: 10px 12px !important;
-            border: 1px solid #cbd5e1 !important;
-            border-radius: 0.5rem !important;
-            background-color: #fff !important;
-            display: flex !important;
-            align-items: center !important;
-        }
 
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: normal !important;
-            padding-left: 0 !important;
-            color: #1e293b !important;
-            font-size: 0.875rem !important;
-            flex-grow: 1 !important;
-            display: flex !important;
-            align-items: center !important;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 44px !important;
-            top: 1px !important;
-            right: 8px !important;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__placeholder {
-            color: #94a3b8 !important;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__clear {
-            margin-right: 0px !important;
-            font-weight: bold !important;
-            color: #cbd5e1 !important;
-            order: 2 !important;
-            margin-left: auto !important;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__clear:hover {
-            color: #64748b !important;
-        }
-
-        .form-select {
-            border-color: #cbd5e1 !important;
-            border-radius: 0.5rem !important;
-        }
-
-        .form-select:focus {
-            border-color: #003d9e !important;
-            box-shadow: 0 0 0 1px #003d9e !important;
-        }
-
-        .flatpickr-date,
-        .form-control {
-            border: 1px solid #cbd5e1 !important;
-            border-radius: 0.5rem !important;
-            height: 46px !important;
-            padding: 10px 12px !important;
-        }
-
-        .flatpickr-date:focus,
-        .form-control:focus {
-            border-color: #003d9e !important;
-            box-shadow: 0 0 0 1px #003d9e !important;
-            outline: none !important;
-        }
-    </style>
-
-    <div class="space-y-2">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-x-4 gap-y-1">
         @hasanyrole(array_merge($roles_show_cabang, $role_admin_pusat))
-        <div class="relative">
-            <select name="kode_cabang" id="kode_cabang_kaskecil" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodecabangkaskecil">
-                <option value="">Semua Cabang</option>
-                @foreach ($cabang as $d)
-                    <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
-                @endforeach
-            </select>
-        </div>
+            <div class="md:col-span-12 relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10 transition-colors">
+                    <i class="ti ti-building text-slate-400 group-focus-within:text-[#003d9e]"></i>
+                </div>
+                <select name="kode_cabang" id="kode_cabang_kaskecil"
+                    class="w-full pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-4 focus:ring-[#003d9e]/5 transition-all appearance-none select2Kodecabangkaskecil font-medium text-slate-700">
+                    <option value="">Semua Cabang</option>
+                    @foreach ($cabang as $d)
+                        <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
+                    @endforeach
+                </select>
+            </div>
         @endrole
 
-        <div class="relative">
-            <select name="formatlaporan" id="formatlaporan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none form-select">
+        <div class="md:col-span-12 relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                <i class="ti ti-layout-grid text-slate-400"></i>
+            </div>
+            <select name="formatlaporan" id="formatlaporan"
+                class="w-full pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-4 focus:ring-[#003d9e]/5 transition-all appearance-none form-select font-medium text-slate-700">
                 <option value="">Format Laporan</option>
                 <option value="1">Detail</option>
                 <option value="2">Rekap</option>
             </select>
         </div>
 
-        <div class="grid grid-cols-2 gap-4" id="coakaskecil">
+        <div class="md:col-span-12 grid grid-cols-2 gap-4" id="coakaskecil">
             <div class="relative">
-                <select name="kode_akun_dari" id="kode_akun_dari_kaskecil" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodeakundarikaskecil">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                    <i class="ti ti-list text-slate-400"></i>
+                </div>
+                <select name="kode_akun_dari" id="kode_akun_dari_kaskecil"
+                    class="w-full pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-4 focus:ring-[#003d9e]/5 transition-all appearance-none select2Kodeakundarikaskecil font-medium text-slate-700">
                     <option value="">Dari Akun</option>
                     @foreach ($coa as $d)
-                        <option value="{{ $d->kode_akun }}">{{ $d->kode_akun }} {{ truncateText($d->nama_akun) }}</option>
+                        <option value="{{ $d->kode_akun }}">{{ $d->kode_akun }} {{ truncateText($d->nama_akun) }}
+                        </option>
                     @endforeach
                 </select>
             </div>
             <div class="relative">
-                <select name="kode_akun_sampai" id="kode_akun_sampai_kaskecil" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none select2Kodeakunsampaikaskecil">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                    <i class="ti ti-list text-slate-400"></i>
+                </div>
+                <select name="kode_akun_sampai" id="kode_akun_sampai_kaskecil"
+                    class="w-full pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-4 focus:ring-[#003d9e]/5 transition-all appearance-none select2Kodeakunsampaikaskecil font-medium text-slate-700">
                     <option value="">Sampai Akun</option>
                     @foreach ($coa as $d)
-                        <option value="{{ $d->kode_akun }}">{{ $d->kode_akun }} {{ truncateText($d->nama_akun) }}</option>
+                        <option value="{{ $d->kode_akun }}">{{ $d->kode_akun }} {{ truncateText($d->nama_akun) }}
+                        </option>
                     @endforeach
                 </select>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-            <div class="relative">
-                <input type="text" name="dari" id="dari" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Dari Tanggal">
+        <div class="md:col-span-6 relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="ti ti-calendar text-slate-400"></i>
             </div>
-            <div class="relative">
-                <input type="text" name="sampai" id="sampai" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Sampai Tanggal">
+            <input type="text" name="dari" id="dari"
+                class="w-full pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-4 focus:ring-[#003d9e]/5 transition-all font-medium text-slate-700 flatpickr-date"
+                placeholder="Dari Tanggal">
+        </div>
+
+        <div class="md:col-span-6 relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="ti ti-calendar text-slate-400"></i>
             </div>
+            <input type="text" name="sampai" id="sampai"
+                class="w-full pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-4 focus:ring-[#003d9e]/5 transition-all font-medium text-slate-700 flatpickr-date"
+                placeholder="Sampai Tanggal">
         </div>
     </div>
 
-    <div class="row mt-2">
-        <div class="col-lg-10 col-md-12 col-sm-12">
-            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButton" style="background-color: #003d9e; border-color: #003d9e;">
-                <i class="ti ti-printer me-1"></i> Cetak
+    <div class="flex flex-col sm:flex-row gap-3 mt-4">
+        <div class="flex-grow">
+            <button type="submit" name="submitButton"
+                class="w-full h-12 flex items-center justify-center gap-2 bg-[#003d9e] hover:bg-[#002d75] text-white font-bold rounded-xl shadow-lg shadow-blue-900/20 transition-all duration-200 active:scale-95"
+                id="submitButton">
+                <i class="fas fa-print opacity-70"></i>
+                <span class="tracking-wide">Cetak Laporan</span>
             </button>
         </div>
-        <div class="col-lg-2 col-md-12 col-sm-12">
-            <button type="submit" name="exportButton" class="btn btn-success w-100" id="exportButton">
-                <i class="ti ti-download"></i>
+        <div class="w-full sm:w-16">
+            <button type="submit" name="exportButton"
+                class="w-full h-12 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-900/20 transition-all duration-200 active:scale-95"
+                id="exportButton" title="Export Excel">
+                <i class="fas fa-file-excel text-lg"></i>
             </button>
         </div>
     </div>

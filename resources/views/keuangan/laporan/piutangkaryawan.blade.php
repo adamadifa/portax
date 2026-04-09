@@ -1,29 +1,67 @@
-<form action="{{ route('laporankeuangan.cetakpiutangkaryawan') }}" id="formPiutangkaryawan" target="_blank" method="POST">
+<form action="{{ route('laporankeuangan.cetakpiutangkaryawan') }}" id="formPiutangkaryawan" target="_blank" method="POST"
+    class="space-y-3">
     @csrf
-    @hasanyrole($roles_show_cabang)
-        <x-select label="Pilih Cabang" name="kode_cabang_piutangkaryawan" :data="$cabang" key="kode_cabang" textShow="nama_cabang" upperCase="true"
-            select2="select2Kodecabangpiutangkaryawan" />
-        <x-select label="Semua Departemen" name="kode_dept_piutangkaryawan" :data="$departemen" key="kode_dept" textShow="nama_dept" upperCase="true"
-            select2="select2Kodedeptpiutangkaryawan" />
-    @endrole
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-x-4 gap-y-1">
+        @hasanyrole($roles_show_cabang)
+            <div class="md:col-span-12 relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10 transition-colors">
+                    <i class="ti ti-building text-slate-400"></i>
+                </div>
+                <select name="kode_cabang_piutangkaryawan" id="kode_cabang_piutangkaryawan"
+                    class="w-full pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-4 focus:ring-[#003d9e]/5 transition-all appearance-none select2Kodecabangpiutangkaryawan font-medium text-slate-700">
+                    <option value="">Semua Cabang</option>
+                    @foreach ($cabang as $d)
+                        <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="md:col-span-12 relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10 transition-colors">
+                    <i class="ti ti-users text-slate-400"></i>
+                </div>
+                <select name="kode_dept_piutangkaryawan" id="kode_dept_piutangkaryawan"
+                    class="w-full pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-4 focus:ring-[#003d9e]/5 transition-all appearance-none select2Kodedeptpiutangkaryawan font-medium text-slate-700">
+                    <option value="">Semua Departemen</option>
+                    @foreach ($departemen as $d)
+                        <option value="{{ $d->kode_dept }}">{{ textUpperCase($d->nama_dept) }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endrole
 
-    <div class="row">
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Dari" name="dari" datepicker="flatpickr-date" />
+        <div class="md:col-span-6 relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="ti ti-calendar text-slate-400"></i>
+            </div>
+            <input type="text" name="dari" id="dari_piutangkaryawan"
+                class="w-full pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-4 focus:ring-[#003d9e]/5 transition-all font-medium text-slate-700 flatpickr-date"
+                placeholder="Dari Tanggal">
         </div>
-        <div class="col-lg-6 col-md-12 col-sm-12">
-            <x-input-with-icon icon="ti ti-calendar" label="Sampai" name="sampai" datepicker="flatpickr-date" />
+
+        <div class="md:col-span-6 relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="ti ti-calendar text-slate-400"></i>
+            </div>
+            <input type="text" name="sampai" id="sampai_piutangkaryawan"
+                class="w-full pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-4 focus:ring-[#003d9e]/5 transition-all font-medium text-slate-700 flatpickr-date"
+                placeholder="Sampai Tanggal">
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-10 col-md-12 col-sm-12">
-            <button type="submit" name="submitButton" class="btn btn-primary w-100" id="submitButton">
-                <i class="ti ti-printer me-1"></i> Cetak
+
+    <div class="flex flex-col sm:flex-row gap-3 mt-4">
+        <div class="flex-grow">
+            <button type="submit" name="submitButton"
+                class="w-full h-12 flex items-center justify-center gap-2 bg-[#003d9e] hover:bg-[#002d75] text-white font-bold rounded-xl shadow-lg shadow-blue-900/20 transition-all duration-200 active:scale-95"
+                id="submitButton">
+                <i class="fas fa-print opacity-70"></i>
+                <span class="tracking-wide">Cetak Laporan</span>
             </button>
         </div>
-        <div class="col-lg-2 col-md-12 col-sm-12">
-            <button type="submit" name="exportButton" class="btn btn-success w-100" id="exportButton">
-                <i class="ti ti-download"></i>
+        <div class="w-full sm:w-16">
+            <button type="submit" name="exportButton"
+                class="w-full h-12 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-900/20 transition-all duration-200 active:scale-95"
+                id="exportButton" title="Export Excel">
+                <i class="fas fa-file-excel text-lg"></i>
             </button>
         </div>
     </div>
@@ -44,12 +82,21 @@
                 });
             }
 
-
+            const select2Kodedeptpiutangkaryawan = $(".select2Kodedeptpiutangkaryawan");
+            if (select2Kodedeptpiutangkaryawan.length) {
+                select2Kodedeptpiutangkaryawan.each(function() {
+                    var $this = $(this);
+                    $this.wrap('<div class="position-relative"></div>').select2({
+                        placeholder: 'Semua Departemen',
+                        allowClear: true,
+                        dropdownParent: $this.parent()
+                    });
+                });
+            }
 
             formPiutangkaryawan.submit(function(e) {
-                const kode_cabang = formPiutangkaryawan.find('#kode_cabang_piutangkaryawan').val();
-                const dari = formPiutangkaryawan.find('#dari').val();
-                const sampai = formPiutangkaryawan.find('#sampai').val();
+                const dari = formPiutangkaryawan.find('#dari_piutangkaryawan').val();
+                const sampai = formPiutangkaryawan.find('#sampai_piutangkaryawan').val();
                 const start = new Date(dari);
                 const end = new Date(sampai);
                 if (dari == "") {
@@ -59,7 +106,7 @@
                         icon: "warning",
                         showConfirmButton: true,
                         didClose: (e) => {
-                            $(this).find("#dari").focus();
+                            formPiutangkaryawan.find("#dari_piutangkaryawan").focus();
                         },
                     });
                     return false;
@@ -70,7 +117,7 @@
                         icon: "warning",
                         showConfirmButton: true,
                         didClose: (e) => {
-                            $(this).find("#sampai").focus();
+                            formPiutangkaryawan.find("#sampai_piutangkaryawan").focus();
                         },
                     });
                     return false;
@@ -81,7 +128,7 @@
                         icon: "warning",
                         showConfirmButton: true,
                         didClose: (e) => {
-                            $(this).find("#sampai").focus();
+                            formPiutangkaryawan.find("#sampai_piutangkaryawan").focus();
                         },
                     });
                     return false;

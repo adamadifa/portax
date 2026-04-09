@@ -24,6 +24,14 @@
                         <div class="col-12">
                             <div class="row">
                                 <div class="form-group mb-3">
+                                    <select name="kode_cabang" id="kode_cabang" class="form-select select2">
+                                        <option value="">Cabang</option>
+                                        @foreach ($cabang as $d)
+                                            <option value="{{ $d->kode_cabang }}">{{ $d->nama_cabang }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
                                     <select name="bulan" id="bulan" class="form-select">
                                         <option value="">Bulan</option>
                                         @foreach ($list_bulan as $d)
@@ -207,11 +215,13 @@
                 data: {
                     _token: "{{ csrf_token() }}",
                     bulan: bulan,
-                    tahun: tahun
+                    tahun: tahun,
+                    kode_cabang: $("#kode_cabang").val()
                 },
                 cache: false,
                 success: function(respond) {
                     $("#loaddetailsaldo").html(respond);
+                    $(".money").maskMoney();
                 },
                 error: function(xhr, status, error) {
                     let errorMessage = 'Terjadi kesalahan saat mengambil saldo!';
@@ -251,15 +261,16 @@
     $(document).on('submit', '#formCreatesaldoawal', function(e) {
         let bulan = $("#bulan").val();
         let tahun = $("#tahun").val();
+        let kode_cabang = $("#kode_cabang").val();
         let jmldata = $("#loaddetailsaldo tr").length;
-        if (bulan == "" || tahun == "") {
+        if (bulan == "" || tahun == "" || kode_cabang == "") {
             Swal.fire({
                 title: "Oops!",
-                text: 'Bulan dan Tahun Harus Diisi !',
+                text: 'Cabang, Bulan dan Tahun Harus Diisi !',
                 icon: "warning",
                 showConfirmButton: true,
                 didClose: (e) => {
-                    $("#bulan").focus();
+                    $("#kode_cabang").focus();
                 },
             });
             return false;

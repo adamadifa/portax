@@ -88,21 +88,14 @@
                     {{ $d->kode_akun }} {{ $d->nama_akun }}
                 @endif
                 <input type="hidden" name="kode_akun[]" value="{{ $d->kode_akun }}">
-                <input type="hidden" name="jumlah[]" value="{{ $d->saldo_akhir }}">
-                {{-- {{ $d->saldo_akhir . '+' . $net_profit_loss }} --}}
-                {{-- {{ $d->level }} - {{ $next_level }} --}}
             </td>
             <td style="text-align: right;">
-                {{--
-                                    Variabel $laba_rugi undefined karena di Blade, assignment variabel dengan @if ... @else ... @endif tidak akan menyimpan nilai ke variabel PHP seperti di kode biasa.
-                                    Solusi: gunakan @php ... @endphp untuk assignment, lalu tampilkan nilainya.
-                                --}}
-
-
-                @if ($d->level == 0 || $d->level == 1)
+                @if ($d->level == 0 || $d->level == 1 || $d->level == 2)
                     <b>{{ formatAngka($saldo_akhir) }}</b>
+                    <input type="hidden" name="jumlah[]" value="{{ $saldo_akhir }}">
                 @else
-                    {{ formatAngka($saldo_akhir) }}
+                    <input type="text" name="jumlah[]" value="{{ formatAngka($saldo_akhir) }}" 
+                        class="form-control text-end money" style="height: 30px;">
                 @endif
             </td>
         </tr>
