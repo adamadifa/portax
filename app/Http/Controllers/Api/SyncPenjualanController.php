@@ -85,7 +85,7 @@ class SyncPenjualanController extends Controller
 
                 // Historibayar (optional array)
                 'historibayar' => 'nullable|array',
-                'historibayar.*.no_bukti' => 'required|string|max:20', 
+                'historibayar.*.no_bukti' => 'required|string|max:20',
                 'historibayar.*.tanggal' => 'required|date',
                 'historibayar.*.kode_salesman' => 'nullable|string|max:7',
                 'historibayar.*.jenis_bayar' => 'required|string|max:2',
@@ -125,7 +125,7 @@ class SyncPenjualanController extends Controller
                 if (!isset($salesmanData['kode_cabang'])) {
                     $salesmanData['kode_cabang'] = $kode_cabang;
                 }
-                
+
                 // Filter columns to prevent "Column not found" error
                 $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('salesman');
                 $filteredData = array_intersect_key($salesmanData, array_flip($tableColumns));
@@ -154,25 +154,25 @@ class SyncPenjualanController extends Controller
 
             // Get Salesman for Auto Numbering
             $salesman = Salesman::join('cabang', 'salesman.kode_cabang', '=', 'cabang.kode_cabang')
-            ->where('kode_salesman', $request->kode_salesman)->first();
+                ->where('kode_salesman', $request->kode_salesman)->first();
             $no_fak_new = null;
             if ($salesman) {
                 $tahun = date('y', strtotime($request->tanggal));
                 $thn = date('Y', strtotime($request->tanggal));
                 $start_date = "2024-03-01";
-                
+
                 if ($request->tanggal >= '2024-03-01' && $salesman->kode_cabang != "PST") {
-                      $lastransaksi = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
-                            ->where('tanggal', '>=', $start_date)
-                            ->whereRaw('MID(no_fak_new,6,1)="' . $salesman->kode_sales . '"')
-                            ->where('salesman.kode_cabang', $salesman->kode_cabang)
-                            ->whereRaw('YEAR(tanggal)="' . $thn . '"')
-                            ->whereRaw('LEFT(no_fak_new,3)="' . $salesman->kode_pt . '"')
-                            ->orderBy('no_fak_new', 'desc')
-                            ->first();
-                      
-                      $last_no_fak_new = $lastransaksi != NULL ? $lastransaksi->no_fak_new : "";
-                      $no_fak_new = buatkode($last_no_fak_new, $salesman->kode_pt . $tahun . $salesman->kode_sales, 6);
+                    $lastransaksi = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
+                        ->where('tanggal', '>=', $start_date)
+                        ->whereRaw('MID(no_fak_new,6,1)="' . $salesman->kode_sales . '"')
+                        ->where('salesman.kode_cabang', $salesman->kode_cabang)
+                        ->whereRaw('YEAR(tanggal)="' . $thn . '"')
+                        ->whereRaw('LEFT(no_fak_new,3)="' . $salesman->kode_pt . '"')
+                        ->orderBy('no_fak_new', 'desc')
+                        ->first();
+
+                    $last_no_fak_new = $lastransaksi != NULL ? $lastransaksi->no_fak_new : "";
+                    $no_fak_new = buatkode($last_no_fak_new, $salesman->kode_pt . $tahun . $salesman->kode_sales, 6);
                 }
             }
 
@@ -217,7 +217,7 @@ class SyncPenjualanController extends Controller
 
             // 1. Header: Upsert
             //$penjualanData already prepared above
-            
+
             // Remove unneeded fields for update check
             $updateData = $penjualanData;
             unset($updateData['no_faktur']); // Don't update the key itself
@@ -229,7 +229,7 @@ class SyncPenjualanController extends Controller
             // Let's assume we keep existing no_fak_new if it exists, or update if we really want to sync it from client (but client doesn't seem to send no_fak_new).
             // Actually, the code generates no_fak_new. If updating, we probably shouldn't regenerate it if it's already there, or maybe we accept it doesn't change.
             // But lets follow "updateOrCreate".
-            
+
             $penjualan = Penjualan::updateOrCreate(
                 ['no_faktur' => $request->no_faktur],
                 $penjualanData
@@ -237,7 +237,7 @@ class SyncPenjualanController extends Controller
 
             // 2. Detail: Replace
             Detailpenjualan::where('no_faktur', $request->no_faktur)->delete();
-            
+
             $detailCount = 0;
             foreach ($request->detail as $detail) {
                 Detailpenjualan::create([
@@ -293,7 +293,7 @@ class SyncPenjualanController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal sync data penjualan',
+                'message' => 'Gagal sync data penjualan' + $e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -348,7 +348,7 @@ class SyncPenjualanController extends Controller
                 'data.*.jenis_bayar' => 'required|string|max:2',
                 'data.*.status' => 'required|string|max:1',
                 // 'data.*.id_user' => 'required|integer',
-                
+
                 // Data Master Optional Batch
                 'data.*.salesman' => 'nullable|array',
                 'data.*.pelanggan' => 'nullable|array',
@@ -370,8 +370,8 @@ class SyncPenjualanController extends Controller
             // Get User once (Super Admin ID 1)
             $id_user = 1;
             $user = User::find($id_user);
-            if(!$user) {
-                 return response()->json([
+            if (!$user) {
+                return response()->json([
                     'success' => false,
                     'message' => 'Super Admin (ID 1) tidak ditemukan'
                 ], 404);
@@ -437,25 +437,25 @@ class SyncPenjualanController extends Controller
                     // Auto Numbering Logic
                     // Since old records are committed-deleted, query sees clean state
                     $no_fak_new = null;
-                    
+
                     $salesmanBatch = Salesman::join('cabang', 'salesman.kode_cabang', '=', 'cabang.kode_cabang')
                         ->where('kode_salesman', $penjualanData['kode_salesman'])->first();
-                        
+
                     if ($salesmanBatch) {
                         $tahun = date('y', strtotime($penjualanData['tanggal']));
                         $thn = date('Y', strtotime($penjualanData['tanggal']));
                         $start_date = "2024-03-01";
-                        
+
                         if ($penjualanData['tanggal'] >= '2024-03-01' && $salesmanBatch->kode_cabang != "PST") {
                             $lastransaksi = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
-                                    ->where('tanggal', '>=', $start_date)
-                                    ->whereRaw('MID(no_fak_new,6,1)="' . $salesmanBatch->kode_sales . '"')
-                                    ->where('salesman.kode_cabang', $salesmanBatch->kode_cabang)
-                                    ->whereRaw('YEAR(tanggal)="' . $thn . '"')
-                                    ->whereRaw('LEFT(no_fak_new,3)="' . $salesmanBatch->kode_pt . '"')
-                                    ->orderBy('no_fak_new', 'desc')
-                                    ->first();
-                            
+                                ->where('tanggal', '>=', $start_date)
+                                ->whereRaw('MID(no_fak_new,6,1)="' . $salesmanBatch->kode_sales . '"')
+                                ->where('salesman.kode_cabang', $salesmanBatch->kode_cabang)
+                                ->whereRaw('YEAR(tanggal)="' . $thn . '"')
+                                ->whereRaw('LEFT(no_fak_new,3)="' . $salesmanBatch->kode_pt . '"')
+                                ->orderBy('no_fak_new', 'desc')
+                                ->first();
+
                             $last_no_fak_new = $lastransaksi != NULL ? $lastransaksi->no_fak_new : "";
                             $no_fak_new = buatkode($last_no_fak_new, $salesmanBatch->kode_pt . $tahun . $salesmanBatch->kode_sales, 6);
 
@@ -539,7 +539,8 @@ class SyncPenjualanController extends Controller
                     // Insert History
                     if (isset($penjualanData['historibayar']) && is_array($penjualanData['historibayar'])) {
                         foreach ($penjualanData['historibayar'] as $bayar) {
-                             Historibayarpenjualan::create([
+                            Historibayarpenjualan::create(
+                                [
                                     'no_bukti' => $bayar['no_bukti'],
                                     'no_faktur' => $penjualanData['no_faktur'],
                                     'tanggal' => $bayar['tanggal'],
@@ -638,9 +639,9 @@ class SyncPenjualanController extends Controller
 
             // Hapus detail terlebih dahulu (karena ada foreign key)
             Detailpenjualan::where('no_faktur', $request->no_faktur)->delete();
-            
+
             // Hapus histori bayar juga jika ada
-             Historibayarpenjualan::where('no_faktur', $request->no_faktur)->delete();
+            Historibayarpenjualan::where('no_faktur', $request->no_faktur)->delete();
 
             // Hapus header
             $penjualan->delete();
@@ -800,8 +801,8 @@ class SyncPenjualanController extends Controller
 
             // Order by tanggal and created_at to ensure sequence
             $penjualanList = $query->orderBy('marketing_penjualan.tanggal', 'asc')
-                                   ->orderBy('marketing_penjualan.created_at', 'asc')
-                                   ->get();
+                ->orderBy('marketing_penjualan.created_at', 'asc')
+                ->get();
 
             if ($penjualanList->isEmpty()) {
                 return response()->json([
@@ -822,11 +823,11 @@ class SyncPenjualanController extends Controller
             foreach ($penjualanList as $penjualan) {
                 $thn = date('Y', strtotime($penjualan->tanggal));
                 $thn_short = date('y', strtotime($penjualan->tanggal));
-                
+
                 // Construct Prefix: PT + YY + SalesCode
                 // Example: PST + 24 + A = PST24A
                 $prefix = $penjualan->kode_pt . $thn_short . $penjualan->kode_sales;
-                
+
                 // Initialize last code for this prefix if not yet known in this session
                 if (!isset($lastCodes[$prefix])) {
                     // Find the last no_fak_new from DB *before* this period
@@ -853,7 +854,7 @@ class SyncPenjualanController extends Controller
 
                 // Generate new code
                 $newCode = buatkode($lastCodes[$prefix], $prefix, 6);
-                
+
                 // Update if different
                 if ($penjualan->no_fak_new !== $newCode) {
                     // Update straight to DB to avoid model events if any, or use model update
@@ -861,7 +862,7 @@ class SyncPenjualanController extends Controller
                     Penjualan::where('no_faktur', $penjualan->no_faktur)->update(['no_fak_new' => $newCode]);
                     $updatedCount++;
                 }
-                
+
                 // Update local cache for next iteration
                 $lastCodes[$prefix] = $newCode;
             }
@@ -928,7 +929,7 @@ class SyncPenjualanController extends Controller
 
             if ($request->kode_cabang) {
                 $query->join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
-                      ->where('salesman.kode_cabang', $request->kode_cabang);
+                    ->where('salesman.kode_cabang', $request->kode_cabang);
             }
 
             if ($request->kode_salesman) {
