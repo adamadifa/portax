@@ -220,21 +220,21 @@ class PembayaranpenjualanController extends Controller
                 ->first();
 
 
-            $today = Carbon::now();
-            $historiBayarDate = Carbon::parse($historibayar->created_at);
-            $diffInDays = $today->diffInDays($historiBayarDate);
-            if ($diffInDays > 3 && !$user->hasRole('super admin')) {
-                return Redirect::back()->with(messageError('Data tidak dapat di edit karena telah lebih dari 3 hari.'));
-            }
+            // $today = Carbon::now();
+            // $historiBayarDate = Carbon::parse($historibayar->created_at);
+            // $diffInDays = $today->diffInDays($historiBayarDate);
+            // if ($diffInDays > 3 && !$user->hasRole('super admin')) {
+            //     return Redirect::back()->with(messageError('Data tidak dapat di edit karena telah lebih dari 3 hari.'));
+            // }
 
-            $cektutuplaporanpembayaran = cektutupLaporan($historibayar->tanggal, "penjualan");
-            if ($cektutuplaporanpembayaran > 0) {
-                return Redirect::back()->with(messageError('Periode Laporan Sudah Ditutup'));
-            }
-            $cektutuplaporan = cektutupLaporan($request->tanggal, "penjualan");
-            if ($cektutuplaporan > 0) {
-                return Redirect::back()->with(messageError('Periode Laporan Sudah Ditutup'));
-            }
+            // $cektutuplaporanpembayaran = cektutupLaporan($historibayar->tanggal, "penjualan");
+            // if ($cektutuplaporanpembayaran > 0) {
+            //     return Redirect::back()->with(messageError('Periode Laporan Sudah Ditutup'));
+            // }
+            // $cektutuplaporan = cektutupLaporan($request->tanggal, "penjualan");
+            // if ($cektutuplaporan > 0) {
+            //     return Redirect::back()->with(messageError('Periode Laporan Sudah Ditutup'));
+            // }
 
 
             Historibayarpenjualan::where('no_bukti', $no_bukti)->update([
@@ -278,10 +278,10 @@ class PembayaranpenjualanController extends Controller
         $historibayar = Historibayarpenjualan::where('no_bukti', $no_bukti)->first();
         DB::beginTransaction();
         try {
-            $cektutuplaporan = cektutupLaporan($historibayar->tanggal, "penjualan");
-            if ($cektutuplaporan > 0) {
-                return Redirect::back()->with(messageError('Periode Laporan Sudah Ditutup !'));
-            }
+            // $cektutuplaporan = cektutupLaporan($historibayar->tanggal, "penjualan");
+            // if ($cektutuplaporan > 0) {
+            //     return Redirect::back()->with(messageError('Periode Laporan Sudah Ditutup !'));
+            // }
             //Hapus Surat Jalan
             Historibayarpenjualan::where('no_bukti', $no_bukti)->delete();
             DB::commit();

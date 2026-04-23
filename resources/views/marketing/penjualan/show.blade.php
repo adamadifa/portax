@@ -461,9 +461,7 @@
                 <div class="row mb-2 mt-3">
                     <div class="col">
                         @if ($penjualan->status_batal == 0)
-                            @can('pembayaranpenjualan.create')
                                 <a href="#" class="btn btn-primary" id="btnCreateBayar"><i class="ti ti-plus me-1"></i>Input Pembayaran</a>
-                            @endcan
                         @endif
 
                     </div>
@@ -516,33 +514,24 @@
                                             <td>{{ $d->nama_salesman }}</td>
                                             <td>
                                                 <div class="d-flex">
-                                                    @if (in_array($d->jenis_bayar, ['TN', 'TP']))
-                                                        @if ($d->voucher == 0)
-                                                            @can('pembayaranpenjualan.edit')
-                                                                <div>
-                                                                    <a href="#" class="me-2 btnEditBayar"
-                                                                        no_bukti="{{ Crypt::encrypt($d->no_bukti) }}">
-                                                                        <i class="ti ti-edit text-success"></i>
-                                                                    </a>
-                                                                </div>
-                                                            @endcan
-                                                        @endif
+                                                    <div>
+                                                        <a href="#" class="me-2 btnEditBayar"
+                                                            no_bukti="{{ Crypt::encrypt($d->no_bukti) }}">
+                                                            <i class="ti ti-edit text-success"></i>
+                                                        </a>
+                                                    </div>
 
-
-                                                        @can('pembayaranpenjualan.delete')
-                                                            <div>
-                                                                <form method="POST" name="deleteform" class="deleteform"
-                                                                    style="margin-bottom:0px !important; padding:0 !important"
-                                                                    action="{{ route('pembayaranpenjualan.delete', Crypt::encrypt($d->no_bukti)) }}">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <a href="#" class="delete-confirm ml-1">
-                                                                        <i class="ti ti-trash text-danger"></i>
-                                                                    </a>
-                                                                </form>
-                                                            </div>
-                                                        @endcan
-                                                    @endif
+                                                    <div>
+                                                        <form method="POST" name="deleteform" class="deleteform"
+                                                            style="margin-bottom:0px !important; padding:0 !important"
+                                                            action="{{ route('pembayaranpenjualan.delete', Crypt::encrypt($d->no_bukti)) }}">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <a href="#" class="delete-confirm ml-1">
+                                                                <i class="ti ti-trash text-danger"></i>
+                                                            </a>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>
