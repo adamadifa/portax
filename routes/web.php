@@ -157,6 +157,7 @@ use App\Http\Controllers\SetoranpenjualanController;
 use App\Http\Controllers\SetoranpusatController;
 use App\Http\Controllers\SetorantransferController;
 use App\Http\Controllers\SettingkomisidriverhelperController;
+use App\Http\Controllers\SaldoawalpiutangController;
 use App\Http\Controllers\SfaControler;
 
 use App\Http\Controllers\SlipgajiController;
@@ -1114,6 +1115,17 @@ Route::middleware('auth')->group(function () {
         Route::put('/settingkomisidriverhelper/{kode_komisi}', 'update')->name('settingkomisidriverhelper.update');
         Route::delete('/settingkomisidriverhelper/{kode_komisi}', 'destroy')->name('settingkomisidriverhelper.delete');
         Route::get('/settingkomisidriverhelper/{kode_komisi}/cetak', 'cetak')->name('settingkomisidriverhelper.cetak');
+    });
+
+    Route::controller(SaldoawalpiutangController::class)->group(function () {
+        Route::get('/sapiutang', 'index')->name('sapiutang.index')->can('sapiutang.index');
+        Route::get('/sapiutang/create', 'create')->name('sapiutang.create')->can('sapiutang.create');
+        Route::post('/sapiutang/store', 'store')->name('sapiutang.store')->can('sapiutang.create');
+        Route::delete('/sapiutang/{kode_saldo_awal}/delete', 'destroy')->name('sapiutang.delete')->can('sapiutang.delete');
+        Route::get('/sapiutang/{kode_saldo_awal}/show', 'show')->name('sapiutang.show')->can('sapiutang.show');
+
+        //AJAX REQUEST
+        Route::post('/sapiutang/getdetailsaldo', 'getdetailsaldo')->name('sapiutang.getdetailsaldo');
     });
 
     Route::controller(PenjualanController::class)->group(function () {

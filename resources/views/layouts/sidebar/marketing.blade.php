@@ -36,6 +36,7 @@
             'penjualan.index',
             'pembelianmarketing.index',
             'retur.index',
+            'sapiutang.index',
             'ajuanlimit.index',
             ...$laporanpermissions,
         ]))
@@ -55,6 +56,8 @@
             'pembelianmarketing/*',
             'retur',
             'retur/*',
+            'sapiutang',
+            'sapiutang/*',
             'ajuanlimit',
             'ajuanlimit/*',
             'ajuanfaktur',
@@ -147,6 +150,13 @@
                 <li class="menu-item {{ request()->is(['retur', 'retur/*']) ? 'active' : '' }}">
                     <a href="{{ route('retur.index') }}" class="menu-link">
                         <div>Retur</div>
+                    </a>
+                </li>
+            @endcan
+            @can('sapiutang.index')
+                <li class="menu-item {{ request()->is(['sapiutang', 'sapiutang/*']) ? 'active' : '' }}">
+                    <a href="{{ route('sapiutang.index') }}" class="menu-link">
+                        <div>Saldo Awal Piutang</div>
                     </a>
                 </li>
             @endcan
