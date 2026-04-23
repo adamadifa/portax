@@ -66,6 +66,7 @@ class PembayaranpenjualanController extends Controller
         $saldo_voucher = $saldo_voucher_program->jml_voucher - $diskonprogram->jml_voucher;
         $data['saldo_voucher'] = $saldo_voucher;
         // dd($data['saldo_voucher']);
+        $data['jenis_bayar'] = config('penjualan.jenis_bayar');
         return view('marketing.pembayaranpenjualan.create', $data);
     }
 
@@ -76,7 +77,8 @@ class PembayaranpenjualanController extends Controller
         $request->validate([
             'tanggal' => 'required',
             'jumlah' => 'required',
-            'kode_salesman' => 'required'
+            'kode_salesman' => 'required',
+            'jenis_bayar' => 'required'
         ]);
         $no_faktur = Crypt::decrypt($no_faktur);
         $penjualan = Penjualan::where('no_faktur', $no_faktur)
@@ -85,7 +87,7 @@ class PembayaranpenjualanController extends Controller
 
         $pelanggan = Pelanggan::where('kode_pelanggan', $penjualan->kode_pelanggan)->first();
         $jenis_transaksi = $penjualan->jenis_transaksi;
-        $jenis_bayar = $jenis_transaksi == 'T' ? 'TN' : 'TP';
+        $jenis_bayar = $request->jenis_bayar;
         $kode_cabang = $pelanggan->kode_cabang;
         $tahun = date('y', strtotime($request->tanggal));
         if (isset($request->agreementvoucher)) {
@@ -179,6 +181,7 @@ class PembayaranpenjualanController extends Controller
             ->where('marketing_penjualan_giro_detail.no_faktur', $no_faktur)
             ->where('marketing_penjualan_giro.status', '2')
             ->get();
+        $data['jenis_bayar'] = config('penjualan.jenis_bayar');
         $data['historibayar'] = $historibayar;
         return view('marketing.pembayaranpenjualan.edit', $data);
     }
@@ -190,7 +193,8 @@ class PembayaranpenjualanController extends Controller
         $request->validate([
             'tanggal' => 'required',
             'jumlah' => 'required',
-            'kode_salesman' => 'required'
+            'kode_salesman' => 'required',
+            'jenis_bayar' => 'required'
         ]);
 
         $no_bukti = Crypt::decrypt($no_bukti);
@@ -235,7 +239,7 @@ class PembayaranpenjualanController extends Controller
 
             Historibayarpenjualan::where('no_bukti', $no_bukti)->update([
                 'tanggal' => $request->tanggal,
-                // 'jenis_bayar' => $jenis_bayar,
+                'jenis_bayar' => $request->jenis_bayar,
                 'jumlah' => toNumber($request->jumlah),
                 'voucher' => $voucher,
                 'jenis_voucher' => $jenis_voucher,

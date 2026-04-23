@@ -11,6 +11,17 @@
         <input type="hidden" name="kode_salesman" value="{{ Auth::user()->kode_salesman }}" />
     @endif
 
+    <div class="form-group mb-3">
+        <label class="form-label">Jenis Bayar</label>
+        <select name="jenis_bayar" id="jenis_bayar" class="form-select select2Jenisbayar">
+            <option value="">Jenis Bayar</option>
+            @foreach ($jenis_bayar as $key => $value)
+                <option value="{{ $key }}" {{ $historibayar->jenis_bayar == $key ? 'selected' : '' }}>
+                    {{ $value }}</option>
+            @endforeach
+        </select>
+    </div>
+
     <div class="row mt-2">
         <div class="col-12">
             <div class="form-check mt-3 mb-2">
@@ -81,6 +92,18 @@
             });
         }
 
+        const select2Jenisbayar = $('.select2Jenisbayar');
+        if (select2Jenisbayar.length) {
+            select2Jenisbayar.each(function() {
+                var $this = $(this);
+                $this.wrap('<div class="position-relative"></div>').select2({
+                    placeholder: 'Jenis Bayar',
+                    allowClear: true,
+                    dropdownParent: $this.parent()
+                });
+            });
+        }
+
         const select2Kodevoucher = $('.select2Kodevoucher');
         if (select2Kodevoucher.length) {
             select2Kodevoucher.each(function() {
@@ -133,6 +156,7 @@
             const jml = $(this).find("#jumlah").val();
             const jumlah = parseInt(jml.replace(/\./g, ''));
             const kode_salesman = $(this).find("#kode_salesman").val();
+            const jenis_bayar = $(this).find("#jenis_bayar").val();
             const jenis_voucher = $(this).find("#jenis_voucher").val();
             const kode_giro = $(this).find("#kode_giro").val();
             if (isNaN(sisa_bayar)) {
@@ -163,6 +187,18 @@
                         form.find("#jumlah").focus();
                     },
                 });
+                return false;
+            } else if (jenis_bayar == "") {
+                Swal.fire({
+                    title: "Oops!",
+                    text: "Jenis Bayar Harus Diisi !",
+                    icon: "warning",
+                    showConfirmButton: true,
+                    didClose: (e) => {
+                        form.find("#jenis_bayar").focus();
+                    },
+                });
+
                 return false;
             } else if (kode_salesman == "") {
                 Swal.fire({

@@ -27,6 +27,22 @@
         </div>
     </div>
 
+    <!-- Jenis Bayar -->
+    <div class="relative mb-4">
+        <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-black z-10">Jenis Bayar</label>
+        <div class="flex items-center border border-slate-300 rounded-lg focus-within:ring-1 focus-within:ring-[#003d9e] focus-within:border-[#003d9e]">
+            <span class="pl-3 text-slate-400"><i class="ti ti-credit-card"></i></span>
+            <div class="w-full">
+                 <select name="jenis_bayar" id="jenis_bayar" class="select2Jenisbayar w-full border-0 focus:ring-0">
+                    <option value="">Jenis Bayar</option>
+                    @foreach($jenis_bayar as $key => $value)
+                        <option value="{{ $key }}">{{ $value }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+
     @if ($level_user == 'salesman')
         <input type="hidden" name="kode_salesman" value="{{ Auth::user()->kode_salesman }}" />
     @else
@@ -162,6 +178,18 @@
             });
         }
 
+        const select2Jenisbayar = $('.select2Jenisbayar');
+        if (select2Jenisbayar.length) {
+            select2Jenisbayar.each(function() {
+                var $this = $(this);
+                $this.select2({
+                    placeholder: 'Jenis Bayar',
+                    allowClear: true,
+                    dropdownParent: $('#modal')
+                });
+            });
+        }
+
         const select2Kodegiro = $('.select2Kodegiro');
         if (select2Kodegiro.length) {
             select2Kodegiro.each(function() {
@@ -204,6 +232,7 @@
             const jml = $(this).find("#jumlah").val();
             const jumlah = parseInt(jml.replace(/\./g, ''));
             const kode_salesman = $(this).find("#kode_salesman").val();
+            const jenis_bayar = $(this).find("#jenis_bayar").val();
             const jenis_voucher = $(this).find("#jenis_voucher").val();
             let saldo_voucher = "{{ $saldo_voucher }}";
             const kode_giro = $(this).find("#kode_giro").val();
@@ -245,6 +274,18 @@
                         form.find("#jumlah").focus();
                     },
                 });
+                return false;
+            } else if (jenis_bayar == "") {
+                Swal.fire({
+                    title: "Oops!",
+                    text: "Jenis Bayar Harus Diisi !",
+                    icon: "warning",
+                    showConfirmButton: true,
+                    didClose: (e) => {
+                        form.find("#jenis_bayar").focus();
+                    },
+                });
+
                 return false;
             } else if (kode_salesman == "") {
                 Swal.fire({
