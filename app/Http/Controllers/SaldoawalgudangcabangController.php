@@ -167,12 +167,25 @@ class SaldoawalgudangcabangController extends Controller
             if ($request->kondisi == "GS") {
                 $query->leftJoin(
                     DB::raw("(
-                            SELECT kode_produk,
-                            SUM(IF( in_out_good = 'I', jumlah, 0)) - SUM(IF( in_out_good = 'O', jumlah, 0)) as sisamutasi
+                            SELECT gudang_cabang_mutasi_detail.kode_produk,
+                            SUM(IF( `in_out_good` = 'I', gudang_cabang_mutasi_detail.jumlah, 0)) -
+                            SUM(IF( `in_out_good` = 'O' AND jenis_mutasi != 'PJ', gudang_cabang_mutasi_detail.jumlah, 0)) -
+                            IFNULL(total_sales, 0) as sisamutasi
                             FROM gudang_cabang_mutasi_detail
-                            INNER JOIN gudang_cabang_mutasi
-                            ON gudang_cabang_mutasi_detail.no_mutasi = gudang_cabang_mutasi.no_mutasi
-                            WHERE tanggal BETWEEN '$tgl_dari_bulanlalu' AND '$tgl_sampai_bulanlalu'  AND kode_cabang = '$kode_cabang'  GROUP BY kode_produk
+                            INNER JOIN gudang_cabang_mutasi ON gudang_cabang_mutasi_detail.no_mutasi = gudang_cabang_mutasi.no_mutasi
+                            LEFT JOIN (
+                                SELECT produk_harga.kode_produk, SUM(jumlah) as total_sales
+                                FROM marketing_penjualan_detail
+                                INNER JOIN marketing_penjualan ON marketing_penjualan_detail.no_faktur = marketing_penjualan.no_faktur
+                                INNER JOIN produk_harga ON marketing_penjualan_detail.kode_harga = produk_harga.kode_harga
+                                INNER JOIN salesman ON marketing_penjualan.kode_salesman = salesman.kode_salesman
+                                WHERE status_batal = 0 AND status_promosi = '0' AND tanggal >= '$tgl_dari_bulanlalu' AND tanggal <= '$tgl_sampai_bulanlalu'
+                                AND salesman.kode_cabang = '$kode_cabang'
+                                GROUP BY produk_harga.kode_produk
+                            ) marketing_penjualan_sisa ON gudang_cabang_mutasi_detail.kode_produk = marketing_penjualan_sisa.kode_produk
+                            WHERE gudang_cabang_mutasi.tanggal >= '$tgl_dari_bulanlalu' AND gudang_cabang_mutasi.tanggal <= '$tgl_sampai_bulanlalu'
+                            AND gudang_cabang_mutasi.kode_cabang = '$kode_cabang' AND in_out_good IS NOT NULL
+                            GROUP BY gudang_cabang_mutasi_detail.kode_produk, total_sales
                         ) mutasi"),
                     function ($join) {
                         $join->on('produk.kode_produk', '=', 'mutasi.kode_produk');
