@@ -119,14 +119,6 @@
                  <div class="w-2/3 p-4 flex flex-col justify-center">
                     <div class="grid grid-cols-2 gap-x-4 gap-y-3">
                          <div>
-                             <p class="text-[10px] font-bold uppercase text-slate-400">Limit Kredit</p>
-                             <p class="text-lg font-bold text-blue-600" id="limit_pelanggan_text">0</p>
-                         </div>
-                         <div>
-                            <p class="text-[10px] font-bold uppercase text-slate-400">Sisa Piutang</p>
-                            <p class="text-lg font-bold text-red-500" id="sisa_piutang_text">0</p>
-                        </div>
-                        <div>
                             <p class="text-[10px] font-bold uppercase text-slate-400">Faktur Kredit</p>
                             <p class="text-base font-bold text-slate-700"><span id="jmlfaktur_kredit">0</span> Fkt</p>
                         </div>
@@ -1699,20 +1691,20 @@
                 e.preventDefault();
                 SwalWarning('jenis_bayar', 'Jenis Bayar Tidak Boleh Kosong');
                 return false;
-            } else if (jenis_transaksi == "K" && siklus_pembayaran === '0' && parseInt(totalPiutang) >
-                parseInt(limit_pelanggan)) {
-                e.preventDefault();
-                SwalWarning('nama_produk', 'Melebihi Limit, Silahkan Ajukan Penambahan Limit !');
-                return false;
-            } else if (jenis_transaksi == "K" && siklus_pembayaran === '1' && parseInt(grandtotal) >
-                parseInt(limit_pelanggan)) {
-                e.preventDefault();
-                SwalWarning('nama_produk', 'Melebihi Limit, Silahkan Ajukan Penambahan Limit !');
-                return false;
-            } else if (jenis_transaksi == "K" && jmlfakturbelumlunas >= jmlfakturmax) {
-                e.preventDefault();
-                SwalWarning('keterangan', 'Melebihi Batas Jumlah Faktur Kredit !');
-                return false;
+            // } else if (jenis_transaksi == "K" && siklus_pembayaran === '0' && parseInt(totalPiutang) >
+            //     parseInt(limit_pelanggan)) {
+            //     e.preventDefault();
+            //     SwalWarning('nama_produk', 'Melebihi Limit, Silahkan Ajukan Penambahan Limit !');
+            //     return false;
+            // } else if (jenis_transaksi == "K" && siklus_pembayaran === '1' && parseInt(grandtotal) >
+            //     parseInt(limit_pelanggan)) {
+            //     e.preventDefault();
+            //     SwalWarning('nama_produk', 'Melebihi Limit, Silahkan Ajukan Penambahan Limit !');
+            //     return false;
+            // } else if (jenis_transaksi == "K" && jmlfakturbelumlunas >= jmlfakturmax) {
+            //     e.preventDefault();
+            //     SwalWarning('keterangan', 'Melebihi Batas Jumlah Faktur Kredit !');
+            //     return false;
             } else if (voucherVal > saldo_voucher) {
                 e.preventDefault();
                 SwalWarning('voucher', 'Melebihi Saldo Voucher !');
