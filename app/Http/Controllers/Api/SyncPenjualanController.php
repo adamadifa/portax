@@ -153,28 +153,28 @@ class SyncPenjualanController extends Controller
 
 
             // Get Salesman for Auto Numbering
-            $salesman = Salesman::join('cabang', 'salesman.kode_cabang', '=', 'cabang.kode_cabang')
-                ->where('kode_salesman', $request->kode_salesman)->first();
+            // $salesman = Salesman::join('cabang', 'salesman.kode_cabang', '=', 'cabang.kode_cabang')
+            //     ->where('kode_salesman', $request->kode_salesman)->first();
             $no_fak_new = null;
-            if ($salesman) {
-                $tahun = date('y', strtotime($request->tanggal));
-                $thn = date('Y', strtotime($request->tanggal));
-                $start_date = "2024-03-01";
+            // if ($salesman) {
+            //     $tahun = date('y', strtotime($request->tanggal));
+            //     $thn = date('Y', strtotime($request->tanggal));
+            //     $start_date = "2024-03-01";
 
-                if ($request->tanggal >= '2024-03-01' && $salesman->kode_cabang != "PST") {
-                    $lastransaksi = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
-                        ->where('tanggal', '>=', $start_date)
-                        ->whereRaw('MID(no_fak_new,6,1)="' . $salesman->kode_sales . '"')
-                        ->where('salesman.kode_cabang', $salesman->kode_cabang)
-                        ->whereRaw('YEAR(tanggal)="' . $thn . '"')
-                        ->whereRaw('LEFT(no_fak_new,3)="' . $salesman->kode_pt . '"')
-                        ->orderBy('no_fak_new', 'desc')
-                        ->first();
+            //     if ($request->tanggal >= '2024-03-01' && $salesman->kode_cabang != "PST") {
+            //         $lastransaksi = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
+            //             ->where('tanggal', '>=', $start_date)
+            //             ->whereRaw('MID(no_fak_new,6,1)="' . $salesman->kode_sales . '"')
+            //             ->where('salesman.kode_cabang', $salesman->kode_cabang)
+            //             ->whereRaw('YEAR(tanggal)="' . $thn . '"')
+            //             ->whereRaw('LEFT(no_fak_new,3)="' . $salesman->kode_pt . '"')
+            //             ->orderBy('no_fak_new', 'desc')
+            //             ->first();
 
-                    $last_no_fak_new = $lastransaksi != NULL ? $lastransaksi->no_fak_new : "";
-                    $no_fak_new = buatkode($last_no_fak_new, $salesman->kode_pt . $tahun . $salesman->kode_sales, 6);
-                }
-            }
+            //         $last_no_fak_new = $lastransaksi != NULL ? $lastransaksi->no_fak_new : "";
+            //         $no_fak_new = buatkode($last_no_fak_new, $salesman->kode_pt . $tahun . $salesman->kode_sales, 6);
+            //     }
+            // }
 
             // Prepare data penjualan
             $penjualanData = [
@@ -434,57 +434,86 @@ class SyncPenjualanController extends Controller
                     // Force User ID
                     $penjualanData['id_user'] = $id_user;
 
+                    // Check & Create Salesman
+                    $cekSalesman = Salesman::where('kode_salesman', $penjualanData['kode_salesman'])->first();
+                    if (!$cekSalesman && isset($penjualanData['salesman'])) {
+                        $salesmanData = $penjualanData['salesman'];
+                        if (!isset($salesmanData['kode_cabang'])) {
+                            $salesmanData['kode_cabang'] = $kode_cabang;
+                        }
+                        // Filter columns
+                        $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('salesman');
+                        $filteredData = array_intersect_key($salesmanData, array_flip($tableColumns));
+                        Salesman::create($filteredData);
+                    }
+
+                    // Check & Create Pelanggan
+                    $cekPelanggan = Pelanggan::where('kode_pelanggan', $penjualanData['kode_pelanggan'])->first();
+                    if (!$cekPelanggan && isset($penjualanData['pelanggan'])) {
+                        $pelangganData = $penjualanData['pelanggan'];
+                        if (!isset($pelangganData['kode_cabang'])) {
+                            $pelangganData['kode_cabang'] = $kode_cabang;
+                        }
+                        if (!isset($pelangganData['kode_salesman'])) {
+                            $pelangganData['kode_salesman'] = $penjualanData['kode_salesman'];
+                        }
+                        // Filter columns
+                        $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('pelanggan');
+                        $filteredData = array_intersect_key($pelangganData, array_flip($tableColumns));
+                        Pelanggan::create($filteredData);
+                    }
+
                     // Auto Numbering Logic
                     // Since old records are committed-deleted, query sees clean state
                     $no_fak_new = null;
 
-                    $salesmanBatch = Salesman::join('cabang', 'salesman.kode_cabang', '=', 'cabang.kode_cabang')
-                        ->where('kode_salesman', $penjualanData['kode_salesman'])->first();
+                    // $salesmanBatch = Salesman::join('cabang', 'salesman.kode_cabang', '=', 'cabang.kode_cabang')
+                    //     ->where('kode_salesman', $penjualanData['kode_salesman'])->first();
 
-                    if ($salesmanBatch) {
-                        $tahun = date('y', strtotime($penjualanData['tanggal']));
-                        $thn = date('Y', strtotime($penjualanData['tanggal']));
-                        $start_date = "2024-03-01";
+                    // if ($salesmanBatch) {
+                    //     $tahun = date('y', strtotime($penjualanData['tanggal']));
+                    //     $thn = date('Y', strtotime($penjualanData['tanggal']));
+                    //     $start_date = "2024-03-01";
 
-                        if ($penjualanData['tanggal'] >= '2024-03-01' && $salesmanBatch->kode_cabang != "PST") {
-                            $lastransaksi = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
-                                ->where('tanggal', '>=', $start_date)
-                                ->whereRaw('MID(no_fak_new,6,1)="' . $salesmanBatch->kode_sales . '"')
-                                ->where('salesman.kode_cabang', $salesmanBatch->kode_cabang)
-                                ->whereRaw('YEAR(tanggal)="' . $thn . '"')
-                                ->whereRaw('LEFT(no_fak_new,3)="' . $salesmanBatch->kode_pt . '"')
-                                ->orderBy('no_fak_new', 'desc')
-                                ->first();
+                    //     if ($penjualanData['tanggal'] >= '2024-03-01' && $salesmanBatch->kode_cabang != "PST") {
+                    //         $lastransaksi = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
+                    //             ->where('tanggal', '>=', $start_date)
+                    //             ->whereRaw('MID(no_fak_new,6,1)="' . $salesmanBatch->kode_sales . '"')
+                    //             ->where('salesman.kode_cabang', $salesmanBatch->kode_cabang)
+                    //             ->whereRaw('YEAR(tanggal)="' . $thn . '"')
+                    //             ->whereRaw('LEFT(no_fak_new,3)="' . $salesmanBatch->kode_pt . '"')
+                    //             ->orderBy('no_fak_new', 'desc')
+                    //             ->first();
 
-                            $last_no_fak_new = $lastransaksi != NULL ? $lastransaksi->no_fak_new : "";
-                            $no_fak_new = buatkode($last_no_fak_new, $salesmanBatch->kode_pt . $tahun . $salesmanBatch->kode_sales, 6);
+                    //         $last_no_fak_new = $lastransaksi != NULL ? $lastransaksi->no_fak_new : "";
+                    //         $no_fak_new = buatkode($last_no_fak_new, $salesmanBatch->kode_pt . $tahun . $salesmanBatch->kode_sales, 6);
 
-                            // DEBUG: Capture info for the first record to diagnose
-                            if ($isFirstRecord) {
-                                $remaining_count = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
-                                    ->where('tanggal', '>=', $start_date)
-                                    ->whereRaw('MID(no_fak_new,6,1)="' . $salesmanBatch->kode_sales . '"')
-                                    ->where('salesman.kode_cabang', $salesmanBatch->kode_cabang)
-                                    ->whereRaw('YEAR(tanggal)="' . $thn . '"')
-                                    ->whereRaw('LEFT(no_fak_new,3)="' . $salesmanBatch->kode_pt . '"')
-                                    ->count();
+                    //         // DEBUG: Capture info for the first record to diagnose
+                    //         if ($isFirstRecord) {
+                    //             $remaining_count = Penjualan::join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
+                    //                 ->where('tanggal', '>=', $start_date)
+                    //                 ->whereRaw('MID(no_fak_new,6,1)="' . $salesmanBatch->kode_sales . '"')
+                    //                 ->where('salesman.kode_cabang', $salesmanBatch->kode_cabang)
+                    //                 ->whereRaw('YEAR(tanggal)="' . $thn . '"')
+                    //                 ->whereRaw('LEFT(no_fak_new,3)="' . $salesmanBatch->kode_pt . '"')
+                    //                 ->count();
 
-                                $debug_info['first_record_debug'] = [
-                                    'kode_salesman' => $penjualanData['kode_salesman'],
-                                    'kode_sales' => $salesmanBatch->kode_sales,
-                                    'kode_cabang' => $salesmanBatch->kode_cabang,
-                                    'kode_pt' => $salesmanBatch->kode_pt,
-                                    'tahun' => $tahun,
-                                    'thn' => $thn,
-                                    'remaining_matching_records_after_delete' => $remaining_count,
-                                    'lastransaksi_found' => $lastransaksi != NULL ? $lastransaksi->no_fak_new : 'NULL (empty)',
-                                    'lastransaksi_no_faktur' => $lastransaksi != NULL ? $lastransaksi->no_faktur : 'NULL',
-                                    'generated_no_fak_new' => $no_fak_new,
-                                ];
-                                $isFirstRecord = false;
-                            }
-                        }
-                    }
+                    //             $debug_info['first_record_debug'] = [
+                    //                 'kode_salesman' => $penjualanData['kode_salesman'],
+                    //                 'kode_sales' => $salesmanBatch->kode_sales,
+                    //                 'kode_cabang' => $salesmanBatch->kode_cabang,
+                    //                 'kode_pt' => $salesmanBatch->kode_pt,
+                    //                 'tahun' => $tahun,
+                    //                 'thn' => $thn,
+                    //                 'remaining_matching_records_after_delete' => $remaining_count,
+                    //                 'lastransaksi_found' => $lastransaksi != NULL ? $lastransaksi->no_fak_new : 'NULL (empty)',
+                    //                 'lastransaksi_no_faktur' => $lastransaksi != NULL ? $lastransaksi->no_faktur : 'NULL',
+                    //                 'generated_no_fak_new' => $no_fak_new,
+                    //             ];
+                    //             $isFirstRecord = false;
+                    //         }
+                    //     }
+                    // }
 
                     // Prepare Header Data
                     $header = array_merge($penjualanData, [
@@ -519,8 +548,14 @@ class SyncPenjualanController extends Controller
                     unset($header['salesman']);
                     unset($header['pelanggan']);
 
-                    // Create New Record
-                    Penjualan::create($header);
+                    // Create or Update Record
+                    Penjualan::updateOrCreate(
+                        ['no_faktur' => $header['no_faktur']],
+                        $header
+                    );
+
+                    // 2. Detail: Replace
+                    Detailpenjualan::where('no_faktur', $header['no_faktur'])->delete();
 
                     // Insert Details
                     foreach ($penjualanData['detail'] as $detail) {
@@ -539,9 +574,9 @@ class SyncPenjualanController extends Controller
                     // Insert History
                     if (isset($penjualanData['historibayar']) && is_array($penjualanData['historibayar'])) {
                         foreach ($penjualanData['historibayar'] as $bayar) {
-                            Historibayarpenjualan::create(
+                            Historibayarpenjualan::updateOrCreate(
+                                ['no_bukti' => $bayar['no_bukti']],
                                 [
-                                    'no_bukti' => $bayar['no_bukti'],
                                     'no_faktur' => $penjualanData['no_faktur'],
                                     'tanggal' => $bayar['tanggal'],
                                     'kode_salesman' => $bayar['kode_salesman'] ?? $penjualanData['kode_salesman'],
@@ -583,6 +618,8 @@ class SyncPenjualanController extends Controller
 
             } catch (Exception $e) {
                 DB::rollBack();
+                \Illuminate\Support\Facades\Log::error('Sync Batch Penjualan Error: ' . $e->getMessage());
+                \Illuminate\Support\Facades\Log::error($e->getTraceAsString());
                 return response()->json([
                     'success' => false,
                     'message' => 'Gagal sync batch (Insert Rollback). Data lama sudah terhapus, silakan ulangi sync.',
@@ -905,6 +942,7 @@ class SyncPenjualanController extends Controller
                 'kode_salesman' => 'nullable|string',
                 'dari' => 'nullable|date',
                 'sampai' => 'nullable|date',
+                'no_faktur' => 'nullable|array',
             ]);
 
             if ($validator->fails()) {
@@ -916,10 +954,10 @@ class SyncPenjualanController extends Controller
             }
 
             // Minimal harus ada 1 filter agar tidak hapus semua data
-            if (!$request->kode_cabang && !$request->kode_salesman && !$request->dari && !$request->sampai) {
+            if (!$request->kode_cabang && !$request->kode_salesman && !$request->dari && !$request->sampai && !$request->no_faktur) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Minimal harus ada 1 parameter filter (kode_cabang / kode_salesman / dari / sampai)'
+                    'message' => 'Minimal harus ada 1 parameter filter (kode_cabang / kode_salesman / dari / sampai / no_faktur)'
                 ], 422);
             }
 
@@ -927,21 +965,25 @@ class SyncPenjualanController extends Controller
             $query = Penjualan::query();
             $query->select('marketing_penjualan.no_faktur');
 
-            if ($request->kode_cabang) {
-                $query->join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
-                    ->where('salesman.kode_cabang', $request->kode_cabang);
-            }
+            if ($request->no_faktur) {
+                $query->whereIn('marketing_penjualan.no_faktur', $request->no_faktur);
+            } else {
+                if ($request->kode_cabang) {
+                    $query->join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman')
+                        ->where('salesman.kode_cabang', $request->kode_cabang);
+                }
 
-            if ($request->kode_salesman) {
-                $query->where('marketing_penjualan.kode_salesman', $request->kode_salesman);
-            }
+                if ($request->kode_salesman) {
+                    $query->where('marketing_penjualan.kode_salesman', $request->kode_salesman);
+                }
 
-            if ($request->dari && $request->sampai) {
-                $query->whereBetween('marketing_penjualan.tanggal', [$request->dari, $request->sampai]);
-            } elseif ($request->dari) {
-                $query->where('marketing_penjualan.tanggal', '>=', $request->dari);
-            } elseif ($request->sampai) {
-                $query->where('marketing_penjualan.tanggal', '<=', $request->sampai);
+                if ($request->dari && $request->sampai) {
+                    $query->whereBetween('marketing_penjualan.tanggal', [$request->dari, $request->sampai]);
+                } elseif ($request->dari) {
+                    $query->where('marketing_penjualan.tanggal', '>=', $request->dari);
+                } elseif ($request->sampai) {
+                    $query->where('marketing_penjualan.tanggal', '<=', $request->sampai);
+                }
             }
 
             $no_fakturs = $query->pluck('marketing_penjualan.no_faktur')->toArray();
