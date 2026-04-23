@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\SyncPenjualanController;
+use App\Http\Controllers\Api\SyncKasbesarController;
 use App\Http\Controllers\Api\SyncKaskecilController;
 use App\Http\Controllers\Api\SyncLedgerController;
 use App\Http\Controllers\Api\SyncJurnalumumController;
@@ -35,6 +36,9 @@ Route::prefix('sync')->group(function () {
     Route::delete('/penjualan/batch', [SyncPenjualanController::class, 'deleteBatch']);
     Route::post('/penjualan/reset-no-fak-new', [SyncPenjualanController::class, 'resetNoFakNew']);
     Route::post('/penjualan/pre-delete', [SyncPenjualanController::class, 'preDeleteSync']);
+
+    // Kas Besar
+    Route::post('/kasbesar/batch', [SyncKasbesarController::class, 'syncBatch']);
 
     // Kas Kecil
     Route::post('/kaskecil', [SyncKaskecilController::class, 'sync']);
