@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bank;
 use App\Models\Coa;
 use App\Models\Ledger;
+use App\Models\Ledgercostratio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -53,28 +54,33 @@ class SyncLedgerController extends Controller
 
             DB::beginTransaction();
 
-            // Validasi foreign key - cek kode_bank
-            $bankExists = Bank::where('kode_bank', $request->kode_bank)->exists();
-            if (!$bankExists) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validasi gagal',
-                    'errors' => [
-                        'kode_bank' => ['Kode bank tidak ditemukan di database']
-                    ]
-                ], 422);
+            // Auto-create Bank jika belum ada
+            $bank = Bank::find($request->kode_bank);
+            if (!$bank) {
+                // Cari kode_cabang dari request atau default ke TSM/PST jika tidak ada
+                $kodeCabang = $request->kode_cabang ?? 'TSM'; 
+                // Pastikan cabang ada, jika tidak ada pakai cabang pertama yang tersedia
+                if (!DB::table('cabang')->where('kode_cabang', $kodeCabang)->exists()) {
+                    $kodeCabang = DB::table('cabang')->value('kode_cabang') ?? 'TSM';
+                }
+
+                Bank::create([
+                    'kode_bank' => $request->kode_bank,
+                    'nama_bank' => 'Sync Placeholder ' . $request->kode_bank,
+                    'kode_cabang' => $kodeCabang,
+                    'show_on_cabang' => 1,
+                    'jenis_rekening' => '1', // Default
+                ]);
             }
 
-            // Validasi foreign key - cek kode_akun
-            $coaExists = Coa::where('kode_akun', $request->kode_akun)->exists();
-            if (!$coaExists) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validasi gagal',
-                    'errors' => [
-                        'kode_akun' => ['Kode akun tidak ditemukan di database']
-                    ]
-                ], 422);
+            // Auto-create COA jika belum ada
+            if (!Coa::where('kode_akun', $request->kode_akun)->exists()) {
+                Coa::create([
+                    'kode_akun' => $request->kode_akun,
+                    'nama_akun' => 'Sync Placeholder ' . $request->kode_akun,
+                    'level' => 5, // Default level
+                    'kode_kategori' => substr($request->kode_akun, 0, 1),
+                ]);
             }
 
             // Cek apakah data dengan no_bukti sudah ada
@@ -99,23 +105,9 @@ class SyncLedgerController extends Controller
             if ($isUpdate) {
                 // Update data yang sudah ada
                 $ledger->update($ledgerData);
-                // Hapus cost ratio lama
-                \App\Models\Ledgercostratio::where('no_bukti', $ledger->no_bukti)->delete();
             } else {
                 // Insert data baru
                 $ledger = Ledger::create($ledgerData);
-            }
-
-            // Insert cost ratio jika ada
-            $costRatioCount = 0;
-            if ($request->has('cost_ratio') && is_array($request->cost_ratio)) {
-                foreach ($request->cost_ratio as $kodeCr) {
-                    \App\Models\Ledgercostratio::create([
-                        'kode_cr' => $kodeCr,
-                        'no_bukti' => $ledger->no_bukti,
-                    ]);
-                    $costRatioCount++;
-                }
             }
 
             DB::commit();
@@ -124,7 +116,8 @@ class SyncLedgerController extends Controller
                 'success' => true,
                 'message' => $isUpdate ? 'Data ledger berhasil diupdate' : 'Data ledger berhasil disync',
                 'data' => [
-                    'no_bukti' => $ledger->no_bukti,
+                    'id' => $ledger->id,
+                    'no_bukti' => $request->no_bukti,
                     'action' => $isUpdate ? 'updated' : 'created',
                     'created_at' => now()->toDateTimeString()
                 ]
@@ -217,7 +210,6 @@ class SyncLedgerController extends Controller
                 'data.*.kode_akun' => 'required|string|max:6',
                 'data.*.keterangan' => 'required|string|max:255',
                 'data.*.jumlah' => 'required|integer',
-                'data.*.jumlah' => 'required|integer',
                 'data.*.debet_kredit' => 'required|string|max:1',
                 'data.*.cost_ratio' => 'nullable|array',
                 'data.*.cost_ratio.*' => 'string|max:10',
@@ -253,6 +245,34 @@ class SyncLedgerController extends Controller
                 try {
                     DB::beginTransaction();
 
+                    // Auto-create Bank jika belum ada
+                    $bank = Bank::find($ledgerData['kode_bank']);
+                    if (!$bank) {
+                        // Gunakan kode_cabang dari request (batch header) atau dari data per baris jika ada
+                        $kodeCabang = $request->kode_cabang ?? ($ledgerData['kode_cabang'] ?? 'TSM');
+                        if (!DB::table('cabang')->where('kode_cabang', $kodeCabang)->exists()) {
+                            $kodeCabang = DB::table('cabang')->value('kode_cabang') ?? 'TSM';
+                        }
+
+                        Bank::create([
+                            'kode_bank' => $ledgerData['kode_bank'],
+                            'nama_bank' => 'Sync Placeholder ' . $ledgerData['kode_bank'],
+                            'kode_cabang' => $kodeCabang,
+                            'show_on_cabang' => 1,
+                            'jenis_rekening' => '1',
+                        ]);
+                    }
+
+                    // Auto-create COA jika belum ada
+                    if (!Coa::where('kode_akun', $ledgerData['kode_akun'])->exists()) {
+                        Coa::create([
+                            'kode_akun' => $ledgerData['kode_akun'],
+                            'nama_akun' => 'Sync Placeholder ' . $ledgerData['kode_akun'],
+                            'level' => 5,
+                            'kode_kategori' => substr($ledgerData['kode_akun'], 0, 1),
+                        ]);
+                    }
+
                     // Cek apakah data dengan no_bukti sudah ada
                     $ledger = Ledger::find($ledgerData['no_bukti']);
                     $isUpdate = $ledger !== null;
@@ -275,23 +295,9 @@ class SyncLedgerController extends Controller
                     if ($isUpdate) {
                         // Update data yang sudah ada
                         $ledger->update($header);
-                        // Hapus cost ratio lama
-                        \App\Models\Ledgercostratio::where('no_bukti', $ledger->no_bukti)->delete();
                     } else {
                         // Insert data baru
                         $ledger = Ledger::create($header);
-                    }
-
-                    // Insert cost ratio jika ada
-                    $costRatioCount = 0;
-                    if (isset($ledgerData['cost_ratio']) && is_array($ledgerData['cost_ratio'])) {
-                        foreach ($ledgerData['cost_ratio'] as $kodeCr) {
-                            \App\Models\Ledgercostratio::create([
-                                'kode_cr' => $kodeCr,
-                                'no_bukti' => $ledger->no_bukti,
-                            ]);
-                            $costRatioCount++;
-                        }
                     }
 
                     DB::commit();
@@ -511,10 +517,6 @@ class SyncLedgerController extends Controller
                 ->whereBetween('tanggal', [$request->dari, $request->sampai]);
 
             $count = $query->count();
-            
-            // Hapus juga relasi cost ratio-nya
-            $noBuktis = $query->pluck('no_bukti');
-            \App\Models\Ledgercostratio::whereIn('no_bukti', $noBuktis)->delete();
             
             $query->delete();
 

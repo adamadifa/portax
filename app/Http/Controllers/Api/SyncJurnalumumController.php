@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Coa;
 use App\Models\Jurnalumum;
+use App\Models\Jurnalumumcostratio;
+use App\Models\Coa;
+use App\Models\Bank;
 use App\Models\Departemen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -50,28 +52,41 @@ class SyncJurnalumumController extends Controller
 
             DB::beginTransaction();
 
-            // Validasi foreign key - cek kode_akun
-            $coaExists = Coa::where('kode_akun', $request->kode_akun)->exists();
-            if (!$coaExists) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validasi gagal',
-                    'errors' => [
-                        'kode_akun' => ['Kode akun tidak ditemukan di database']
-                    ]
-                ], 422);
+            // Auto-create Cabang jika belum ada
+            $kodeCabang = $request->kode_cabang_sync ?? $request->kode_cabang;
+            if ($kodeCabang && !DB::table('cabang')->where('kode_cabang', $kodeCabang)->exists()) {
+                DB::table('cabang')->insert([
+                    'kode_cabang' => $kodeCabang,
+                    'nama_cabang' => 'Sync Placeholder ' . $kodeCabang,
+                    'alamat_cabang' => '-',
+                    'telepon_cabang' => '-',
+                    'lokasi_cabang' => '-',
+                    'radius_cabang' => 100,
+                    'kode_regional' => 'R00',
+                    'urutan' => 1,
+                    'kode_pt' => '01',
+                    'nama_pt' => 'Sync Placeholder',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
 
-            // Validasi foreign key - cek kode_dept
-            $deptExists = Departemen::where('kode_dept', $request->kode_dept)->exists();
-            if (!$deptExists) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validasi gagal',
-                    'errors' => [
-                        'kode_dept' => ['Kode departemen tidak ditemukan di database']
-                    ]
-                ], 422);
+            // Auto-create Departemen jika belum ada
+            if (!empty($request->kode_dept) && !Departemen::where('kode_dept', $request->kode_dept)->exists()) {
+                Departemen::create([
+                    'kode_dept' => $request->kode_dept,
+                    'nama_dept' => 'Sync Placeholder ' . $request->kode_dept,
+                ]);
+            }
+
+            // Auto-create COA jika belum ada
+            if (!empty($request->kode_akun) && !Coa::where('kode_akun', $request->kode_akun)->exists()) {
+                Coa::create([
+                    'kode_akun' => $request->kode_akun,
+                    'nama_akun' => 'Sync Placeholder ' . $request->kode_akun,
+                    'level' => 5,
+                    'kode_kategori' => substr($request->kode_akun, 0, 1),
+                ]);
             }
 
             // Cek apakah data dengan kode_ju sudah ada
@@ -96,23 +111,10 @@ class SyncJurnalumumController extends Controller
             if ($isUpdate) {
                 // Update data yang sudah ada
                 $jurnalumum->update($jurnalumumData);
-                // Hapus cost ratio lama
-                \App\Models\Jurnalumumcostratio::where('kode_ju', $jurnalumum->kode_ju)->delete();
             } else {
                 // Insert data baru
+                $jurnalumumData['kode_ju'] = $request->kode_ju;
                 $jurnalumum = Jurnalumum::create($jurnalumumData);
-            }
-
-            // Insert cost ratio jika ada
-            $costRatioCount = 0;
-            if ($request->has('cost_ratio') && is_array($request->cost_ratio)) {
-                foreach ($request->cost_ratio as $kodeCr) {
-                    \App\Models\Jurnalumumcostratio::create([
-                        'kode_cr' => $kodeCr,
-                        'kode_ju' => $jurnalumum->kode_ju,
-                    ]);
-                    $costRatioCount++;
-                }
             }
 
             DB::commit();
@@ -121,7 +123,7 @@ class SyncJurnalumumController extends Controller
                 'success' => true,
                 'message' => $isUpdate ? 'Data jurnal umum berhasil diupdate' : 'Data jurnal umum berhasil disync',
                 'data' => [
-                    'kode_ju' => $jurnalumum->kode_ju,
+                    'id' => $jurnalumum->id,
                     'action' => $isUpdate ? 'updated' : 'created',
                     'created_at' => now()->toDateTimeString()
                 ]
@@ -270,16 +272,47 @@ class SyncJurnalumumController extends Controller
                 try {
                     DB::beginTransaction();
 
-                    // Validasi foreign key - cek kode_akun
-                    $coaExists = Coa::where('kode_akun', $jurnalumumData['kode_akun'])->exists();
-                    if (!$coaExists) {
-                        throw new Exception('Kode akun tidak ditemukan di database');
-                    }
-
                     // Validasi foreign key - cek kode_dept
                     $deptExists = Departemen::where('kode_dept', $jurnalumumData['kode_dept'])->exists();
                     if (!$deptExists) {
                         throw new Exception('Kode departemen tidak ditemukan di database');
+                    }
+
+                    // Auto-create Cabang jika belum ada
+                    $kodeCabang = $request->kode_cabang_sync ?? ($request->kode_cabang ?? ($jurnalumumData['kode_cabang'] ?? null));
+                    if ($kodeCabang && !DB::table('cabang')->where('kode_cabang', $kodeCabang)->exists()) {
+                        DB::table('cabang')->insert([
+                            'kode_cabang' => $kodeCabang,
+                            'nama_cabang' => 'Sync Placeholder ' . $kodeCabang,
+                            'alamat_cabang' => '-',
+                            'telepon_cabang' => '-',
+                            'lokasi_cabang' => '-',
+                            'radius_cabang' => 100,
+                            'kode_regional' => 'R00',
+                            'urutan' => 1,
+                            'kode_pt' => '01',
+                            'nama_pt' => 'Sync Placeholder',
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+
+                    // Auto-create Departemen jika belum ada
+                    if (!empty($jurnalumumData['kode_dept']) && !Departemen::where('kode_dept', $jurnalumumData['kode_dept'])->exists()) {
+                        Departemen::create([
+                            'kode_dept' => $jurnalumumData['kode_dept'],
+                            'nama_dept' => 'Sync Placeholder ' . $jurnalumumData['kode_dept'],
+                        ]);
+                    }
+
+                    // Auto-create COA jika belum ada
+                    if (!empty($jurnalumumData['kode_akun']) && !Coa::where('kode_akun', $jurnalumumData['kode_akun'])->exists()) {
+                        Coa::create([
+                            'kode_akun' => $jurnalumumData['kode_akun'],
+                            'nama_akun' => 'Sync Placeholder ' . $jurnalumumData['kode_akun'],
+                            'level' => 5,
+                            'kode_kategori' => substr($jurnalumumData['kode_akun'], 0, 1),
+                        ]);
                     }
 
                     // Cek apakah data dengan kode_ju sudah ada
@@ -304,23 +337,10 @@ class SyncJurnalumumController extends Controller
                     if ($isUpdate) {
                         // Update data yang sudah ada
                         $jurnalumum->update($header);
-                        // Hapus cost ratio lama
-                        \App\Models\Jurnalumumcostratio::where('kode_ju', $jurnalumum->kode_ju)->delete();
                     } else {
                         // Insert data baru
+                        $header['kode_ju'] = $jurnalumumData['kode_ju'];
                         $jurnalumum = Jurnalumum::create($header);
-                    }
-
-                    // Insert cost ratio jika ada
-                    $costRatioCount = 0;
-                    if (isset($jurnalumumData['cost_ratio']) && is_array($jurnalumumData['cost_ratio'])) {
-                        foreach ($jurnalumumData['cost_ratio'] as $kodeCr) {
-                            \App\Models\Jurnalumumcostratio::create([
-                                'kode_cr' => $kodeCr,
-                                'kode_ju' => $jurnalumum->kode_ju,
-                            ]);
-                            $costRatioCount++;
-                        }
                     }
 
                     DB::commit();
@@ -644,10 +664,6 @@ class SyncJurnalumumController extends Controller
             }
 
             $count = $query->count();
-            
-            // Hapus juga relasi cost ratio-nya
-            $kodeJus = $query->pluck('kode_ju');
-            \App\Models\Jurnalumumcostratio::whereIn('kode_ju', $kodeJus)->delete();
             
             $query->delete();
 

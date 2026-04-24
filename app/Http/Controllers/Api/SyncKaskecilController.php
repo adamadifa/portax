@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Kaskecil;
 use App\Models\Kaskecilcostratio;
+use App\Models\Coa;
+use App\Models\Bank;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -53,6 +55,35 @@ class SyncKaskecilController extends Controller
 
             DB::beginTransaction();
 
+            // Auto-create Cabang jika belum ada
+            $kodeCabang = $request->kode_cabang_sync ?? $request->kode_cabang;
+            if ($kodeCabang && !DB::table('cabang')->where('kode_cabang', $kodeCabang)->exists()) {
+                DB::table('cabang')->insert([
+                    'kode_cabang' => $kodeCabang,
+                    'nama_cabang' => 'Sync Placeholder ' . $kodeCabang,
+                    'alamat_cabang' => '-',
+                    'telepon_cabang' => '-',
+                    'lokasi_cabang' => '-',
+                    'radius_cabang' => 100,
+                    'kode_regional' => 'R00',
+                    'urutan' => 1,
+                    'kode_pt' => '01',
+                    'nama_pt' => 'Sync Placeholder',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // Auto-create COA jika belum ada
+            if (!Coa::where('kode_akun', $request->kode_akun)->exists()) {
+                Coa::create([
+                    'kode_akun' => $request->kode_akun,
+                    'nama_akun' => 'Sync Placeholder ' . $request->kode_akun,
+                    'level' => 5,
+                    'kode_kategori' => substr($request->kode_akun, 0, 1),
+                ]);
+            }
+
             // Cek apakah data dengan id sudah ada
             $kaskecil = Kaskecil::find($request->id);
             $isUpdate = $kaskecil !== null;
@@ -74,24 +105,10 @@ class SyncKaskecilController extends Controller
             if ($isUpdate) {
                 // Update data yang sudah ada
                 $kaskecil->update($kaskecilData);
-                // Hapus cost ratio lama
-                Kaskecilcostratio::where('id', $kaskecil->id)->delete();
             } else {
                 // Insert data baru dengan id yang dikirim
                 $kaskecilData['id'] = $request->id;
                 $kaskecil = Kaskecil::create($kaskecilData);
-            }
-
-            // Insert cost ratio jika ada
-            $costRatioCount = 0;
-            if ($request->has('cost_ratio') && is_array($request->cost_ratio)) {
-                foreach ($request->cost_ratio as $kodeCr) {
-                    Kaskecilcostratio::create([
-                        'kode_cr' => $kodeCr,
-                        'id' => $kaskecil->id,
-                    ]);
-                    $costRatioCount++;
-                }
             }
 
             DB::commit();
@@ -102,13 +119,13 @@ class SyncKaskecilController extends Controller
                 'data' => [
                     'id' => $kaskecil->id,
                     'no_bukti' => $request->no_bukti,
-                    'total_cost_ratio' => $costRatioCount,
                     'action' => $isUpdate ? 'updated' : 'created',
                     'created_at' => now()->toDateTimeString()
                 ]
             ], $isUpdate ? 200 : 201);
         } catch (Exception $e) {
             DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('Gagal sync kas kecil: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return response()->json([
                 'success' => false,
@@ -197,6 +214,35 @@ class SyncKaskecilController extends Controller
                 try {
                     DB::beginTransaction();
 
+                    // Auto-create Cabang jika belum ada
+                    $kodeCabang = $request->kode_cabang_sync ?? ($request->kode_cabang ?? $kaskecilData['kode_cabang']);
+                    if ($kodeCabang && !DB::table('cabang')->where('kode_cabang', $kodeCabang)->exists()) {
+                        DB::table('cabang')->insert([
+                            'kode_cabang' => $kodeCabang,
+                            'nama_cabang' => 'Sync Placeholder ' . $kodeCabang,
+                            'alamat_cabang' => '-',
+                            'telepon_cabang' => '-',
+                            'lokasi_cabang' => '-',
+                            'radius_cabang' => 100,
+                            'kode_regional' => 'R00',
+                            'urutan' => 1,
+                            'kode_pt' => '01',
+                            'nama_pt' => 'Sync Placeholder',
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+
+                    // Auto-create COA jika belum ada
+                    if (!Coa::where('kode_akun', $kaskecilData['kode_akun'])->exists()) {
+                        Coa::create([
+                            'kode_akun' => $kaskecilData['kode_akun'],
+                            'nama_akun' => 'Sync Placeholder ' . $kaskecilData['kode_akun'],
+                            'level' => 5,
+                            'kode_kategori' => substr($kaskecilData['kode_akun'], 0, 1),
+                        ]);
+                    }
+
                     // Cek apakah data dengan id sudah ada
                     $kaskecil = Kaskecil::find($kaskecilData['id']);
                     $isUpdate = $kaskecil !== null;
@@ -218,24 +264,10 @@ class SyncKaskecilController extends Controller
                     if ($isUpdate) {
                         // Update data yang sudah ada
                         $kaskecil->update($header);
-                        // Hapus cost ratio lama
-                        Kaskecilcostratio::where('id', $kaskecil->id)->delete();
                     } else {
                         // Insert data baru dengan id yang dikirim
                         $header['id'] = $kaskecilData['id'];
                         $kaskecil = Kaskecil::create($header);
-                    }
-
-                    // Insert cost ratio jika ada
-                    $costRatioCount = 0;
-                    if (isset($kaskecilData['cost_ratio']) && is_array($kaskecilData['cost_ratio'])) {
-                        foreach ($kaskecilData['cost_ratio'] as $kodeCr) {
-                            Kaskecilcostratio::create([
-                                'kode_cr' => $kodeCr,
-                                'id' => $kaskecil->id,
-                            ]);
-                            $costRatioCount++;
-                        }
                     }
 
                     DB::commit();
@@ -245,8 +277,7 @@ class SyncKaskecilController extends Controller
                         'no_bukti' => $kaskecilData['no_bukti'],
                         'status' => 'success',
                         'message' => $isUpdate ? 'Berhasil diupdate' : 'Berhasil disync',
-                        'action' => $isUpdate ? 'updated' : 'created',
-                        'cost_ratio_count' => $costRatioCount
+                        'action' => $isUpdate ? 'updated' : 'created'
                     ];
                 } catch (Exception $e) {
                     DB::rollBack();
@@ -472,10 +503,6 @@ class SyncKaskecilController extends Controller
             }
 
             $count = $query->count();
-            
-            // Hapus juga relasi cost ratio-nya
-            $ids = $query->pluck('id');
-            \App\Models\Kaskecilcostratio::whereIn('id', $ids)->delete();
             
             $query->delete();
 
