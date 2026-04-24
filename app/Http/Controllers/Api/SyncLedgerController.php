@@ -37,6 +37,10 @@ class SyncLedgerController extends Controller
                 // Optional fields
                 'kode_peruntukan' => 'nullable|string|max:2',
                 'keterangan_peruntukan' => 'nullable|string|max:255',
+
+                // Cost Ratio (optional array)
+                'cost_ratio' => 'nullable|array',
+                'cost_ratio.*' => 'string|max:10',
             ]);
 
             if ($validator->fails()) {
@@ -94,9 +98,23 @@ class SyncLedgerController extends Controller
             if ($isUpdate) {
                 // Update data yang sudah ada
                 $ledger->update($ledgerData);
+                // Hapus cost ratio lama
+                \App\Models\Ledgercostratio::where('no_bukti', $ledger->no_bukti)->delete();
             } else {
                 // Insert data baru
                 $ledger = Ledger::create($ledgerData);
+            }
+
+            // Insert cost ratio jika ada
+            $costRatioCount = 0;
+            if ($request->has('cost_ratio') && is_array($request->cost_ratio)) {
+                foreach ($request->cost_ratio as $kodeCr) {
+                    \App\Models\Ledgercostratio::create([
+                        'kode_cr' => $kodeCr,
+                        'no_bukti' => $ledger->no_bukti,
+                    ]);
+                    $costRatioCount++;
+                }
             }
 
             DB::commit();
@@ -198,7 +216,10 @@ class SyncLedgerController extends Controller
                 'data.*.kode_akun' => 'required|string|max:6',
                 'data.*.keterangan' => 'required|string|max:255',
                 'data.*.jumlah' => 'required|integer',
+                'data.*.jumlah' => 'required|integer',
                 'data.*.debet_kredit' => 'required|string|max:1',
+                'data.*.cost_ratio' => 'nullable|array',
+                'data.*.cost_ratio.*' => 'string|max:10',
             ]);
 
             if ($validator->fails()) {
@@ -252,9 +273,23 @@ class SyncLedgerController extends Controller
                     if ($isUpdate) {
                         // Update data yang sudah ada
                         $ledger->update($header);
+                        // Hapus cost ratio lama
+                        \App\Models\Ledgercostratio::where('no_bukti', $ledger->no_bukti)->delete();
                     } else {
                         // Insert data baru
                         $ledger = Ledger::create($header);
+                    }
+
+                    // Insert cost ratio jika ada
+                    $costRatioCount = 0;
+                    if (isset($ledgerData['cost_ratio']) && is_array($ledgerData['cost_ratio'])) {
+                        foreach ($ledgerData['cost_ratio'] as $kodeCr) {
+                            \App\Models\Ledgercostratio::create([
+                                'kode_cr' => $kodeCr,
+                                'no_bukti' => $ledger->no_bukti,
+                            ]);
+                            $costRatioCount++;
+                        }
                     }
 
                     DB::commit();

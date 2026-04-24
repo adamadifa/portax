@@ -95,9 +95,23 @@ class SyncJurnalumumController extends Controller
             if ($isUpdate) {
                 // Update data yang sudah ada
                 $jurnalumum->update($jurnalumumData);
+                // Hapus cost ratio lama
+                \App\Models\Jurnalumumcostratio::where('kode_ju', $jurnalumum->kode_ju)->delete();
             } else {
                 // Insert data baru
                 $jurnalumum = Jurnalumum::create($jurnalumumData);
+            }
+
+            // Insert cost ratio jika ada
+            $costRatioCount = 0;
+            if ($request->has('cost_ratio') && is_array($request->cost_ratio)) {
+                foreach ($request->cost_ratio as $kodeCr) {
+                    \App\Models\Jurnalumumcostratio::create([
+                        'kode_cr' => $kodeCr,
+                        'kode_ju' => $jurnalumum->kode_ju,
+                    ]);
+                    $costRatioCount++;
+                }
             }
 
             DB::commit();
@@ -221,6 +235,8 @@ class SyncJurnalumumController extends Controller
                 'data.*.kode_dept' => 'required|string|max:3',
                 'data.*.kode_peruntukan' => 'required|string|max:2',
                 'data.*.id_user' => 'required|integer',
+                'data.*.cost_ratio' => 'nullable|array',
+                'data.*.cost_ratio.*' => 'string|max:10',
             ]);
 
             if ($validator->fails()) {
@@ -286,9 +302,23 @@ class SyncJurnalumumController extends Controller
                     if ($isUpdate) {
                         // Update data yang sudah ada
                         $jurnalumum->update($header);
+                        // Hapus cost ratio lama
+                        \App\Models\Jurnalumumcostratio::where('kode_ju', $jurnalumum->kode_ju)->delete();
                     } else {
                         // Insert data baru
                         $jurnalumum = Jurnalumum::create($header);
+                    }
+
+                    // Insert cost ratio jika ada
+                    $costRatioCount = 0;
+                    if (isset($jurnalumumData['cost_ratio']) && is_array($jurnalumumData['cost_ratio'])) {
+                        foreach ($jurnalumumData['cost_ratio'] as $kodeCr) {
+                            \App\Models\Jurnalumumcostratio::create([
+                                'kode_cr' => $kodeCr,
+                                'kode_ju' => $jurnalumum->kode_ju,
+                            ]);
+                            $costRatioCount++;
+                        }
                     }
 
                     DB::commit();
