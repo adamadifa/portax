@@ -93,6 +93,7 @@ class SyncLedgerController extends Controller
                 'debet_kredit' => $request->debet_kredit,
                 'kode_peruntukan' => $request->kode_peruntukan,
                 'keterangan_peruntukan' => $request->keterangan_peruntukan,
+                'is_sync' => 1,
             ];
 
             if ($isUpdate) {
@@ -268,6 +269,7 @@ class SyncLedgerController extends Controller
                         'debet_kredit' => $ledgerData['debet_kredit'],
                         'kode_peruntukan' => $ledgerData['kode_peruntukan'] ?? null,
                         'keterangan_peruntukan' => $ledgerData['keterangan_peruntukan'] ?? null,
+                        'is_sync' => 1,
                     ];
 
                     if ($isUpdate) {
@@ -482,6 +484,47 @@ class SyncLedgerController extends Controller
                 'message' => 'Gagal hapus batch',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Cleanup data ledger hasil sync sebelum sync baru dimulai
+     */
+    public function preSyncCleanup(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'dari' => 'required|date',
+                'sampai' => 'required|date',
+                'kode_cabang' => 'nullable|string|max:3'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'message' => 'Validasi gagal', 'errors' => $validator->errors()], 422);
+            }
+
+            // Ledger tidak punya kode_cabang langsung, biasanya lewat bank atau coa? 
+            // Tapi di PacificV4 kita filter berdasarkan kode_cabang report.
+            // Kita hapus yang is_sync = 1 dan dalam periode.
+            
+            $query = Ledger::where('is_sync', 1)
+                ->whereBetween('tanggal', [$request->dari, $request->sampai]);
+
+            $count = $query->count();
+            
+            // Hapus juga relasi cost ratio-nya
+            $noBuktis = $query->pluck('no_bukti');
+            \App\Models\Ledgercostratio::whereIn('no_bukti', $noBuktis)->delete();
+            
+            $query->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Cleanup berhasil. {$count} data ledger hasil sync dihapus.",
+                'count' => $count
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Cleanup gagal: ' . $e->getMessage()], 500);
         }
     }
 }

@@ -90,6 +90,7 @@ class SyncJurnalumumController extends Controller
                 'kode_peruntukan' => $request->kode_peruntukan, // Note: typo di migration menggunakan kode_pruntukan
                 'kode_cabang' => $request->kode_cabang,
                 'id_user' => 1,
+                'is_sync' => 1,
             ];
 
             if ($isUpdate) {
@@ -297,6 +298,7 @@ class SyncJurnalumumController extends Controller
                         'kode_peruntukan' => $jurnalumumData['kode_peruntukan'],
                         'kode_cabang' => $jurnalumumData['kode_cabang'] ?? null,
                         'id_user' => $jurnalumumData['id_user'],
+                        'is_sync' => 1,
                     ];
 
                     if ($isUpdate) {
@@ -615,6 +617,47 @@ class SyncJurnalumumController extends Controller
                 'error_type' => config('app.debug') ? get_class($e) : null,
                 'details' => config('app.debug') ? $e->getTraceAsString() : null
             ], 500);
+        }
+    }
+
+    /**
+     * Cleanup data jurnal umum hasil sync sebelum sync baru dimulai
+     */
+    public function preSyncCleanup(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'dari' => 'required|date',
+                'sampai' => 'required|date',
+                'kode_cabang' => 'nullable|string|max:3'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'message' => 'Validasi gagal', 'errors' => $validator->errors()], 422);
+            }
+
+            $query = Jurnalumum::where('is_sync', 1)
+                ->whereBetween('tanggal', [$request->dari, $request->sampai]);
+
+            if (!empty($request->kode_cabang)) {
+                $query->where('kode_cabang', $request->kode_cabang);
+            }
+
+            $count = $query->count();
+            
+            // Hapus juga relasi cost ratio-nya
+            $kodeJus = $query->pluck('kode_ju');
+            \App\Models\Jurnalumumcostratio::whereIn('kode_ju', $kodeJus)->delete();
+            
+            $query->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Cleanup berhasil. {$count} data jurnal umum hasil sync dihapus.",
+                'count' => $count
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Cleanup gagal: ' . $e->getMessage()], 500);
         }
     }
 }

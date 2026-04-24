@@ -59,8 +59,15 @@ Route::prefix('sync')->group(function () {
     Route::post('/jurnalumum', [SyncJurnalumumController::class, 'sync']);
     Route::post('/jurnalumum/batch', [SyncJurnalumumController::class, 'syncBatch']);
     Route::post('/jurnalumum/check', [SyncJurnalumumController::class, 'check']);
+    Route::post('/jurnalumum/pre-sync-cleanup', [SyncJurnalumumController::class, 'preSyncCleanup']);
     Route::delete('/jurnalumum', [SyncJurnalumumController::class, 'delete']);
     Route::delete('/jurnalumum/batch', [SyncJurnalumumController::class, 'deleteBatch']);
+
+    // Kas Kecil
+    Route::post('/kaskecil/pre-sync-cleanup', [SyncKaskecilController::class, 'preSyncCleanup']);
+    
+    // Ledger
+    Route::post('/ledger/pre-sync-cleanup', [SyncLedgerController::class, 'preSyncCleanup']);
 
     // Cost Ratio
     Route::post('/costratio/batch', [SyncCostratioController::class, 'syncBatch']);
