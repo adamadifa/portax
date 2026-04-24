@@ -56,10 +56,17 @@ class SyncCostratioController extends Controller
                         'jumlah' => $item['jumlah'],
                     ];
 
-                    Costratio::updateOrCreate(
-                        ['kode_cr' => $item['kode_cr']],
-                        $costratioData
-                    );
+                    // Menggunakan update atau create secara eksplisit
+                    $costratio = Costratio::where('kode_cr', $item['kode_cr'])->first();
+                    
+                    if ($costratio) {
+                        $costratio->update($costratioData);
+                    } else {
+                        Costratio::create(array_merge(
+                            ['kode_cr' => $item['kode_cr']],
+                            $costratioData
+                        ));
+                    }
 
                     DB::commit();
                     $successCount++;
