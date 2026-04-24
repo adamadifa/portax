@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\SyncKasbesarController;
 use App\Http\Controllers\Api\SyncKaskecilController;
 use App\Http\Controllers\Api\SyncLedgerController;
 use App\Http\Controllers\Api\SyncJurnalumumController;
+use App\Http\Controllers\Api\SyncCostratioController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -60,6 +61,10 @@ Route::prefix('sync')->group(function () {
     Route::post('/jurnalumum/check', [SyncJurnalumumController::class, 'check']);
     Route::delete('/jurnalumum', [SyncJurnalumumController::class, 'delete']);
     Route::delete('/jurnalumum/batch', [SyncJurnalumumController::class, 'deleteBatch']);
+
+    // Cost Ratio
+    Route::post('/costratio/batch', [SyncCostratioController::class, 'syncBatch']);
+    Route::delete('/costratio/batch', [SyncCostratioController::class, 'deleteBatch']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

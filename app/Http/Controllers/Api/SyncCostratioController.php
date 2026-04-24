@@ -1,0 +1,134 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Costratio;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Exception;
+
+class SyncCostratioController extends Controller
+{
+    /**
+     * Sync data cost ratio dari aplikasi lain
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function syncBatch(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'data' => 'required|array|min:1',
+                'data.*.kode_cr' => 'required|string|max:20',
+                'data.*.tanggal' => 'required|date',
+                'data.*.kode_akun' => 'required|string|max:10',
+                'data.*.jumlah' => 'required|integer',
+                'data.*.kode_cabang' => 'nullable|string|max:3',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $id_user = 1; // Default to Super Admin
+            $successCount = 0;
+            $failedCount = 0;
+            $results = [];
+
+            foreach ($request->data as $item) {
+                try {
+                    DB::beginTransaction();
+
+                    $costratioData = [
+                        'tanggal' => $item['tanggal'],
+                        'kode_akun' => $item['kode_akun'],
+                        'keterangan' => $item['keterangan'] ?? null,
+                        'kode_cabang' => $item['kode_cabang'] ?? null,
+                        'kode_sumber' => $item['kode_sumber'] ?? null,
+                        'jumlah' => $item['jumlah'],
+                    ];
+
+                    Costratio::updateOrCreate(
+                        ['kode_cr' => $item['kode_cr']],
+                        $costratioData
+                    );
+
+                    DB::commit();
+                    $successCount++;
+                    $results[] = [
+                        'kode_cr' => $item['kode_cr'],
+                        'status' => 'success'
+                    ];
+                } catch (Exception $e) {
+                    DB::rollBack();
+                    $failedCount++;
+                    $results[] = [
+                        'kode_cr' => $item['kode_cr'] ?? 'unknown',
+                        'status' => 'failed',
+                        'message' => $e->getMessage()
+                    ];
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Sync Cost Ratio selesai. Sukses: {$successCount}, Gagal: {$failedCount}",
+                'summary' => [
+                    'total' => count($request->data),
+                    'success' => $successCount,
+                    'failed' => $failedCount
+                ],
+                'results' => $results
+            ], 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal sync batch cost ratio',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete batch cost ratio
+     */
+    public function deleteBatch(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'kode_cr' => 'required|array|min:1',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $deletedCount = Costratio::whereIn('kode_cr', $request->kode_cr)->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Berhasil menghapus {$deletedCount} data cost ratio."
+            ], 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus batch cost ratio',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+}
