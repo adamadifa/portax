@@ -71,6 +71,7 @@ Route::prefix('sync')->group(function () {
 
     // Cost Ratio
     Route::post('/costratio/batch', [SyncCostratioController::class, 'syncBatch']);
+    Route::post('/costratio/reset-batch', [SyncCostratioController::class, 'resetBatch']);
     Route::delete('/costratio/batch', [SyncCostratioController::class, 'deleteBatch']);
 });
 

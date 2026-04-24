@@ -138,4 +138,82 @@ class SyncCostratioController extends Controller
             ], 500);
         }
     }
+    
+    /**
+     * Reset data transaksi (Kas Kecil, Ledger, Jurnal Umum) yang sudah tersinkronisasi
+     * berdasarkan periode dan kode cabang
+     */
+    public function resetBatch(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'dari' => 'required|date',
+                'sampai' => 'required|date',
+                'kode_cabang' => 'nullable|string|max:3',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $dari = $request->dari;
+            $sampai = $request->sampai;
+            $kode_cabang = $request->kode_cabang;
+
+            DB::beginTransaction();
+
+            // 1. Reset Kas Kecil
+            $queryKk = DB::table('keuangan_kaskecil')
+                ->where('is_sync', 1)
+                ->whereBetween('tanggal', [$dari, $sampai]);
+            if (!empty($kode_cabang)) {
+                $queryKk->where('kode_cabang', $kode_cabang);
+            }
+            $deletedKk = $queryKk->delete();
+
+            // 2. Reset Ledger
+            $queryLedger = DB::table('keuangan_ledger')
+                ->where('is_sync', 1)
+                ->whereBetween('tanggal', [$dari, $sampai]);
+            if (!empty($kode_cabang)) {
+                $queryLedger->whereIn('kode_bank', function($q) use ($kode_cabang) {
+                    $q->select('kode_bank')->from('bank')->where('kode_cabang', $kode_cabang);
+                });
+            }
+            $deletedLedger = $queryLedger->delete();
+
+            // 3. Reset Jurnal Umum
+            $queryJu = DB::table('accounting_jurnalumum')
+                ->where('is_sync', 1)
+                ->whereBetween('tanggal', [$dari, $sampai]);
+            if (!empty($kode_cabang)) {
+                $queryJu->where('kode_cabang', $kode_cabang);
+            }
+            $deletedJu = $queryJu->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Reset data sync berhasil.",
+                'summary' => [
+                    'kaskecil' => $deletedKk,
+                    'ledger' => $deletedLedger,
+                    'jurnalumum' => $deletedJu,
+                ]
+            ], 200);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mereset data sync',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
