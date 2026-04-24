@@ -1847,6 +1847,7 @@ class LaporanaccountingController extends Controller
             ->unionAll($jurnalumum);
 
         $biaya = DB::query()->fromSub($union_data, 'transaksi_biaya')
+               ->where('kode_akun', 'like', '6%')
                ->orderBy('tanggal')
                ->orderBy('kode_akun')
                ->get();
