@@ -141,7 +141,7 @@ class KaskecilController extends Controller
                 $cekAkun = substr($kode_akun[$i], 0, 3);
 
 
-                //Inseert Cost Ratio
+                /* //Inseert Cost Ratio
                 if ($debet_kredit[$i] == 'D' and in_array($cekAkun, ['6-1', '6-2'])) {
                     $lastcostratio = Costratio::select('kode_cr')
                         ->whereRaw('LEFT(kode_cr,6) ="CR' . date('my', strtotime($request->tanggal)) . '"')
@@ -165,7 +165,7 @@ class KaskecilController extends Controller
                         'id' => $kaskecil->id,
                     ]);
                     $last_kodecr = $kode_cr;
-                }
+                } */
             }
 
             DB::commit();
@@ -268,7 +268,7 @@ class KaskecilController extends Controller
             //Inseert Cost Ratio
 
             // dd($cekCostratio);
-            if ($debet_kredit == 'D' and in_array($cekAkun, ['6-1', '6-2'])) {
+            /* if ($debet_kredit == 'D' and in_array($cekAkun, ['6-1', '6-2'])) {
                 // dd($cekCostratio);
                 if (!$cekCostratio) {
                     $lastcostratio = Costratio::select('kode_cr')
@@ -306,7 +306,7 @@ class KaskecilController extends Controller
                 if ($cekCostratio) {
                     Costratio::where('kode_cr', $cekCostratio->kode_cr)->delete();
                 }
-            }
+            } */
 
             DB::commit();
             return Redirect::back()->with(messageSuccess('Data Berhasil Diupdate'));

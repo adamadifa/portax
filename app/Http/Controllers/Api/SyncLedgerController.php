@@ -516,7 +516,11 @@ class SyncLedgerController extends Controller
             $query = Ledger::where('is_sync', 1)
                 ->whereBetween('tanggal', [$request->dari, $request->sampai]);
 
-            $count = $query->count();
+            $noBuktis = $query->pluck('no_bukti')->toArray();
+            $count = count($noBuktis);
+            if (!empty($noBuktis)) {
+                DB::table('keuangan_ledger_costratio')->whereIn('no_bukti', $noBuktis)->delete();
+            }
             
             $query->delete();
 

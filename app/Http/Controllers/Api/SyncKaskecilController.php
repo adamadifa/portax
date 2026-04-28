@@ -502,8 +502,12 @@ class SyncKaskecilController extends Controller
                 $query->where('kode_cabang', $request->kode_cabang);
             }
 
-            $count = $query->count();
-            
+            $ids = $query->pluck('id')->toArray();
+            $count = count($ids);
+            if (!empty($ids)) {
+                DB::table('keuangan_kaskecil_costratio')->whereIn('id', $ids)->delete();
+            }
+
             $query->delete();
 
             return response()->json([

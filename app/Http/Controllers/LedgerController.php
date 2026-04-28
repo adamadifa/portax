@@ -106,9 +106,8 @@ class LedgerController extends Controller
                     'keterangan_peruntukan' => $ket_peruntukan[$i]
 
                 ]);
-                //Jika Kode akun Masuk kedalam Kateogri Cost Ratio
+                /* //Jika Kode akun Masuk kedalam Kateogri Cost Ratio
                 if ($debet_kredit[$i] == 'D' && in_array(substr($kode_akun[$i], 0, 3), $kode_akun_cr) && $kode_peruntukan[$i] == 'PC') {
-
                     //Generate Kode Cost Ratio
                     $kode = "CR" . $bulan . $tahun;
                     $costratio = Costratio::select('kode_cr')
@@ -133,7 +132,7 @@ class LedgerController extends Controller
                         'no_bukti' => $no_bukti,
                         'kode_cr' => $kode_cr,
                     ]);
-                }
+                } */
             }
 
             DB::commit();
@@ -187,7 +186,7 @@ class LedgerController extends Controller
                 'kode_peruntukan' => $request->kode_peruntukan,
                 'keterangan_peruntukan' => $request->kode_peruntukan == 'PC' ? $request->kode_cabang :  null,
             ]);
-            $cekcostratio = Ledgercostratio::where('no_bukti', $no_bukti)->first();
+            /* $cekcostratio = Ledgercostratio::where('no_bukti', $no_bukti)->first();
             if ($request->debet_kredit == 'D' && in_array(substr($request->kode_akun, 0, 3), $kode_akun_cr) && $request->kode_peruntukan == 'PC') {
                 //Cek Jika Sudah Ada di Cost Ratio
                 if ($cekcostratio != null) {
@@ -232,7 +231,7 @@ class LedgerController extends Controller
                     Ledgercostratio::where('no_bukti', $no_bukti)->delete();
                     Costratio::where('kode_cr', $cekcostratio->kode_cr)->delete();
                 }
-            }
+            } */
             DB::commit();
             return Redirect::back()->with(messageSuccess('Data Berhasil Disimpan'));
         } catch (\Exception $e) {
@@ -247,14 +246,18 @@ class LedgerController extends Controller
         $no_bukti = Crypt::decrypt($no_bukti);
         try {
             $ledger = Ledger::where('no_bukti', $no_bukti)->first();
-            $cekcostratio = Ledgercostratio::where('no_bukti', $no_bukti)->first();
             $cektutuplaporanledger = cektutupLaporan($ledger->tanggal, "ledger");
             if ($cektutuplaporanledger > 0) {
                 return Redirect::back()->with(messageError('Periode Laporan Sudah Ditutup'));
             }
 
+            $cekcostratio = Ledgercostratio::where('no_bukti', $no_bukti)->first();
+            if ($cekcostratio) {
+                Costratio::where('kode_cr', $cekcostratio->kode_cr)->delete();
+                Ledgercostratio::where('no_bukti', $no_bukti)->delete();
+            }
+
             Ledger::where('no_bukti', $no_bukti)->delete();
-            Costratio::where('kode_cr', $cekcostratio->kode_cr)->delete();
 
             return Redirect::back()->with(messageSuccess('Data Berhasil Dihapus'));
         } catch (\Exception $e) {

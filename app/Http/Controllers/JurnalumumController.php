@@ -101,7 +101,7 @@ class JurnalumumController extends Controller
                     'id_user' => auth()->user()->id
                 ]);
 
-                if ($debet_kredit[$i] == 'D' && in_array(substr($kode_akun[$i], 0, 3), ['6-1', '6-2']) && $kode_peruntukan[$i] == 'PC') {
+                /* if ($debet_kredit[$i] == 'D' && in_array(substr($kode_akun[$i], 0, 3), ['6-1', '6-2']) && $kode_peruntukan[$i] == 'PC') {
                     $lastcostratio = Costratio::select('kode_cr')
                         ->whereRaw('LEFT(kode_cr,6) ="CR' . date('my', strtotime($tanggal[$i])) . '"')
                         ->orderBy('kode_cr', 'desc')
@@ -123,7 +123,7 @@ class JurnalumumController extends Controller
                         'kode_ju' => $kode_ju,
                         'kode_cr' => $kode_cr,
                     ]);
-                }
+                } */
             }
             DB::commit();
             return Redirect::back()->with(messageSuccess('Data Berhasil Disimpan'));
@@ -188,7 +188,7 @@ class JurnalumumController extends Controller
 
 
             $costratio = Jurnalumumcostratio::where('kode_ju', $jurnalumum->kode_ju)->first();
-            if ($request->debet_kredit == 'D' && in_array(substr($request->kode_akun, 0, 3), ['6-1', '6-2']) && $request->kode_peruntukan == 'PC') {
+            /* if ($request->debet_kredit == 'D' && in_array(substr($request->kode_akun, 0, 3), ['6-1', '6-2']) && $request->kode_peruntukan == 'PC') {
                 if (!$costratio) {
                     $lastcostratio = Costratio::select('kode_cr')
                         ->whereRaw('LEFT(kode_cr,6) ="CR' . date('my', strtotime($request->tanggal)) . '"')
@@ -222,7 +222,7 @@ class JurnalumumController extends Controller
                 if ($costratio) {
                     Jurnalumumcostratio::where('kode_ju', $jurnalumum->kode_ju)->delete();
                 }
-            }
+            } */
 
 
             DB::commit();
