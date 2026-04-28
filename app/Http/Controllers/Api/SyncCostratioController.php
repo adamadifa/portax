@@ -166,34 +166,60 @@ class SyncCostratioController extends Controller
 
             DB::beginTransaction();
 
+            // 0. Reset accounting_costratio first (optional, based on filters)
+            $queryCr = DB::table('accounting_costratio')
+                ->whereBetween('tanggal', [$dari, $sampai]);
+            if (!empty($kode_cabang)) {
+                $queryCr->where('kode_cabang', $kode_cabang);
+            }
+            $queryCr->delete();
+
             // 1. Reset Kas Kecil
-            $queryKk = DB::table('keuangan_kaskecil')
+            $queryKkIds = DB::table('keuangan_kaskecil')
                 ->where('is_sync', 1)
                 ->whereBetween('tanggal', [$dari, $sampai]);
             if (!empty($kode_cabang)) {
-                $queryKk->where('kode_cabang', $kode_cabang);
+                $queryKkIds->where('kode_cabang', $kode_cabang);
             }
-            $deletedKk = $queryKk->delete();
+            $idsKk = $queryKkIds->pluck('id');
+
+            if ($idsKk->isNotEmpty()) {
+                DB::table('keuangan_kaskecil_costratio')->whereIn('id', $idsKk)->delete();
+                DB::table('keuangan_kaskecil')->whereIn('id', $idsKk)->delete();
+            }
+            $deletedKk = count($idsKk);
 
             // 2. Reset Ledger
-            $queryLedger = DB::table('keuangan_ledger')
+            $queryLedgerNoBukti = DB::table('keuangan_ledger')
                 ->where('is_sync', 1)
                 ->whereBetween('tanggal', [$dari, $sampai]);
             if (!empty($kode_cabang)) {
-                $queryLedger->whereIn('kode_bank', function($q) use ($kode_cabang) {
+                $queryLedgerNoBukti->whereIn('kode_bank', function ($q) use ($kode_cabang) {
                     $q->select('kode_bank')->from('bank')->where('kode_cabang', $kode_cabang);
                 });
             }
-            $deletedLedger = $queryLedger->delete();
+            $noBuktiLedgers = $queryLedgerNoBukti->pluck('no_bukti');
+
+            if ($noBuktiLedgers->isNotEmpty()) {
+                DB::table('keuangan_ledger_costratio')->whereIn('no_bukti', $noBuktiLedgers)->delete();
+                DB::table('keuangan_ledger')->whereIn('no_bukti', $noBuktiLedgers)->delete();
+            }
+            $deletedLedger = count($noBuktiLedgers);
 
             // 3. Reset Jurnal Umum
-            $queryJu = DB::table('accounting_jurnalumum')
+            $queryJuKodeJu = DB::table('accounting_jurnalumum')
                 ->where('is_sync', 1)
                 ->whereBetween('tanggal', [$dari, $sampai]);
             if (!empty($kode_cabang)) {
-                $queryJu->where('kode_cabang', $kode_cabang);
+                $queryJuKodeJu->where('kode_cabang', $kode_cabang);
             }
-            $deletedJu = $queryJu->delete();
+            $kodeJuJurnals = $queryJuKodeJu->pluck('kode_ju');
+
+            if ($kodeJuJurnals->isNotEmpty()) {
+                DB::table('accounting_jurnalumum_costratio')->whereIn('kode_ju', $kodeJuJurnals)->delete();
+                DB::table('accounting_jurnalumum')->whereIn('kode_ju', $kodeJuJurnals)->delete();
+            }
+            $deletedJu = count($kodeJuJurnals);
 
             DB::commit();
 
