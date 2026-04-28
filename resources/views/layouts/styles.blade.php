@@ -205,113 +205,37 @@
         margin-bottom: 0.75rem !important;
     }
 
-    /* Flatpickr Compact & Colorful Redesign */
+    /* Minimal Flatpickr Base Styles */
     .flatpickr-calendar {
         background: #fff !important;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-        border: none !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+        z-index: 9999 !important;
         border-radius: 0.75rem !important;
-        padding: 0 !important;
-        font-family: 'Inter', sans-serif !important;
-        width: 280px !important;
-        overflow: hidden !important;
-    }
-
-    .flatpickr-calendar::before, .flatpickr-calendar::after {
-        display: none !important;
-    }
-
-    /* Colored Header */
-    .flatpickr-months {
-        background: #003d9e !important;
-        padding: 10px 0 !important;
-        color: #fff !important;
-    }
-
-    .flatpickr-current-month {
-        color: #fff !important;
-        padding: 0 !important;
-    }
-
-    .flatpickr-monthDropdown-months {
-        color: #fff !important;
-        font-weight: 700 !important;
-        background: transparent !important;
-    }
-
-    .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
-        background-color: #fff !important;
-        color: #334155 !important;
-    }
-
-    .numInputWrapper input.cur-year {
-        color: #fff !important;
-        font-weight: 400 !important;
-    }
-
-    .flatpickr-prev-month, .flatpickr-next-month {
-        color: #fff !important;
-        fill: #fff !important;
-        top: 10px !important;
-    }
-
-    .flatpickr-prev-month:hover svg, .flatpickr-next-month:hover svg {
-        fill: #fff !important;
-        opacity: 0.8;
-    }
-
-    /* Weekdays Row */
-    .flatpickr-weekdays {
-        background: #fff !important;
-        padding: 8px 0 !important;
-        border-bottom: 1px solid #f1f5f9 !important;
-    }
-
-    span.flatpickr-weekday {
-        color: #003d9e !important;
-        font-weight: 800 !important;
-        font-size: 0.75rem !important;
-        text-transform: uppercase !important;
-    }
-
-    /* Days Grid */
-    .flatpickr-innerContainer {
+        width: 300px !important; /* Ukuran yang pas untuk 7 kolom */
         padding: 5px !important;
     }
 
+    .flatpickr-days, .dayContainer {
+        width: 280px !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
+    }
+
     .flatpickr-day {
-        color: #475569 !important;
-        font-size: 0.85rem !important;
-        border-radius: 0.5rem !important;
-        height: 35px !important;
-        line-height: 35px !important;
-        max-width: 35px !important;
+        border-radius: 8px !important;
+        height: 38px !important;
+        line-height: 38px !important;
+        max-width: 38px !important;
         margin: 1px !important;
-        transition: all 0.2s ease !important;
+        font-weight: 500 !important;
     }
 
-    .flatpickr-day:hover {
-        background: #f1f5f9 !important;
-        color: #003d9e !important;
-    }
-
-    .flatpickr-day.today {
-        border-color: #003d9e !important;
-        color: #003d9e !important;
-        font-weight: 700 !important;
-    }
-
-    .flatpickr-day.selected {
-        background: #003d9e !important;
-        border-color: #003d9e !important;
-        color: #fff !important;
-        box-shadow: 0 4px 6px -1px rgba(0, 61, 158, 0.3) !important;
-    }
-
-    /* Hide Adjacent Month Days */
-    .flatpickr-day.prevMonthDay,
+    /* Memudarkan warna hari yang berada di luar bulan aktif */
+    .flatpickr-day.prevMonthDay, 
     .flatpickr-day.nextMonthDay {
-        visibility: hidden !important;
-        pointer-events: none !important;
+        color: #cbd5e1 !important;
+        opacity: 0.5 !important;
+        background: transparent !important;
     }
 </style>
