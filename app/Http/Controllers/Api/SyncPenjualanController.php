@@ -10,6 +10,8 @@ use App\Models\Pelanggan;
 use App\Models\User;
 use App\Models\Kategorisalesman;
 use App\Models\Historibayarpenjualan;
+use App\Models\Produk;
+use App\Models\Harga;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -82,6 +84,11 @@ class SyncPenjualanController extends Controller
                 'detail.*.subtotal' => 'required|integer',
 
                 'detail.*.status_promosi' => 'nullable|string|max:1',
+                'detail.*.kode_produk' => 'nullable|string|max:10',
+                'detail.*.nama_produk' => 'nullable|string|max:100',
+                'detail.*.kode_cabang_harga' => 'nullable|string|max:3',
+                'detail.*.kode_kategori_salesman_harga' => 'nullable|string|max:3',
+                'detail.*.kode_pelanggan_harga' => 'nullable|string|max:13',
 
                 // Historibayar (optional array)
                 'historibayar' => 'nullable|array',
@@ -240,6 +247,31 @@ class SyncPenjualanController extends Controller
 
             $detailCount = 0;
             foreach ($request->detail as $detail) {
+                // Auto-create Produk and Harga if missing
+                if (isset($detail['kode_produk'])) {
+                    Produk::updateOrCreate(
+                        ['kode_produk' => $detail['kode_produk']],
+                        [
+                            'nama_produk' => $detail['nama_produk'] ?? 'Sync Placeholder ' . $detail['kode_produk'],
+                            'status_aktif_produk' => 1,
+                        ]
+                    );
+
+                    Harga::updateOrCreate(
+                        ['kode_harga' => $detail['kode_harga']],
+                        [
+                            'kode_produk' => $detail['kode_produk'],
+                            'harga_dus' => $detail['harga_dus'],
+                            'harga_pack' => $detail['harga_pack'],
+                            'harga_pcs' => $detail['harga_pcs'],
+                            'kode_cabang' => $detail['kode_cabang_harga'] ?? null,
+                            'kode_kategori_salesman' => $detail['kode_kategori_salesman_harga'] ?? 'NM',
+                            'kode_pelanggan' => $detail['kode_pelanggan_harga'] ?? null,
+                            'status_aktif_harga' => 1,
+                        ]
+                    );
+                }
+
                 Detailpenjualan::create([
                     'no_faktur' => $request->no_faktur,
                     'kode_harga' => $detail['kode_harga'],
@@ -559,6 +591,31 @@ class SyncPenjualanController extends Controller
 
                     // Insert Details
                     foreach ($penjualanData['detail'] as $detail) {
+                        // Auto-create Produk and Harga if missing
+                        if (isset($detail['kode_produk'])) {
+                            Produk::updateOrCreate(
+                                ['kode_produk' => $detail['kode_produk']],
+                                [
+                                    'nama_produk' => $detail['nama_produk'] ?? 'Sync Placeholder ' . $detail['kode_produk'],
+                                    'status_aktif_produk' => 1,
+                                ]
+                            );
+
+                            Harga::updateOrCreate(
+                                ['kode_harga' => $detail['kode_harga']],
+                                [
+                                    'kode_produk' => $detail['kode_produk'],
+                                    'harga_dus' => $detail['harga_dus'],
+                                    'harga_pack' => $detail['harga_pack'],
+                                    'harga_pcs' => $detail['harga_pcs'],
+                                    'kode_cabang' => $detail['kode_cabang_harga'] ?? null,
+                                    'kode_kategori_salesman' => $detail['kode_kategori_salesman_harga'] ?? 'NM',
+                                    'kode_pelanggan' => $detail['kode_pelanggan_harga'] ?? null,
+                                    'status_aktif_harga' => 1,
+                                ]
+                            );
+                        }
+
                         Detailpenjualan::create([
                             'no_faktur' => $penjualanData['no_faktur'],
                             'kode_harga' => $detail['kode_harga'],
