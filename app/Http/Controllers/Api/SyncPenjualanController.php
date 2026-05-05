@@ -293,7 +293,7 @@ class SyncPenjualanController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal sync data penjualan' + $e->getMessage(),
+                'message' => 'Gagal sync data penjualan: ' . $e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -622,7 +622,7 @@ class SyncPenjualanController extends Controller
                 \Illuminate\Support\Facades\Log::error($e->getTraceAsString());
                 return response()->json([
                     'success' => false,
-                    'message' => 'Gagal sync batch (Insert Rollback). Data lama sudah terhapus, silakan ulangi sync.',
+                    'message' => 'Gagal sync batch (Insert Rollback): ' . $e->getMessage(),
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ], 500);
@@ -631,7 +631,7 @@ class SyncPenjualanController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal sync batch',
+                'message' => 'Gagal sync batch: ' . $e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -699,7 +699,7 @@ class SyncPenjualanController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menghapus data penjualan',
+                'message' => 'Gagal menghapus data penjualan: ' . $e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -789,7 +789,7 @@ class SyncPenjualanController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal hapus batch',
+                'message' => 'Gagal hapus batch: ' . $e->getMessage(),
                 'error' => $e->getMessage()
             ], 500);
         }
