@@ -86,9 +86,24 @@ class SyncPenjualanController extends Controller
                 'detail.*.status_promosi' => 'nullable|string|max:1',
                 'detail.*.kode_produk' => 'nullable|string|max:10',
                 'detail.*.nama_produk' => 'nullable|string|max:100',
+                'detail.*.satuan' => 'nullable|string|max:10',
+                'detail.*.isi_pcs_dus' => 'nullable|integer',
+                'detail.*.isi_pack_dus' => 'nullable|integer',
+                'detail.*.isi_pcs_pack' => 'nullable|integer',
+                'detail.*.kode_kategori_produk' => 'nullable|string',
+                'detail.*.kode_jenis_produk' => 'nullable|string',
+                'detail.*.status_aktif_produk' => 'nullable|string',
+                'detail.*.kode_sku' => 'nullable|string',
+                'detail.*.kode_kategori_diskon' => 'nullable|string',
                 'detail.*.kode_cabang_harga' => 'nullable|string|max:3',
                 'detail.*.kode_kategori_salesman_harga' => 'nullable|string|max:3',
                 'detail.*.kode_pelanggan_harga' => 'nullable|string|max:13',
+                'detail.*.harga_retur_dus' => 'nullable|integer',
+                'detail.*.harga_retur_pack' => 'nullable|integer',
+                'detail.*.harga_retur_pcs' => 'nullable|integer',
+                'detail.*.status_aktif_harga' => 'nullable|string',
+                'detail.*.status_ppn' => 'nullable|string',
+                'detail.*.status_promo' => 'nullable|string',
 
                 // Historibayar (optional array)
                 'historibayar' => 'nullable|array',
@@ -253,7 +268,15 @@ class SyncPenjualanController extends Controller
                         ['kode_produk' => $detail['kode_produk']],
                         [
                             'nama_produk' => $detail['nama_produk'] ?? 'Sync Placeholder ' . $detail['kode_produk'],
-                            'status_aktif_produk' => 1,
+                            'satuan' => $detail['satuan'] ?? '-',
+                            'isi_pcs_dus' => $detail['isi_pcs_dus'] ?? 1,
+                            'isi_pack_dus' => $detail['isi_pack_dus'] ?? 0,
+                            'isi_pcs_pack' => $detail['isi_pcs_pack'] ?? 0,
+                            'kode_kategori_produk' => $detail['kode_kategori_produk'] ?? 'UN',
+                            'kode_jenis_produk' => $detail['kode_jenis_produk'] ?? 'UN',
+                            'status_aktif_produk' => $detail['status_aktif_produk'] ?? 1,
+                            'kode_sku' => $detail['kode_sku'] ?? '-',
+                            'kode_kategori_diskon' => $detail['kode_kategori_diskon'] ?? '-',
                         ]
                     );
 
@@ -264,10 +287,15 @@ class SyncPenjualanController extends Controller
                             'harga_dus' => $detail['harga_dus'],
                             'harga_pack' => $detail['harga_pack'],
                             'harga_pcs' => $detail['harga_pcs'],
+                            'harga_retur_dus' => $detail['harga_retur_dus'] ?? 0,
+                            'harga_retur_pack' => $detail['harga_retur_pack'] ?? 0,
+                            'harga_retur_pcs' => $detail['harga_retur_pcs'] ?? 0,
                             'kode_cabang' => $detail['kode_cabang_harga'] ?? null,
                             'kode_kategori_salesman' => $detail['kode_kategori_salesman_harga'] ?? 'NM',
                             'kode_pelanggan' => $detail['kode_pelanggan_harga'] ?? null,
-                            'status_aktif_harga' => 1,
+                            'status_aktif_harga' => $detail['status_aktif_harga'] ?? 1,
+                            'status_ppn' => $detail['status_ppn'] ?? null,
+                            'status_promo' => $detail['status_promo'] ?? 0,
                         ]
                     );
                 }
@@ -597,7 +625,15 @@ class SyncPenjualanController extends Controller
                                 ['kode_produk' => $detail['kode_produk']],
                                 [
                                     'nama_produk' => $detail['nama_produk'] ?? 'Sync Placeholder ' . $detail['kode_produk'],
-                                    'status_aktif_produk' => 1,
+                                    'satuan' => $detail['satuan'] ?? '-',
+                                    'isi_pcs_dus' => $detail['isi_pcs_dus'] ?? 1,
+                                    'isi_pack_dus' => $detail['isi_pack_dus'] ?? 0,
+                                    'isi_pcs_pack' => $detail['isi_pcs_pack'] ?? 0,
+                                    'kode_kategori_produk' => $detail['kode_kategori_produk'] ?? 'UN',
+                                    'kode_jenis_produk' => $detail['kode_jenis_produk'] ?? 'UN',
+                                    'status_aktif_produk' => $detail['status_aktif_produk'] ?? 1,
+                                    'kode_sku' => $detail['kode_sku'] ?? '-',
+                                    'kode_kategori_diskon' => $detail['kode_kategori_diskon'] ?? '-',
                                 ]
                             );
 
@@ -608,10 +644,15 @@ class SyncPenjualanController extends Controller
                                     'harga_dus' => $detail['harga_dus'],
                                     'harga_pack' => $detail['harga_pack'],
                                     'harga_pcs' => $detail['harga_pcs'],
+                                    'harga_retur_dus' => $detail['harga_retur_dus'] ?? 0,
+                                    'harga_retur_pack' => $detail['harga_retur_pack'] ?? 0,
+                                    'harga_retur_pcs' => $detail['harga_retur_pcs'] ?? 0,
                                     'kode_cabang' => $detail['kode_cabang_harga'] ?? null,
                                     'kode_kategori_salesman' => $detail['kode_kategori_salesman_harga'] ?? 'NM',
                                     'kode_pelanggan' => $detail['kode_pelanggan_harga'] ?? null,
-                                    'status_aktif_harga' => 1,
+                                    'status_aktif_harga' => $detail['status_aktif_harga'] ?? 1,
+                                    'status_ppn' => $detail['status_ppn'] ?? null,
+                                    'status_promo' => $detail['status_promo'] ?? 0,
                                 ]
                             );
                         }
