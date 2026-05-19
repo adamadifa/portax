@@ -107,7 +107,7 @@
                         <th class="px-3 py-2">Keterangan</th>
                         <th class="px-3 py-2 text-right">Debet</th>
                         <th class="px-3 py-2 text-right">Kredit</th>
-                        <th class="px-3 py-2">Cabang</th>
+
                         <th class="px-3 py-2 text-right">#</th>
                     </tr>
                 </thead>
@@ -118,7 +118,7 @@
                         <td colspan="3" class="px-3 py-2 text-right">TOTAL</td>
                         <td class="px-3 py-2 text-right text-emerald-600 font-bold" id="total_debet">-</td>
                         <td class="px-3 py-2 text-right text-red-600 font-bold" id="total_kredit">-</td>
-                        <td colspan="2"></td>
+                        <td colspan="1"></td>
                     </tr>
                 </tfoot>
             </table>
@@ -334,7 +334,6 @@
                     row.find('td:eq(2)').text(keterangan);
                     row.find('td:eq(3)').removeClass('jmldebet').addClass('text-end jmldebet').text(debet);
                     row.find('td:eq(4)').removeClass('jmlkredit').addClass('text-end jmlkredit').text(kredit);
-                    row.find('td:eq(5)').text(kode_cabang);
 
                     // Reset mode edit
                     form.find("#btnTambahItem").removeData('edit-id');
@@ -355,7 +354,6 @@
                         <td class="px-3 py-2">${keterangan}</td>
                         <td class="px-3 py-2 text-right jmldebet text-emerald-600 font-semibold">${debet ? debet : '-'}</td>
                         <td class="px-3 py-2 text-right jmlkredit text-red-600 font-semibold">${kredit ? kredit : '-'}</td>
-                        <td class="px-3 py-2"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold border border-blue-100">${kode_cabang}</span></td>
                         <td class="px-3 py-2 text-right">
                             <div class="flex items-center justify-end gap-1.5">
                                 <a href="#" id="${baris}" class="edit w-6 h-6 flex items-center justify-center bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"><i class="ti ti-edit text-xs"></i></a>

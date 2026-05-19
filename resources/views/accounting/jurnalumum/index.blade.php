@@ -72,7 +72,7 @@
                     <th class="px-4 py-3" style="width: 10%">Tanggal</th>
                     <th class="px-4 py-3" style="width: 25%">Keterangan</th>
                     <th class="px-4 py-3" style="width: 20%">Akun</th>
-                    <th class="px-4 py-3" style="width: 12%">Cabang</th>
+
                     <th class="px-4 py-3 text-right">Debet</th>
                     <th class="px-4 py-3 text-right">Kredit</th>
                     <th class="px-4 py-3">Dept</th>
@@ -93,9 +93,7 @@
                         <td class="px-4 py-3 text-slate-600 text-sm">{{ formatIndo($d->tanggal) }}</td>
                         <td class="px-4 py-3 text-slate-800 text-sm font-medium">{{ $d->keterangan }}</td>
                         <td class="px-4 py-3 text-slate-600 text-sm font-medium">{{ $d->kode_akun }} - {{ $d->nama_akun }}</td>
-                        <td class="px-4 py-3 text-slate-600 text-sm">
-                            {{ $d->kode_cabang }}
-                        </td>
+
                         <td class="px-4 py-3 text-right text-emerald-600 font-semibold text-sm">
                             {{ $debet > 0 ? formatAngkaDesimal($debet) : '-' }}
                         </td>
