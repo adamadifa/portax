@@ -1,24 +1,63 @@
+<style>
+    /* Styling for Select2 to match standard form-control in modal */
+    .select2-container--default .select2-selection--single {
+        border: 1px solid #d9dee3 !important;
+        border-radius: 0.375rem !important;
+        height: 38.2px !important;
+        display: flex;
+        align-items: center;
+        background-color: #fff;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100% !important;
+        right: 10px !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #697a8d !important;
+        padding-left: 0.875rem !important;
+        padding-right: 2rem !important;
+        line-height: normal !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #a1acb8 !important;
+    }
+    .select2-search__field {
+        outline: none !important;
+    }
+</style>
+
 <form action="{{ route('jurnalumum.store') }}" method="POST" id="formJurnalumum">
     @csrf
-    <div class="row mb-3">
-        <div class="col">
+    
+    <!-- Input Fields Section -->
+    <div class="row">
+        <!-- Tanggal Row -->
+        <div class="col-12">
             <x-input-with-icon icon="ti ti-calendar" label="Tanggal" name="tanggal" datepicker="flatpickr-date" />
-            <div class="row">
-                <div class="col-lg-6 col-sm-12 col-md-12">
-                    <div class="form-group mb-3">
-                        <select name="kode_akun" id="kode_akun" class="form-select select2Kodeakun">
-                            <option value="">Akun</option>
-                            @foreach ($coa as $d)
-                                <option value="{{ $d->kode_akun }}">{{ $d->kode_akun }} - {{ $d->nama_akun }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-sm-12 col-md-12">
-                    <x-input-with-icon label="Jumlah" name="jumlah" align="right" numberFormat="true" icon="ti ti-moneybag" />
-                </div>
+        </div>
+        
+        <!-- Akun & Jumlah Row -->
+        <div class="col-lg-6 col-md-12 col-sm-12">
+            <div class="form-group mb-3">
+                <select name="kode_akun" id="kode_akun" class="form-select select2Kodeakun">
+                    <option value="">Pilih Kode Akun</option>
+                    @foreach ($coa as $d)
+                        <option value="{{ $d->kode_akun }}">{{ $d->kode_akun }} - {{ $d->nama_akun }}</option>
+                    @endforeach
+                </select>
             </div>
+        </div>
+        <div class="col-lg-6 col-md-12 col-sm-12">
+            <x-input-with-icon label="Jumlah" name="jumlah" align="right" numberFormat="true" icon="ti ti-moneybag" />
+        </div>
+
+        <!-- Keterangan Row -->
+        <div class="col-12">
             <x-input-with-icon icon="ti ti-file-description" label="Keterangan" name="keterangan" />
+        </div>
+
+        <!-- Debet/Kredit & Cabang Row -->
+        <div class="col-lg-6 col-md-12 col-sm-12">
             <div class="form-group mb-3">
                 <select name="debet_kredit" id="debet_kredit" class="form-select">
                     <option value="">Debet / Kredit</option>
@@ -26,69 +65,81 @@
                     <option value="K">Kredit</option>
                 </select>
             </div>
-            <div class="form-group mb-3">
-                <select name="kode_peruntukan" id="kode_peruntukan" class="form-select">
-                    <option value="">Peruntukan</option>
-                    <option value="MP">MP</option>
-                    <option value="PC">PACIFIC</option>
-                </select>
+        </div>
+        
+        @if (auth()->user()->kode_cabang == 'PST' || empty(auth()->user()->kode_cabang))
+            <div class="col-lg-6 col-md-12 col-sm-12" id="cabang">
+                <div class="form-group mb-3">
+                    <select name="kode_cabang" id="kode_cabang" class="form-select select2Kodecabang">
+                        <option value="">Pilih Cabang</option>
+                        @foreach ($cabang as $d)
+                            <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
-            <div class="form-group mb-3" id="cabang">
-                <select name="kode_cabang" id="kode_cabang" class="form-select select2Kodecabang">
-                    <option value="">Pilih Cabang</option>
-                    @foreach ($cabang as $d)
-                        <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group mb-3">
-                <button class="btn btn-primary w-100" id="btnTambahItem"><i class="ti ti-plus me-1"></i>Tambah
-                    Item</button>
-            </div>
+        @else
+            <input type="hidden" name="kode_cabang" id="kode_cabang" value="{{ auth()->user()->kode_cabang }}">
+        @endif
+        
+        <input type="hidden" name="kode_peruntukan" id="kode_peruntukan" value="PC">
+
+        <!-- Add Button -->
+        <div class="col-12 mt-1">
+            <button class="bg-[#003d9e] hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg w-full flex items-center justify-center gap-2 transition-all active:scale-95 text-sm" id="btnTambahItem">
+                <i class="ti ti-plus"></i>
+                Tambah Item
+            </button>
         </div>
     </div>
-    <div class="row mb-3">
-        <div class="col">
-            <table class="table table-bordered table-striped">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Akun</th>
-                        <th>Keteranngan</th>
-                        <th>Debet</th>
-                        <th>Kredit</th>
-                        <th>Peruntukan</th>
-                        <th>#</th>
+
+    <!-- Full Width Table Section (Bottom) -->
+    <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/30 w-full mt-4">
+        <div class="px-4 py-3 bg-slate-100/80 border-b border-slate-200">
+            <span class="text-sm font-bold text-slate-800 tracking-wide">Daftar Item Jurnal</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="bg-slate-100 border-b border-slate-200 uppercase tracking-wider text-slate-500 font-semibold">
+                        <th class="px-3 py-2">Tanggal</th>
+                        <th class="px-3 py-2">Akun</th>
+                        <th class="px-3 py-2">Keterangan</th>
+                        <th class="px-3 py-2 text-right">Debet</th>
+                        <th class="px-3 py-2 text-right">Kredit</th>
+                        <th class="px-3 py-2">Cabang</th>
+                        <th class="px-3 py-2 text-right">#</th>
                     </tr>
                 </thead>
-                <tbody id="loadjurnalumum">
+                <tbody id="loadjurnalumum" class="divide-y divide-slate-200 bg-white">
                 </tbody>
-                <tfoot class="table-dark">
+                <tfoot class="bg-slate-50 font-bold text-slate-700 border-t border-slate-200">
                     <tr>
-                        <td colspan="3" class="text-end">TOTAL</td>
-                        <td class="text-end" id="total_debet"></td>
-                        <td class="text-end" id="total_kredit"></td>
+                        <td colspan="3" class="px-3 py-2 text-right">TOTAL</td>
+                        <td class="px-3 py-2 text-right text-emerald-600 font-bold" id="total_debet">-</td>
+                        <td class="px-3 py-2 text-right text-red-600 font-bold" id="total_kredit">-</td>
                         <td colspan="2"></td>
                     </tr>
                 </tfoot>
             </table>
         </div>
     </div>
-    <div class="row mt-2">
-        <div class="col-12">
-            <div class="form-check mt-3 mb-3">
-                <input class="form-check-input agreement" name="aggrement" value="aggrement" type="checkbox" value="" id="defaultCheck3">
-                <label class="form-check-label" for="defaultCheck3"> Yakin Akan Disimpan ? </label>
-            </div>
-            <div class="form-group" id="saveButton">
-                <button class="btn btn-primary w-100" type="submit" id="btnSimpan">
-                    <ion-icon name="send-outline" class="me-1"></ion-icon>
-                    Submit
-                </button>
-            </div>
+
+    <!-- Agreement & Submit -->
+    <div class="pt-4 border-t border-slate-200 flex flex-col items-center md:items-start gap-3 mt-4">
+        <div class="flex items-center gap-2">
+            <input class="w-4 h-4 text-[#003d9e] border-slate-300 rounded focus:ring-[#003d9e] agreement" name="aggrement" value="aggrement" type="checkbox" id="defaultCheck3">
+            <label class="text-sm font-medium text-slate-700" for="defaultCheck3"> Yakin Akan Disimpan ? </label>
+        </div>
+        <div class="w-full" id="saveButton">
+            <button class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-lg w-full flex items-center justify-center gap-2 transition-all active:scale-95 text-sm" type="submit" id="btnSimpan">
+                <i class="ti ti-send text-base"></i>
+                Submit Jurnal
+            </button>
         </div>
     </div>
 </form>
+
 <script>
     $(document).ready(function() {
         let total_debet_set = 0;
@@ -111,12 +162,13 @@
             </div>
             Loading..`);
         }
+
         const select2Kodeakun = $('.select2Kodeakun');
         if (select2Kodeakun.length) {
             select2Kodeakun.each(function() {
                 var $this = $(this);
                 $this.wrap('<div class="position-relative"></div>').select2({
-                    placeholder: 'Pilih  Kode Akun',
+                    placeholder: 'Pilih Kode Akun',
                     allowClear: true,
                     dropdownParent: $this.parent()
                 });
@@ -128,27 +180,12 @@
             select2Kodecabang.each(function() {
                 var $this = $(this);
                 $this.wrap('<div class="position-relative"></div>').select2({
-                    placeholder: 'Pilih  Cabang',
+                    placeholder: 'Pilih Cabang',
                     allowClear: true,
                     dropdownParent: $this.parent()
                 })
             })
         }
-
-        form.find("#cabang").hide();
-
-        function loadkodecabang() {
-            const kode_peruntukan = $("#kode_peruntukan").val();
-            if (kode_peruntukan == "PC") {
-                $("#cabang").show();
-            } else {
-                $("#cabang").hide();
-            }
-        }
-
-        $("#kode_peruntukan").change(function() {
-            loadkodecabang();
-        });
 
         form.find("#saveButton").hide();
 
@@ -171,7 +208,6 @@
                     var k = Math.pow(10, prec);
                     return '' + Math.round(n * k) / k;
                 };
-            // Fix for IE parseFloat(0.55).toFixed(0) = 0;
             s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
             if (s[0].length > 3) {
                 s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
@@ -189,12 +225,8 @@
             form.find("tbody tr").each(function() {
                 const debet = $(this).find(".jmldebet").text().replace(/\./g, '') || 0;
                 const kredit = $(this).find(".jmlkredit").text().replace(/\./g, '') || 0;
-                // total_debet += parseFloat(debet);
-                // total_kredit += parseFloat(kredit);
                 total_debet += parseInt(debet);
                 total_kredit += parseInt(kredit);
-                console.log(total_debet);
-                console.log(total_kredit);
             });
             total_debet_set = total_debet;
             total_kredit_set = total_kredit;
@@ -210,8 +242,7 @@
             const keterangan = form.find("#keterangan").val();
             const debet_kredit = form.find("#debet_kredit").val();
             const kode_peruntukan = form.find("#kode_peruntukan").val();
-            const kode_cabang = kode_peruntukan == 'MP' ? '' : form.find("#kode_cabang").val();
-            const bgperuntukan = "";
+            const kode_cabang = form.find("#kode_cabang").val();
             const kredit = debet_kredit == 'K' ? jumlah : '';
             const debet = debet_kredit == 'D' ? jumlah : '';
             const dataCoa = form.find("#kode_akun :selected").select2(this.data);
@@ -237,7 +268,8 @@
                     didClose: () => {
                         form.find("#kode_akun").focus();
                     },
-                })
+                });
+                return false;
             } else if (jumlah == "" || jumlah == 0) {
                 Swal.fire({
                     title: "Oops!",
@@ -247,7 +279,8 @@
                     didClose: () => {
                         form.find("#jumlah").focus();
                     },
-                })
+                });
+                return false;
             } else if (keterangan == "") {
                 Swal.fire({
                     title: "Oops!",
@@ -257,7 +290,8 @@
                     didClose: () => {
                         form.find("#keterangan").focus();
                     },
-                })
+                });
+                return false;
             } else if (debet_kredit == "") {
                 Swal.fire({
                     title: "Oops!",
@@ -267,29 +301,20 @@
                     didClose: () => {
                         form.find("#debet_kredit").focus();
                     },
-                })
-            } else if (kode_peruntukan == "") {
+                });
+                return false;
+            } else if (kode_cabang == "") {
                 Swal.fire({
                     title: "Oops!",
-                    text: "Kode Peruntukan harus diisi !",
-                    icon: "warning",
-                    showConfirmButton: true,
-                    didClose: () => {
-                        form.find("#kode_peruntukan").focus();
-                    },
-                })
-            } else if (kode_cabang == "" && kode_peruntukan == "PC") {
-                Swal.fire({
-                    title: "Oops!",
-                    text: "Kode Cabang harus diisi !",
+                    text: "Cabang harus diisi !",
                     icon: "warning",
                     showConfirmButton: true,
                     didClose: () => {
                         form.find("#kode_cabang").focus();
                     },
-                })
+                });
+                return false;
             } else {
-                // Cek apakah sedang dalam mode edit
                 const editId = form.find("#btnTambahItem").data('edit-id');
 
                 if (editId) {
@@ -309,15 +334,15 @@
                     row.find('td:eq(2)').text(keterangan);
                     row.find('td:eq(3)').removeClass('jmldebet').addClass('text-end jmldebet').text(debet);
                     row.find('td:eq(4)').removeClass('jmlkredit').addClass('text-end jmlkredit').text(kredit);
-                    row.find('td:eq(5)').text(kode_peruntukan + (kode_cabang ? ' (' + kode_cabang + ')' : ''));
+                    row.find('td:eq(5)').text(kode_cabang);
 
                     // Reset mode edit
                     form.find("#btnTambahItem").removeData('edit-id');
-                    form.find("#btnTambahItem").html('<i class="ti ti-plus me-1"></i>Tambah Item');
+                    form.find("#btnTambahItem").html('<i class="ti ti-plus"></i> Tambah Item');
                 } else {
                     // Tambah row baru
                     baris += 1;
-                    let newRow = `<tr id="${baris}">
+                    let newRow = `<tr id="${baris}" class="hover:bg-slate-50 transition-colors">
                         <input type="hidden" name="tanggal_item[]" value="${tanggal}"/>
                         <input type="hidden" name="kode_akun_item[]" value="${kode_akun}"/>
                         <input type="hidden" name="debet_kredit_item[]" value="${debet_kredit}"/>
@@ -325,15 +350,17 @@
                         <input type="hidden" name="keterangan_item[]" value="${keterangan}"/>
                         <input type="hidden" name="kode_peruntukan_item[]" value="${kode_peruntukan}"/>
                         <input type="hidden" name="kode_cabang_item[]" value="${kode_cabang}"/>
-                        <td>${tanggal}</td>
-                        <td>${nama_akun}</td>
-                        <td>${keterangan}</td>
-                        <td class="text-end jmldebet">${debet}</td>
-                        <td class="text-end jmlkredit">${kredit}</td>
-                        <td>${kode_peruntukan} ${kode_cabang ? '(' + kode_cabang + ')' : ''}</td>
-                        <td>
-                            <a href="#" id="${baris}" class="edit me-2"><i class="ti ti-edit text-info"></i></a>
-                            <a href="#" id="${baris}" class="delete"><i class="ti ti-trash text-danger"></i></a>
+                        <td class="px-3 py-2">${tanggal}</td>
+                        <td class="px-3 py-2 font-medium text-slate-700">${nama_akun}</td>
+                        <td class="px-3 py-2">${keterangan}</td>
+                        <td class="px-3 py-2 text-right jmldebet text-emerald-600 font-semibold">${debet ? debet : '-'}</td>
+                        <td class="px-3 py-2 text-right jmlkredit text-red-600 font-semibold">${kredit ? kredit : '-'}</td>
+                        <td class="px-3 py-2"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold border border-blue-100">${kode_cabang}</span></td>
+                        <td class="px-3 py-2 text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <a href="#" id="${baris}" class="edit w-6 h-6 flex items-center justify-center bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"><i class="ti ti-edit text-xs"></i></a>
+                                <a href="#" id="${baris}" class="delete w-6 h-6 flex items-center justify-center bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors"><i class="ti ti-trash text-xs"></i></a>
+                            </div>
                         </td>
                     </tr>`;
                     form.find("#loadjurnalumum").append(newRow);
@@ -346,7 +373,6 @@
         form.on('click', '.delete', function(e) {
             e.preventDefault();
             var id = $(this).attr("id");
-            //event.preventDefault();
             Swal.fire({
                 title: `Apakah Anda Yakin Ingin Menghapus Data Ini ?`,
                 text: "Jika dihapus maka data akan hilang permanent.",
@@ -354,17 +380,15 @@
                 buttons: true,
                 dangerMode: true,
                 showCancelButton: true,
-                confirmButtonColor: "#554bbb",
+                confirmButtonColor: "#003d9e",
                 cancelButtonColor: "#d33",
                 confirmButtonText: "Yes, Hapus Saja!"
             }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
-                    // Reset mode edit jika row yang dihapus sedang dalam mode edit
                     const editId = form.find("#btnTambahItem").data('edit-id');
                     if (editId == id) {
                         form.find("#btnTambahItem").removeData('edit-id');
-                        form.find("#btnTambahItem").html('<i class="ti ti-plus me-1"></i>Tambah Item');
+                        form.find("#btnTambahItem").html('<i class="ti ti-plus"></i> Tambah Item');
                         resetForm();
                     }
                     $(`#${id}`).remove();
@@ -378,7 +402,6 @@
             const id = $(this).attr("id");
             const row = form.find(`#${id}`);
 
-            // Reset form terlebih dahulu jika ada mode edit sebelumnya
             const currentEditId = form.find("#btnTambahItem").data('edit-id');
             if (currentEditId && currentEditId != id) {
                 resetForm();
@@ -390,7 +413,6 @@
             const jumlah = row.find('input[name="jumlah_item[]"]').val();
             const keterangan = row.find('input[name="keterangan_item[]"]').val();
             const debet_kredit = row.find('input[name="debet_kredit_item[]"]').val();
-            const kode_peruntukan = row.find('input[name="kode_peruntukan_item[]"]').val();
             const kode_cabang = row.find('input[name="kode_cabang_item[]"]').val();
 
             // Isi form dengan data yang akan diedit
@@ -398,46 +420,40 @@
             form.find('.select2Kodeakun').val(kode_akun).trigger('change');
             form.find("#jumlah").val(jumlah);
             form.find("#keterangan").val(keterangan);
-            form.find("#debet_kredit").val(debet_kredit);
-            form.find("#kode_peruntukan").val(kode_peruntukan).trigger('change');
+            form.find("#debet_kredit").val(debet_kredit).trigger('change');
 
-            // Tunggu sebentar untuk memastikan select2 sudah ter-update
             setTimeout(function() {
-                if (kode_peruntukan == 'PC' && kode_cabang) {
+                const userBranch = "{{ auth()->user()->kode_cabang }}";
+                if ((userBranch === 'PST' || userBranch === '') && kode_cabang) {
                     form.find('.select2Kodecabang').val(kode_cabang).trigger('change');
                 }
             }, 100);
 
             // Set mode edit
             form.find("#btnTambahItem").data('edit-id', id);
-            form.find("#btnTambahItem").html('<i class="ti ti-edit me-1"></i>Update Item');
+            form.find("#btnTambahItem").html('<i class="ti ti-edit"></i> Update Item');
 
-            // Scroll ke form
             $('html, body').animate({
                 scrollTop: form.find("#tanggal").offset().top - 100
             }, 500);
         });
 
-
         function resetForm() {
-            //form.find("#tanggal").val("");
             form.find('.select2Kodeakun').val('').trigger("change");
-            form.find("#debet_kredit").val("");
+            form.find("#debet_kredit").val("").trigger("change");
             form.find("#jumlah").val("");
-            //form.find("#keterangan").val("");
-            //form.find("#kode_peruntukan").val("");
-            form.find('.select2Kodecabang').val('').trigger("change");
+            const userBranch = "{{ auth()->user()->kode_cabang }}";
+            if (userBranch === 'PST' || userBranch === '') {
+                form.find('.select2Kodecabang').val('').trigger("change");
+            }
 
-            // Reset mode edit jika ada
             if (form.find("#btnTambahItem").data('edit-id')) {
                 form.find("#btnTambahItem").removeData('edit-id');
-                form.find("#btnTambahItem").html('<i class="ti ti-plus me-1"></i>Tambah Item');
+                form.find("#btnTambahItem").html('<i class="ti ti-plus"></i> Tambah Item');
             }
         }
 
-
         form.submit(function() {
-
             if (form.find("#loadjurnalumum").children().length == 0) {
                 Swal.fire({
                     title: "Oops!",
@@ -464,6 +480,5 @@
                 buttonDisable();
             }
         });
-
     });
 </script>
