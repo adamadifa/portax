@@ -912,6 +912,10 @@ class LaporanaccountingController extends Controller
     public function cetakbukubesar(Request $request)
     {
         $kode_cabang = $request->kode_cabang;
+        if (auth()->user()->kode_cabang != 'PST' && !empty(auth()->user()->kode_cabang)) {
+            $kode_cabang = auth()->user()->kode_cabang;
+        }
+
         if (!empty($kode_cabang)) {
             $cabang = \App\Models\Cabang::where('kode_cabang', $kode_cabang)->first();
             $data['nama_pt'] = $cabang && !empty($cabang->nama_pt) ? $cabang->nama_pt : 'PT INTIRASA PANGANDARAN';
