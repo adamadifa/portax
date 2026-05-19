@@ -30,77 +30,77 @@ class SaldoawalbukubesarSeeder extends Seeder
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '11101', // Kas Besar
-                'jumlah' => 149722605.67,
+                'jumlah' => 149722606,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '11201', // BNI Giro
-                'jumlah' => 15836560.00,
+                'jumlah' => 15836560,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '11202', // BNI Taplus
-                'jumlah' => 1135028.00,
+                'jumlah' => 1135028,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '11203', // BCA Giro
-                'jumlah' => 42762912.62,
+                'jumlah' => 42762913,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '11301', // Account Receivable
-                'jumlah' => 188121575.60,
+                'jumlah' => 188121576,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '11401', // Persediaan Barang Dagangan
-                'jumlah' => 554664168.86,
+                'jumlah' => 554664169,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '21001', // Account Payable
-                'jumlah' => 1067866926.15,
+                'jumlah' => 1067866927,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '22001', // Hutang PPN
-                'jumlah' => 38602437.00,
+                'jumlah' => 38602437,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '22002', // Hutang Pph 21
-                'jumlah' => 4407392.00,
+                'jumlah' => 4407392,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '22003', // Hutang Pph 23
-                'jumlah' => 8000.00,
+                'jumlah' => 8000,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '22004', // Hutang Pph 29
-                'jumlah' => 71551278.79,
+                'jumlah' => 71551279,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '23001', // Biaya Yang Masih Harus di Bayar
-                'jumlah' => 609187000.00,
+                'jumlah' => 609187000,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '31001', // Modal
-                'jumlah' => 200000000.00,
+                'jumlah' => 200000000,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '32001', // Retained Earnings
-                'jumlah' => -1195726646.21,
+                'jumlah' => -1195726647,
             ],
             [
                 'kode_saldo_awal' => $kode_saldo_awal,
                 'kode_akun' => '33001', // Laba Tahun Berjalan
-                'jumlah' => 227897741.82,
+                'jumlah' => 227897742,
             ],
         ];
 
