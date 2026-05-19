@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cabang;
 use App\Models\Coa;
+use App\Models\CoaPortax;
 use App\Models\Costratio;
 use App\Models\Detailbarangkeluargudangbahan;
 use App\Models\Detailbarangkeluargudanglogistik;
@@ -44,7 +45,7 @@ class LaporanaccountingController extends Controller
         $data['start_year'] = config('global.start_year');
         $cbg = new Cabang();
         $data['cabang'] = $cbg->getCabang();
-        $data['coa'] = Coa::orderby('kode_akun')
+        $data['coa'] = CoaPortax::orderby('kode_akun')
             ->whereNotIn('kode_akun', ['0-0000', '1'])->get();
         return view('accounting.laporan.index', $data);
     }
@@ -534,23 +535,23 @@ class LaporanaccountingController extends Controller
         $query->select(
             'accounting_costratio.kode_akun',
             'nama_akun',
-            'coa.kode_kategori',
+            'coa_portax.kode_kategori',
             'nama_kategori',
             ...$selectColumncabang
         );
-        $query->leftJoin('coa', 'accounting_costratio.kode_akun', '=', 'coa.kode_akun');
-        $query->leftJoin('coa_kategori', 'coa.kode_kategori', '=', 'coa_kategori.kode_kategori');
+        $query->leftJoin('coa_portax', 'accounting_costratio.kode_akun', '=', 'coa_portax.kode_akun');
+        $query->leftJoin('coa_kategori', 'coa_portax.kode_kategori', '=', 'coa_kategori.kode_kategori');
         $query->whereBetween('tanggal', [$dari, $sampai]);
         if (!empty($kode_cabang)) {
             $query->where('kode_cabang', $kode_cabang);
         }
 
         if ($request->formatlaporan == 2) {
-            $query->orderBy('coa.kode_kategori', 'asc');
+            $query->orderBy('coa_portax.kode_kategori', 'asc');
         }
 
-        $query->groupBy('accounting_costratio.kode_akun', 'nama_akun', 'coa.kode_kategori', 'nama_kategori');
-        $query->orderBy('coa.kode_akun');
+        $query->groupBy('accounting_costratio.kode_akun', 'nama_akun', 'coa_portax.kode_kategori', 'nama_kategori');
+        $query->orderBy('coa_portax.kode_akun');
         $costratio = $query->get();
 
         $qlogistik = Detailbarangkeluargudanglogistik::query();
@@ -887,7 +888,7 @@ class LaporanaccountingController extends Controller
         $user = User::findorfail(auth()->user()->id);
 
         $query =  Jurnalumum::query();
-        $query->join('coa', 'accounting_jurnalumum.kode_akun', '=', 'coa.kode_akun');
+        $query->join('coa_portax', 'accounting_jurnalumum.kode_akun', '=', 'coa_portax.kode_akun');
         $query->whereBetween('tanggal', [$request->dari, $request->sampai]);
 
         if ($user->hasRole('general affair') || $user->hasRole('manager general affair')) {
@@ -1596,19 +1597,19 @@ class LaporanaccountingController extends Controller
                 ->groupBy('kode_akun', 'nama_akun')
                 ->orderBy('kode_akun');
 
-            $labarugi = Coa::leftJoinSub($rekapakunlabarugi, 'rekapakun', function ($join) {
-                $join->on('coa.kode_akun', '=', 'rekapakun.kode_akun');
+            $labarugi = CoaPortax::leftJoinSub($rekapakunlabarugi, 'rekapakun', function ($join) {
+                $join->on('coa_portax.kode_akun', '=', 'rekapakun.kode_akun');
             })
-                ->select('coa.kode_akun', 'coa.nama_akun', 'coa.level', 'coa.sub_akun', 'rekapakun.saldo_akhir')
-                ->whereRaw('LEFT(coa.kode_akun,1) IN (' . implode(',', $kode_laba_rugi) . ')')
-                ->whereNotIn('coa.kode_akun', $akun_jangan_ditampilkan)
+                ->select('coa_portax.kode_akun', 'coa_portax.nama_akun', 'coa_portax.level', 'coa_portax.sub_akun', 'rekapakun.saldo_akhir')
+                ->whereRaw('LEFT(coa_portax.kode_akun,1) IN (' . implode(',', $kode_laba_rugi) . ')')
+                ->whereNotIn('coa_portax.kode_akun', $akun_jangan_ditampilkan)
                 ->where(function ($query) {
                     // Hanya tampilkan saldo_akhir yang tidak null,
                     // atau jika null hanya untuk level 0 dan 1
                     $query->whereNotNull('rekapakun.saldo_akhir')
                         ->orWhere(function ($q) {
                             $q->whereNull('rekapakun.saldo_akhir')
-                                ->whereIn('coa.level', [0, 1, 2]);
+                                ->whereIn('coa_portax.level', [0, 1, 2]);
                         });
                 })
                 ->get();
@@ -1746,7 +1747,7 @@ class LaporanaccountingController extends Controller
         $ledger_transaksi = Ledger::query();
         $ledger_transaksi->select(
             'keuangan_ledger.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'keuangan_ledger.tanggal',
             'keuangan_ledger.no_bukti',
@@ -1754,7 +1755,7 @@ class LaporanaccountingController extends Controller
             'keuangan_ledger.keterangan',
             DB::raw('IF(debet_kredit="K",jumlah,0) as jml_kredit'),
             DB::raw('IF(debet_kredit="D",jumlah,0) as jml_debet'),
-            DB::raw('IF((coa.jenis_akun = "1" AND debet_kredit = "K") OR ((coa.jenis_akun = "1" OR coa.jenis_akun IS NULL) AND debet_kredit = "D"), 1, 2) as urutan')
+            DB::raw('IF((coa_portax.jenis_akun = "1" AND debet_kredit = "K") OR ((coa_portax.jenis_akun = "1" OR coa_portax.jenis_akun IS NULL) AND debet_kredit = "D"), 1, 2) as urutan')
         );
         $ledger_transaksi->whereBetween('keuangan_ledger.tanggal', [$dari, $sampai]);
         if (!empty($request->kode_cabang)) {
@@ -1763,7 +1764,7 @@ class LaporanaccountingController extends Controller
                     ->orWhere('keuangan_ledger.keterangan_peruntukan', $request->kode_cabang);
             });
         }
-        $ledger_transaksi->join('coa', 'keuangan_ledger.kode_akun', '=', 'coa.kode_akun');
+        $ledger_transaksi->join('coa_portax', 'keuangan_ledger.kode_akun', '=', 'coa_portax.kode_akun');
         $ledger_transaksi->join('bank', 'keuangan_ledger.kode_bank', '=', 'bank.kode_bank');
         
 
@@ -1772,7 +1773,7 @@ class LaporanaccountingController extends Controller
         $kaskecil_transaksi = Kaskecil::query();
         $kaskecil_transaksi->select(
             'keuangan_kaskecil.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'keuangan_kaskecil.tanggal',
             'keuangan_kaskecil.no_bukti',
@@ -1787,7 +1788,7 @@ class LaporanaccountingController extends Controller
              $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
         }
         $kaskecil_transaksi->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil');
-        $kaskecil_transaksi->join('coa', 'keuangan_kaskecil.kode_akun', '=', 'coa.kode_akun');
+        $kaskecil_transaksi->join('coa_portax', 'keuangan_kaskecil.kode_akun', '=', 'coa_portax.kode_akun');
         
 
 
@@ -1795,7 +1796,7 @@ class LaporanaccountingController extends Controller
         $jurnalumum = Jurnalumum::query();
         $jurnalumum->select(
             'accounting_jurnalumum.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'accounting_jurnalumum.tanggal',
             'accounting_jurnalumum.kode_ju as no_bukti',
@@ -1809,7 +1810,7 @@ class LaporanaccountingController extends Controller
         if (!empty($request->kode_cabang)) {
              $jurnalumum->where('accounting_jurnalumum.kode_cabang', $request->kode_cabang);
         }
-        $jurnalumum->join('coa', 'accounting_jurnalumum.kode_akun', '=', 'coa.kode_akun');
+        $jurnalumum->join('coa_portax', 'accounting_jurnalumum.kode_akun', '=', 'coa_portax.kode_akun');
 
 
         // Union Data
