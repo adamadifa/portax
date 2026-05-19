@@ -911,12 +911,20 @@ class LaporanaccountingController extends Controller
 
     public function cetakbukubesar(Request $request)
     {
+        $kode_cabang = $request->kode_cabang;
+        if (!empty($kode_cabang)) {
+            $cabang = \App\Models\Cabang::where('kode_cabang', $kode_cabang)->first();
+            $data['nama_pt'] = $cabang && !empty($cabang->nama_pt) ? $cabang->nama_pt : 'PT INTIRASA PANGANDARAN';
+            $data['nama_cabang'] = $cabang ? $cabang->nama_cabang : 'Semua Cabang';
+        } else {
+            $data['nama_pt'] = 'PT INTIRASA PANGANDARAN';
+            $data['nama_cabang'] = 'Semua Cabang';
+        }
+
         //Saldo Awal
         $bulan = !empty($request->dari) ? date('m', strtotime($request->dari)) : '';
         $tahun = !empty($request->dari) ? date('Y', strtotime($request->dari)) : '';
         $start_date = $tahun . "-" . $bulan . "-01";
-
-
 
         $saldoawal = Detailsaldoawalbukubesar::query();
 
@@ -1698,33 +1706,13 @@ class LaporanaccountingController extends Controller
 
             // $rekap_akun sekarang berisi total debet dan kredit per kode_akun dari seluruh union
         } else if ($request->formatlaporan == '3') {
-            $kode_laba_rugi = array('4,5,6,7,8,9');
-            $akun_jangan_ditampilkan = ['0-0000', '1', '2'];
-            // Ambil hasil union sebagai subquery, lalu lakukan SUM group by kode_akun
-
-            $rekapakun = DB::query()->fromSub($union_data, 'rekap')
-                ->selectRaw('kode_akun, nama_akun,
-                    SUM(IF(jenis_akun = 1, jml_kredit - jml_debet, jml_debet - jml_kredit)) as saldo_akhir')
-                ->whereRaw('LEFT(kode_akun,1) IN (' . implode(',', $kode_laba_rugi) . ')')
-                ->groupBy('kode_akun', 'nama_akun')
-                ->orderBy('kode_akun');
-
-            $data['labarugi'] = Coa::leftJoinSub($rekapakun, 'rekapakun', function ($join) {
-                $join->on('coa.kode_akun', '=', 'rekapakun.kode_akun');
-            })
-                ->select('coa.kode_akun', 'coa.nama_akun', 'coa.level', 'coa.sub_akun', 'rekapakun.saldo_akhir')
-                ->whereRaw('LEFT(coa.kode_akun,1) IN (' . implode(',', $kode_laba_rugi) . ')')
-                ->whereNotIn('coa.kode_akun', $akun_jangan_ditampilkan)
-                ->where(function ($query) {
-                    // Hanya tampilkan saldo_akhir yang tidak null,
-                    // atau jika null hanya untuk level 0 dan 1
-                    $query->whereNotNull('rekapakun.saldo_akhir')
-                        ->orWhere(function ($q) {
-                            $q->whereNull('rekapakun.saldo_akhir')
-                                ->whereIn('coa.level', [0, 1, 2]);
-                        });
-                })
-                ->get();
+            $data['labarugi'] = \App\Models\CoaPortax::whereRaw('LEFT(kode_akun, 1) IN ("4", "5", "6")')
+                ->orderBy('kode_akun')
+                ->get()
+                ->map(function ($item) {
+                    $item->saldo_akhir = null; // Nominal kosong
+                    return $item;
+                });
 
             if (isset($_POST['exportButton'])) {
                 header("Content-type: application/vnd-ms-excel");

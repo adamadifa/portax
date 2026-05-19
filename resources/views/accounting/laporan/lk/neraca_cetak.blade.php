@@ -105,7 +105,7 @@
 
 <body>
     <div class="header">
-        <h4 class="company-name">PT INTIRASA PANGANDARAN</h4>
+        <h4 class="company-name">{{ $nama_pt }}</h4>
         <h2 class="report-title">Neraca</h2>
         <h4 class="period">Period {{ DateToIndo($dari) }} to {{ DateToIndo($sampai) }}</h4>
     </div>

@@ -16,6 +16,23 @@
             </div>
         </div>
 
+        @hasanyrole($roles_show_cabang)
+        <!-- Cabang -->
+        <div>
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none z-10 transition-colors duration-200 group-focus-within:text-[#003d9e] text-slate-400">
+                    <i class="ti ti-building text-lg"></i>
+                </div>
+                <select name="kode_cabang" id="kode_cabang_ledger" class="w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none form-select select2KodecabangLedger">
+                    <option value="">Semua Cabang</option>
+                    @foreach ($cabang as $d)
+                        <option value="{{ $d->kode_cabang }}">{{ textUpperCase($d->nama_cabang) }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        @endrole
+
         <!-- COA Dari & Sampai -->
         <div id="coa_ledger" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -101,6 +118,18 @@
             }
 
             // Inisialisasi select2
+            const select2KodecabangLedger = $(".select2KodecabangLedger");
+            if (select2KodecabangLedger.length) {
+                select2KodecabangLedger.each(function() {
+                    var $this = $(this);
+                    $this.wrap('<div class="position-relative"></div>').select2({
+                        placeholder: 'Semua Cabang',
+                        allowClear: true,
+                        dropdownParent: $this.parent()
+                    });
+                });
+            }
+
             const select2Kodeakundari = $(".select2Kodeakundari");
             if (select2Kodeakundari.length) {
                 select2Kodeakundari.each(function() {
