@@ -28,6 +28,15 @@ class SaldoawalbukubesarController extends Controller
         $data['list_bulan'] = config('global.list_bulan');
         $data['nama_bulan'] = config('global.nama_bulan');
         $data['start_year'] = config('global.start_year');
+
+        // Check user's branch
+        if (auth()->user()->kode_cabang != 'PST' && !empty(auth()->user()->kode_cabang)) {
+            $kode_cabang = auth()->user()->kode_cabang;
+            $request->merge(['kode_cabang' => $kode_cabang]);
+        } else {
+            $kode_cabang = $request->kode_cabang;
+        }
+
         $query = Saldoawalbukubesar::query();
         $query->join('cabang', 'bukubesar_saldoawal.kode_cabang', '=', 'cabang.kode_cabang');
         if ($request->has('bulan')) {
@@ -39,8 +48,8 @@ class SaldoawalbukubesarController extends Controller
             $query->where('tahun', date('Y'));
         }
 
-        if (!empty($request->kode_cabang)) {
-            $query->where('bukubesar_saldoawal.kode_cabang', $request->kode_cabang);
+        if (!empty($kode_cabang)) {
+            $query->where('bukubesar_saldoawal.kode_cabang', $kode_cabang);
         }
 
         $query->orderBy('bulan', 'asc');
@@ -54,7 +63,13 @@ class SaldoawalbukubesarController extends Controller
     {
         $data['list_bulan'] = config('global.list_bulan');
         $data['start_year'] = config('global.start_year');
-        $data['cek_saldo_awal'] = Saldoawalbukubesar::count();
+
+        if (auth()->user()->kode_cabang != 'PST' && !empty(auth()->user()->kode_cabang)) {
+            $data['cek_saldo_awal'] = Saldoawalbukubesar::where('kode_cabang', auth()->user()->kode_cabang)->count();
+        } else {
+            $data['cek_saldo_awal'] = Saldoawalbukubesar::count();
+        }
+
         $data['coa'] = CoaPortax::orderby('kode_akun', 'asc')
             ->whereNotIn('kode_akun', ['1', '0-0000'])
             ->get();
@@ -92,6 +107,10 @@ class SaldoawalbukubesarController extends Controller
 
     public function store(Request $request)
     {
+        if (auth()->user()->kode_cabang != 'PST' && !empty(auth()->user()->kode_cabang)) {
+            $request->merge(['kode_cabang' => auth()->user()->kode_cabang]);
+        }
+
         $request->validate([
             'bulan' => 'required',
             'tahun' => 'required',
@@ -133,6 +152,10 @@ class SaldoawalbukubesarController extends Controller
 
     public function getsaldo(Request $request)
     {
+        if (auth()->user()->kode_cabang != 'PST' && !empty(auth()->user()->kode_cabang)) {
+            $request->merge(['kode_cabang' => auth()->user()->kode_cabang]);
+        }
+
         $bulan_dipilih = $request->bulan;
         $tahun_dipilih = $request->tahun;
         $nama_bulan = config('global.nama_bulan');

@@ -22,6 +22,7 @@
         <div class="p-4 border-b border-slate-100 bg-slate-50/50">
             <form action="{{ route('saldoawalbukubesar.index') }}" class="flex flex-wrap items-center gap-3 w-full">
                 <!-- Cabang Select -->
+                @if (auth()->user()->kode_cabang == 'PST' || empty(auth()->user()->kode_cabang))
                 <div class="w-full md:w-56">
                     <select name="kode_cabang" id="kode_cabang" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm transition-all select-styled">
                         <option value="">Cabang</option>
@@ -32,6 +33,7 @@
                         @endforeach
                     </select>
                 </div>
+                @endif
 
                 <!-- Bulan Select -->
                 <div class="w-full md:w-44">

@@ -22,6 +22,7 @@
                 <!-- Filter Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <!-- Cabang -->
+                    @if (auth()->user()->kode_cabang == 'PST' || empty(auth()->user()->kode_cabang))
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Cabang</label>
                         <select name="kode_cabang" id="kode_cabang" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm transition-all select-styled">
@@ -31,6 +32,25 @@
                             @endforeach
                         </select>
                     </div>
+                    @else
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Cabang</label>
+                        @php
+                            $user_cabang_name = '';
+                            foreach ($cabang as $d) {
+                                if ($d->kode_cabang == auth()->user()->kode_cabang) {
+                                    $user_cabang_name = $d->nama_cabang;
+                                    break;
+                                }
+                            }
+                            if (empty($user_cabang_name)) {
+                                $user_cabang_name = auth()->user()->kode_cabang;
+                            }
+                        @endphp
+                        <input type="text" value="{{ $user_cabang_name }}" class="w-full px-3 py-2 bg-slate-100 border border-slate-300 rounded-lg text-slate-500 text-sm focus:outline-none" readonly>
+                        <input type="hidden" name="kode_cabang" id="kode_cabang" value="{{ auth()->user()->kode_cabang }}">
+                    </div>
+                    @endif
 
                     <!-- Bulan -->
                     <div>
