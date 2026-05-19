@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Coa;
+use App\Models\CoaPortax;
 use App\Models\Detailpembelian;
 use App\Models\Detailpenjualan;
 use App\Models\Detailretur;
@@ -55,7 +55,7 @@ class SaldoawalbukubesarController extends Controller
         $data['list_bulan'] = config('global.list_bulan');
         $data['start_year'] = config('global.start_year');
         $data['cek_saldo_awal'] = Saldoawalbukubesar::count();
-        $data['coa'] = Coa::orderby('kode_akun', 'asc')
+        $data['coa'] = CoaPortax::orderby('kode_akun', 'asc')
             ->whereNotIn('kode_akun', ['1', '0-0000'])
             ->get();
         $cabang = new Cabang();
@@ -71,7 +71,7 @@ class SaldoawalbukubesarController extends Controller
         $data['nama_bulan'] = config('global.nama_bulan');
         $data['saldoawalbukubesar'] = Saldoawalbukubesar::join('cabang', 'bukubesar_saldoawal.kode_cabang', '=', 'cabang.kode_cabang')
             ->where('kode_saldo_awal', $kode_saldo_awal)->first();
-        $data['detailsaldoawalbukubesar'] = Detailsaldoawalbukubesar::join('coa', 'bukubesar_saldoawal_detail.kode_akun', '=', 'coa.kode_akun')->where('bukubesar_saldoawal_detail.kode_saldo_awal', $kode_saldo_awal)->get();
+        $data['detailsaldoawalbukubesar'] = Detailsaldoawalbukubesar::join('coa_portax', 'bukubesar_saldoawal_detail.kode_akun', '=', 'coa_portax.kode_akun')->where('bukubesar_saldoawal_detail.kode_saldo_awal', $kode_saldo_awal)->get();
         return view('accounting.saldoawalbukubesar.show', $data);
     }
 
@@ -83,8 +83,8 @@ class SaldoawalbukubesarController extends Controller
         $data['nama_bulan'] = config('global.nama_bulan');
         $data['saldoawalbukubesar'] = Saldoawalbukubesar::join('cabang', 'bukubesar_saldoawal.kode_cabang', '=', 'cabang.kode_cabang')
             ->where('kode_saldo_awal', $kode_saldo_awal)->first();
-        $data['detailsaldoawalbukubesar'] = Detailsaldoawalbukubesar::join('coa', 'bukubesar_saldoawal_detail.kode_akun', '=', 'coa.kode_akun')->where('bukubesar_saldoawal_detail.kode_saldo_awal', $kode_saldo_awal)->get();
-        $data['coa'] = Coa::orderby('kode_akun', 'asc')
+        $data['detailsaldoawalbukubesar'] = Detailsaldoawalbukubesar::join('coa_portax', 'bukubesar_saldoawal_detail.kode_akun', '=', 'coa_portax.kode_akun')->where('bukubesar_saldoawal_detail.kode_saldo_awal', $kode_saldo_awal)->get();
+        $data['coa'] = CoaPortax::orderby('kode_akun', 'asc')
             ->whereNotIn('kode_akun', ['1', '0-0000'])
             ->get();
         return view('accounting.saldoawalbukubesar.edit', $data);
@@ -179,10 +179,10 @@ class SaldoawalbukubesarController extends Controller
         $saldoawal = Detailsaldoawalbukubesar::query();
 
         $saldoawal->join('bukubesar_saldoawal', 'bukubesar_saldoawal.kode_saldo_awal', '=', 'bukubesar_saldoawal_detail.kode_saldo_awal');
-        $saldoawal->join('coa', 'bukubesar_saldoawal_detail.kode_akun', '=', 'coa.kode_akun');
+        $saldoawal->join('coa_portax', 'bukubesar_saldoawal_detail.kode_akun', '=', 'coa_portax.kode_akun');
         $saldoawal->select(
             'bukubesar_saldoawal_detail.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
 
             // Set tanggal 1 pada bulan yang dipilih sebagai default tanggal
@@ -193,8 +193,8 @@ class SaldoawalbukubesarController extends Controller
             // 'bukubesar_saldoawal_detail.jumlah as jml_kredit',
 
 
-            DB::raw('IF(coa.jenis_akun ="1",bukubesar_saldoawal_detail.jumlah,0) as jml_kredit'),
-            DB::raw('IF(coa.jenis_akun !="1" || coa.jenis_akun IS NULL,bukubesar_saldoawal_detail.jumlah,0) as jml_debet'),
+            DB::raw('IF(coa_portax.jenis_akun ="1",bukubesar_saldoawal_detail.jumlah,0) as jml_kredit'),
+            DB::raw('IF(coa_portax.jenis_akun !="1" || coa_portax.jenis_akun IS NULL,bukubesar_saldoawal_detail.jumlah,0) as jml_debet'),
             DB::raw('0 as urutan')
         );
         $saldoawal->where('bukubesar_saldoawal.bulan', $bulan);
@@ -214,7 +214,7 @@ class SaldoawalbukubesarController extends Controller
         $ledger = Ledger::query();
         $ledger->select(
             'bank.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'keuangan_ledger.tanggal',
             'keuangan_ledger.no_bukti',
@@ -222,10 +222,10 @@ class SaldoawalbukubesarController extends Controller
             'keuangan_ledger.keterangan',
             DB::raw('IF(debet_kredit="D",jumlah,0) as jml_kredit'),
             DB::raw('IF(debet_kredit="K",jumlah,0) as jml_debet'),
-            DB::raw('IF(coa.jenis_akun="1" AND debet_kredit="D",1,2) as urutan')
+            DB::raw('IF(coa_portax.jenis_akun="1" AND debet_kredit="D",1,2) as urutan')
         );
         $ledger->join('bank', 'keuangan_ledger.kode_bank', '=', 'bank.kode_bank');
-        $ledger->join('coa', 'bank.kode_akun', '=', 'coa.kode_akun');
+        $ledger->join('coa_portax', 'bank.kode_akun', '=', 'coa_portax.kode_akun');
 
 
         $ledger->whereBetween('keuangan_ledger.tanggal', [$start_date, $sampai]);
@@ -240,7 +240,7 @@ class SaldoawalbukubesarController extends Controller
         $ledger_transaksi = Ledger::query();
         $ledger_transaksi->select(
             'keuangan_ledger.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'keuangan_ledger.tanggal',
             'keuangan_ledger.no_bukti',
@@ -248,13 +248,13 @@ class SaldoawalbukubesarController extends Controller
             'keuangan_ledger.keterangan',
             DB::raw('IF(debet_kredit="K",jumlah,0) as jml_kredit'),
             DB::raw('IF(debet_kredit="D",jumlah,0) as jml_debet'),
-            DB::raw('IF((coa.jenis_akun = "1" AND debet_kredit = "K") OR ((coa.jenis_akun = "1" OR coa.jenis_akun IS NULL) AND debet_kredit = "D"), 1, 2) as urutan')
+            DB::raw('IF((coa_portax.jenis_akun = "1" AND debet_kredit = "K") OR ((coa_portax.jenis_akun = "1" OR coa_portax.jenis_akun IS NULL) AND debet_kredit = "D"), 1, 2) as urutan')
         );
         $ledger_transaksi->whereBetween('keuangan_ledger.tanggal', [$start_date, $sampai]);
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
             $ledger_transaksi->whereBetween('keuangan_ledger.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
-        $ledger_transaksi->join('coa', 'keuangan_ledger.kode_akun', '=', 'coa.kode_akun');
+        $ledger_transaksi->join('coa_portax', 'keuangan_ledger.kode_akun', '=', 'coa_portax.kode_akun');
         $ledger_transaksi->join('bank', 'keuangan_ledger.kode_bank', '=', 'bank.kode_bank');
         $ledger_transaksi->orderBy('keuangan_ledger.kode_akun');
         $ledger_transaksi->orderBy('keuangan_ledger.tanggal');
@@ -266,7 +266,7 @@ class SaldoawalbukubesarController extends Controller
         $pembelian = Detailpembelian::query();
         $pembelian->select(
             'pembelian_detail.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'pembelian.tanggal',
             'pembelian.no_bukti',
@@ -278,7 +278,7 @@ class SaldoawalbukubesarController extends Controller
         );
         $pembelian->join('pembelian', 'pembelian_detail.no_bukti', '=', 'pembelian.no_bukti');
         $pembelian->join('pembelian_barang', 'pembelian_detail.kode_barang', '=', 'pembelian_barang.kode_barang');
-        $pembelian->join('coa', 'pembelian_detail.kode_akun', '=', 'coa.kode_akun');
+        $pembelian->join('coa_portax', 'pembelian_detail.kode_akun', '=', 'coa_portax.kode_akun');
         $pembelian->whereBetween('pembelian.tanggal', [$start_date, $sampai]);
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
             $pembelian->whereBetween('pembelian_detail.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
@@ -293,7 +293,7 @@ class SaldoawalbukubesarController extends Controller
         $jurnalumum = Jurnalumum::query();
         $jurnalumum->select(
             'accounting_jurnalumum.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'accounting_jurnalumum.tanggal',
             'accounting_jurnalumum.kode_ju as no_bukti',
@@ -307,7 +307,7 @@ class SaldoawalbukubesarController extends Controller
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
             $jurnalumum->whereBetween('accounting_jurnalumum.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
-        $jurnalumum->join('coa', 'accounting_jurnalumum.kode_akun', '=', 'coa.kode_akun');
+        $jurnalumum->join('coa_portax', 'accounting_jurnalumum.kode_akun', '=', 'coa_portax.kode_akun');
 
         $jurnalumum->orderBy('accounting_jurnalumum.kode_akun');
         $jurnalumum->orderBy('accounting_jurnalumum.tanggal');
@@ -320,7 +320,7 @@ class SaldoawalbukubesarController extends Controller
         $jurnalkoreksi = Jurnalkoreksi::query();
         $jurnalkoreksi->select(
             'pembelian_jurnalkoreksi.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'pembelian_jurnalkoreksi.tanggal',
             'pembelian_jurnalkoreksi.no_bukti',
@@ -334,7 +334,7 @@ class SaldoawalbukubesarController extends Controller
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
             $jurnalkoreksi->whereBetween('pembelian_jurnalkoreksi.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
-        $jurnalkoreksi->join('coa', 'pembelian_jurnalkoreksi.kode_akun', '=', 'coa.kode_akun');
+        $jurnalkoreksi->join('coa_portax', 'pembelian_jurnalkoreksi.kode_akun', '=', 'coa_portax.kode_akun');
 
         $jurnalkoreksi->orderBy('pembelian_jurnalkoreksi.kode_akun');
         $jurnalkoreksi->orderBy('pembelian_jurnalkoreksi.tanggal');
@@ -343,8 +343,8 @@ class SaldoawalbukubesarController extends Controller
 
 
         //    dd($jurnalumum->get());
-        $coa_kas_kecil = Coa::where('kode_transaksi', 'KKL');
-        $coa_piutangcabang = Coa::where('kode_transaksi', 'PCB');
+        $coa_kas_kecil = CoaPortax::where('kode_transaksi', 'KKL');
+        $coa_piutangcabang = CoaPortax::where('kode_transaksi', 'PCB');
 
         //Kas Kecil
         $kaskecil = Kaskecil::query();
@@ -388,7 +388,7 @@ class SaldoawalbukubesarController extends Controller
         $kaskecil_transaksi = Kaskecil::query();
         $kaskecil_transaksi->select(
             'keuangan_kaskecil.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'keuangan_kaskecil.tanggal',
             'keuangan_kaskecil.no_bukti',
@@ -403,7 +403,7 @@ class SaldoawalbukubesarController extends Controller
             $kaskecil_transaksi->whereBetween('keuangan_kaskecil.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
         $kaskecil_transaksi->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil');
-        $kaskecil_transaksi->join('coa', 'keuangan_kaskecil.kode_akun', '=', 'coa.kode_akun');
+        $kaskecil_transaksi->join('coa_portax', 'keuangan_kaskecil.kode_akun', '=', 'coa_portax.kode_akun');
         $kaskecil_transaksi->orderBy('keuangan_kaskecil.kode_akun');
         $kaskecil_transaksi->orderBy('keuangan_kaskecil.tanggal');
         $kaskecil_transaksi->orderBy('keuangan_kaskecil.no_bukti');
@@ -412,7 +412,7 @@ class SaldoawalbukubesarController extends Controller
         $kasbankperantara = Kaskecil::query();
         $kasbankperantara->select(
             'keuangan_kaskecil.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'keuangan_kaskecil.tanggal',
             'keuangan_kaskecil.no_bukti',
@@ -427,7 +427,7 @@ class SaldoawalbukubesarController extends Controller
             $kasbankperantara->whereBetween('keuangan_kaskecil.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
         $kasbankperantara->where('keuangan_kaskecil.kode_akun', '1-1104');
-        $kasbankperantara->join('coa', 'keuangan_kaskecil.kode_akun', '=', 'coa.kode_akun');
+        $kasbankperantara->join('coa_portax', 'keuangan_kaskecil.kode_akun', '=', 'coa_portax.kode_akun');
         $kasbankperantara->orderBy('keuangan_kaskecil.kode_akun');
         $kasbankperantara->orderBy('keuangan_kaskecil.tanggal');
         $kasbankperantara->orderBy('keuangan_kaskecil.no_bukti');
@@ -469,7 +469,7 @@ class SaldoawalbukubesarController extends Controller
         $penjualan_produk = Detailpenjualan::query();
         $penjualan_produk->select(
             'produk.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'marketing_penjualan.tanggal',
             'marketing_penjualan.no_faktur',
@@ -481,7 +481,7 @@ class SaldoawalbukubesarController extends Controller
         );
         $penjualan_produk->join('produk_harga', 'marketing_penjualan_detail.kode_harga', '=', 'produk_harga.kode_harga');
         $penjualan_produk->join('produk', 'produk_harga.kode_produk', '=', 'produk.kode_produk');
-        $penjualan_produk->join('coa', 'produk.kode_akun', '=', 'coa.kode_akun');
+        $penjualan_produk->join('coa_portax', 'produk.kode_akun', '=', 'coa_portax.kode_akun');
         $penjualan_produk->join('marketing_penjualan', 'marketing_penjualan_detail.no_faktur', '=', 'marketing_penjualan.no_faktur');
         $penjualan_produk->join('pelanggan', 'marketing_penjualan.kode_pelanggan', '=', 'pelanggan.kode_pelanggan');
         $penjualan_produk->whereBetween('marketing_penjualan.tanggal', [$start_date, $sampai]);
@@ -515,7 +515,7 @@ class SaldoawalbukubesarController extends Controller
         $penjualannetto = Penjualan::query();
         $penjualannetto->select(
             'marketing_penjualan.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'marketing_penjualan.tanggal',
             'marketing_penjualan.no_faktur as no_bukti',
@@ -526,7 +526,7 @@ class SaldoawalbukubesarController extends Controller
             DB::raw('1 as urutan')
         );
         $penjualannetto->join('pelanggan', 'marketing_penjualan.kode_pelanggan', '=', 'pelanggan.kode_pelanggan');
-        $penjualannetto->join('coa', 'marketing_penjualan.kode_akun', '=', 'coa.kode_akun');
+        $penjualannetto->join('coa_portax', 'marketing_penjualan.kode_akun', '=', 'coa_portax.kode_akun');
         $penjualannetto->leftJoinSub($returpenjualan, 'returpenjualan', function ($join) {
             $join->on('marketing_penjualan.no_faktur', '=', 'returpenjualan.no_faktur');
         });
@@ -549,7 +549,7 @@ class SaldoawalbukubesarController extends Controller
         $kasbesarpiutangdagang = Historibayarpenjualan::query();
         $kasbesarpiutangdagang->select(
             'marketing_penjualan_historibayar.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'marketing_penjualan_historibayar.tanggal',
             'marketing_penjualan_historibayar.no_bukti',
@@ -561,7 +561,7 @@ class SaldoawalbukubesarController extends Controller
         );
         $kasbesarpiutangdagang->join('marketing_penjualan', 'marketing_penjualan_historibayar.no_faktur', '=', 'marketing_penjualan.no_faktur');
         $kasbesarpiutangdagang->join('pelanggan', 'marketing_penjualan.kode_pelanggan', '=', 'pelanggan.kode_pelanggan');
-        $kasbesarpiutangdagang->join('coa', 'marketing_penjualan_historibayar.kode_akun', '=', 'coa.kode_akun');
+        $kasbesarpiutangdagang->join('coa_portax', 'marketing_penjualan_historibayar.kode_akun', '=', 'coa_portax.kode_akun');
         $kasbesarpiutangdagang->whereBetween('marketing_penjualan_historibayar.tanggal', [$start_date, $sampai]);
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
             $kasbesarpiutangdagang->whereBetween('marketing_penjualan_historibayar.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
@@ -577,7 +577,7 @@ class SaldoawalbukubesarController extends Controller
         $returpenjualanpiutangdagang = Detailretur::query();
         $returpenjualanpiutangdagang->select(
             'marketing_retur.kode_akun_piutang_dagang',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'marketing_retur.tanggal',
             DB::raw("marketing_retur.no_retur as no_bukti"),
@@ -588,7 +588,7 @@ class SaldoawalbukubesarController extends Controller
             DB::raw('2 as urutan')
         );
         $returpenjualanpiutangdagang->join('marketing_retur', 'marketing_retur_detail.no_retur', '=', 'marketing_retur.no_retur');
-        $returpenjualanpiutangdagang->join('coa', 'marketing_retur.kode_akun_piutang_dagang', '=', 'coa.kode_akun');
+        $returpenjualanpiutangdagang->join('coa_portax', 'marketing_retur.kode_akun_piutang_dagang', '=', 'coa_portax.kode_akun');
         $returpenjualanpiutangdagang->join('marketing_penjualan', 'marketing_retur.no_faktur', '=', 'marketing_penjualan.no_faktur');
         $returpenjualanpiutangdagang->join('pelanggan', 'marketing_penjualan.kode_pelanggan', '=', 'pelanggan.kode_pelanggan');
         $returpenjualanpiutangdagang->where('jenis_retur', 'PF');
@@ -598,7 +598,7 @@ class SaldoawalbukubesarController extends Controller
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
             $returpenjualanpiutangdagang->whereBetween('marketing_retur.kode_akun_piutang_dagang', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
-        $returpenjualanpiutangdagang->groupBy('marketing_retur.kode_akun_piutang_dagang', 'coa.jenis_akun', 'nama_akun', 'marketing_retur.tanggal', 'marketing_retur.no_retur', 'marketing_retur.no_faktur', 'pelanggan.nama_pelanggan');
+        $returpenjualanpiutangdagang->groupBy('marketing_retur.kode_akun_piutang_dagang', 'coa_portax.jenis_akun', 'nama_akun', 'marketing_retur.tanggal', 'marketing_retur.no_retur', 'marketing_retur.no_faktur', 'pelanggan.nama_pelanggan');
         $returpenjualanpiutangdagang->orderBy('marketing_retur.tanggal');
         $returpenjualanpiutangdagang->orderBy('marketing_retur.no_retur');
 
@@ -606,7 +606,7 @@ class SaldoawalbukubesarController extends Controller
         $retur_penjualan = Detailretur::query();
         $retur_penjualan->select(
             'marketing_retur.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'marketing_retur.tanggal',
             DB::raw("marketing_retur.no_retur as no_bukti"),
@@ -618,7 +618,7 @@ class SaldoawalbukubesarController extends Controller
         );
 
         $retur_penjualan->join('marketing_retur', 'marketing_retur_detail.no_retur', '=', 'marketing_retur.no_retur');
-        $retur_penjualan->join('coa', 'marketing_retur.kode_akun', '=', 'coa.kode_akun');
+        $retur_penjualan->join('coa_portax', 'marketing_retur.kode_akun', '=', 'coa_portax.kode_akun');
         $retur_penjualan->join('marketing_penjualan', 'marketing_retur.no_faktur', '=', 'marketing_penjualan.no_faktur');
         $retur_penjualan->join('pelanggan', 'marketing_penjualan.kode_pelanggan', '=', 'pelanggan.kode_pelanggan');
         $retur_penjualan->whereBetween('marketing_retur.tanggal', [$request->dari, $sampai]);
@@ -634,7 +634,7 @@ class SaldoawalbukubesarController extends Controller
         $potongan_penjualan = Penjualan::query();
         $potongan_penjualan->select(
             'marketing_penjualan.kode_akun_potongan',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'marketing_penjualan.tanggal',
             'marketing_penjualan.no_faktur as no_bukti',
@@ -644,7 +644,7 @@ class SaldoawalbukubesarController extends Controller
             DB::raw('IFNULL(potongan,0) + IFNULL(potongan_istimewa,0) as jml_debet'),
             DB::raw('1 as urutan')
         );
-        $potongan_penjualan->join('coa', 'marketing_penjualan.kode_akun_potongan', '=', 'coa.kode_akun');
+        $potongan_penjualan->join('coa_portax', 'marketing_penjualan.kode_akun_potongan', '=', 'coa_portax.kode_akun');
         $potongan_penjualan->join('pelanggan', 'marketing_penjualan.kode_pelanggan', '=', 'pelanggan.kode_pelanggan');
         $potongan_penjualan->whereBetween('marketing_penjualan.tanggal', [$request->dari, $sampai]);
         $potongan_penjualan->where('marketing_penjualan.status_batal', 0);
@@ -661,7 +661,7 @@ class SaldoawalbukubesarController extends Controller
         $penyesuaian_penjualan = Penjualan::query();
         $penyesuaian_penjualan->select(
             'marketing_penjualan.kode_akun_penyesuaian',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'marketing_penjualan.tanggal',
             'marketing_penjualan.no_faktur as no_bukti',
@@ -671,7 +671,7 @@ class SaldoawalbukubesarController extends Controller
             DB::raw('IFNULL(penyesuaian,0) as jml_debet'),
             DB::raw('1 as urutan')
         );
-        $penyesuaian_penjualan->join('coa', 'marketing_penjualan.kode_akun_penyesuaian', '=', 'coa.kode_akun');
+        $penyesuaian_penjualan->join('coa_portax', 'marketing_penjualan.kode_akun_penyesuaian', '=', 'coa_portax.kode_akun');
         $penyesuaian_penjualan->join('pelanggan', 'marketing_penjualan.kode_pelanggan', '=', 'pelanggan.kode_pelanggan');
         $penyesuaian_penjualan->whereBetween('marketing_penjualan.tanggal', [$request->dari, $sampai]);
         $penyesuaian_penjualan->where('marketing_penjualan.status_batal', 0);
@@ -744,7 +744,7 @@ class SaldoawalbukubesarController extends Controller
         $hutangdagangdanlainnya = Pembelian::query();
         $hutangdagangdanlainnya->select(
             'pembelian.kode_akun',
-            'coa.jenis_akun',
+            'coa_portax.jenis_akun',
             'nama_akun',
             'pembelian.tanggal',
             'pembelian.no_bukti',
@@ -756,7 +756,7 @@ class SaldoawalbukubesarController extends Controller
         );
 
         $hutangdagangdanlainnya->join('supplier', 'pembelian.kode_supplier', '=', 'supplier.kode_supplier');
-        $hutangdagangdanlainnya->join('coa', 'pembelian.kode_akun', '=', 'coa.kode_akun');
+        $hutangdagangdanlainnya->join('coa_portax', 'pembelian.kode_akun', '=', 'coa_portax.kode_akun');
         $hutangdagangdanlainnya->leftJoin(
             DB::raw('(
                 SELECT no_bukti, SUM( IF ( kode_transaksi = "PMB", ( ( jumlah * harga ) + penyesuaian ), 0 ) ) - SUM( IF ( kode_transaksi = "PNJ", ( jumlah * harga ), 0 ) ) as subtotal
@@ -811,19 +811,19 @@ class SaldoawalbukubesarController extends Controller
             ->groupBy('kode_akun', 'nama_akun')
             ->orderBy('kode_akun');
 
-        $labarugi = Coa::leftJoinSub($rekapakunlabarugi, 'rekapakun', function ($join) {
-            $join->on('coa.kode_akun', '=', 'rekapakun.kode_akun');
+        $labarugi = CoaPortax::leftJoinSub($rekapakunlabarugi, 'rekapakun', function ($join) {
+            $join->on('coa_portax.kode_akun', '=', 'rekapakun.kode_akun');
         })
-            ->select('coa.kode_akun', 'coa.nama_akun', 'coa.level', 'coa.sub_akun', 'rekapakun.saldo_akhir')
-            ->whereRaw('LEFT(coa.kode_akun,1) IN (' . implode(',', $kode_laba_rugi) . ')')
-            ->whereNotIn('coa.kode_akun', $akun_jangan_ditampilkan)
+            ->select('coa_portax.kode_akun', 'coa_portax.nama_akun', 'coa_portax.level', 'coa_portax.sub_akun', 'rekapakun.saldo_akhir')
+            ->whereRaw('LEFT(coa_portax.kode_akun,1) IN (' . implode(',', $kode_laba_rugi) . ')')
+            ->whereNotIn('coa_portax.kode_akun', $akun_jangan_ditampilkan)
             ->where(function ($query) {
                 // Hanya tampilkan saldo_akhir yang tidak null,
                 // atau jika null hanya untuk level 0 dan 1
                 $query->whereNotNull('rekapakun.saldo_akhir')
                     ->orWhere(function ($q) {
                         $q->whereNull('rekapakun.saldo_akhir')
-                            ->whereIn('coa.level', [0, 1, 2]);
+                            ->whereIn('coa_portax.level', [0, 1, 2]);
                     });
             })
             ->get();
@@ -917,19 +917,19 @@ class SaldoawalbukubesarController extends Controller
             ->groupBy('kode_akun', 'nama_akun')
             ->orderBy('kode_akun');
 
-        $data['neraca'] = Coa::leftJoinSub($rekapakun, 'rekapakun', function ($join) {
-            $join->on('coa.kode_akun', '=', 'rekapakun.kode_akun');
+        $data['neraca'] = CoaPortax::leftJoinSub($rekapakun, 'rekapakun', function ($join) {
+            $join->on('coa_portax.kode_akun', '=', 'rekapakun.kode_akun');
         })
-            ->select('coa.kode_akun', 'coa.nama_akun', 'coa.level', 'coa.sub_akun', 'rekapakun.saldo_akhir')
-            ->whereRaw('LEFT(coa.kode_akun,1) IN (' . implode(',', $neraca) . ')')
-            ->whereNotIn('coa.kode_akun', $akun_jangan_ditampilkan)
+            ->select('coa_portax.kode_akun', 'coa_portax.nama_akun', 'coa_portax.level', 'coa_portax.sub_akun', 'rekapakun.saldo_akhir')
+            ->whereRaw('LEFT(coa_portax.kode_akun,1) IN (' . implode(',', $neraca) . ')')
+            ->whereNotIn('coa_portax.kode_akun', $akun_jangan_ditampilkan)
             ->where(function ($query) {
                 // Hanya tampilkan saldo_akhir yang tidak null,
                 // atau jika null hanya untuk level 0 dan 1
                 $query->whereNotNull('rekapakun.saldo_akhir')
                     ->orWhere(function ($q) {
                         $q->whereNull('rekapakun.saldo_akhir')
-                            ->whereIn('coa.level', [0, 1, 2]);
+                            ->whereIn('coa_portax.level', [0, 1, 2]);
                     });
             })
             ->get();

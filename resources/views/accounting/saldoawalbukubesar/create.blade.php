@@ -2,212 +2,158 @@
 @section('titlepage', 'Buat Saldo Awal Buku Besar')
 
 @section('content')
-@section('navigasi')
-    <span class="text-muted fw-light">Saldo Awal Buku Besar /</span> Buat Saldo Awal
-@endsection
+    <!-- Page Header -->
+    <div class="mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800">Buat Saldo Awal Buku Besar</h2>
+            <p class="text-slate-500 text-sm">Pilih periode dan cabang untuk menginisialisasi atau memuat saldo awal.</p>
+        </div>
+        <a href="{{ route('saldoawalbukubesar.index') }}" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium text-sm">
+            <i class="fas fa-arrow-left"></i>
+            <span>Kembali</span>
+        </a>
+    </div>
 
-<div class="row">
-    <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
-        <div class="card">
-            {{-- <div class="card-header">
-                @can('saldoawalbukubesar.create')
-                    @if ($cek_saldo_awal == 0)
-                        <a href="#" class="btn btn-primary"><i class="ti ti-plus me-1"></i>Input Saldo Awal</a>
-                    @endif
-
-                @endcan
-            </div> --}}
-            <div class="card-body">
-                <form action="{{ route('saldoawalbukubesar.store') }}" method="POST" id="formCreatesaldoawal" aria-autocomplete="off">
-                    @csrf
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="row">
-                                <div class="form-group mb-3">
-                                    <select name="kode_cabang" id="kode_cabang" class="form-select select2">
-                                        <option value="">Cabang</option>
-                                        @foreach ($cabang as $d)
-                                            <option value="{{ $d->kode_cabang }}">{{ $d->nama_cabang }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <select name="bulan" id="bulan" class="form-select">
-                                        <option value="">Bulan</option>
-                                        @foreach ($list_bulan as $d)
-                                            <option value="{{ $d['kode_bulan'] }}">{{ $d['nama_bulan'] }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <select name="tahun" id="tahun" class="form-select">
-                                        <option value="">Tahun</option>
-                                        @for ($t = $start_year; $t <= date('Y'); $t++)
-                                            <option value="{{ $t }}">{{ $t }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <a href="#" class="btn btn-success w-100" id="getsaldo">
-                                        <i class="ti  ti-badges me-1"></i> <span id="getsaldo-text">Get Saldo</span>
-                                        <span id="getsaldo-loading" class="spinner-border spinner-border-sm d-none" role="status"
-                                            aria-hidden="true"></span>
-                                    </a>
-                                </div>
-                            </div>
-
-                        </div>
+    <!-- Main Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden max-w-4xl">
+        <div class="p-6">
+            <form action="{{ route('saldoawalbukubesar.store') }}" method="POST" id="formCreatesaldoawal" autocomplete="off">
+                @csrf
+                <!-- Filter Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <!-- Cabang -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Cabang</label>
+                        <select name="kode_cabang" id="kode_cabang" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm transition-all select-styled">
+                            <option value="">Pilih Cabang</option>
+                            @foreach ($cabang as $d)
+                                <option value="{{ $d->kode_cabang }}">{{ $d->nama_cabang }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                    <hr>
-                    {{-- <div class="row">
-                        <div class="col-lg-6 col-md-12 col-sm-12">
-                            <div class="form-group mb-3">
-                                <select name="kode_akun" id="kode_akun" class="form-select select2Kodeakun">
-                                    <option value="">Pilih Akun</option>
-                                    @foreach ($coa as $d)
-                                        <option value="{{ $d['kode_akun'] }}">{{ $d['kode_akun'] }} -
-                                            {{ $d['nama_akun'] }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-12 col-sm-12">
-                            <div class="form-group mb-3">
-                                <input type="text" name="jumlah" id="jumlah" class="form-control text-end"
-                                    placeholder="Jumlah">
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-md-12 col-sm-12">
-                            <div class="form-group mb-3">
-                                <button type="button" class="btn btn-primary" id="addsaldoawal">
-                                    <i class="ti ti-plus me-1"></i> Tambah
-                                </button>
-                            </div>
-                        </div>
-                    </div> --}}
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="table-responsive mb-2">
-                                <table class="table table-bordered">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>Nama Akun</th>
-                                            <th>Jumlah</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="loaddetailsaldo">
-                                        <tr id="loading-row" class="d-none">
-                                            <td colspan="2" class="text-center py-4">
-                                                <div class="spinner-border text-primary" role="status">
-                                                    <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                                <p class="mt-2 mb-0 text-muted">Memuat saldo...</p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="form-group">
-                                <button class="btn btn-primary w-100" type="submit">
-                                    <ion-icon name="send-outline" class="me-1"></ion-icon>
-                                    Submit
-                                </button>
-                            </div>
-                        </div>
+
+                    <!-- Bulan -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Bulan</label>
+                        <select name="bulan" id="bulan" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm transition-all select-styled">
+                            <option value="">Pilih Bulan</option>
+                            @foreach ($list_bulan as $d)
+                                <option value="{{ $d['kode_bulan'] }}">{{ $d['nama_bulan'] }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                </form>
-            </div>
+
+                    <!-- Tahun -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Tahun</label>
+                        <select name="tahun" id="tahun" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm transition-all select-styled">
+                            <option value="">Pilih Tahun</option>
+                            @for ($t = $start_year; $t <= date('Y'); $t++)
+                                <option value="{{ $t }}">{{ $t }}</option>
+                            @endfor
+                        </select>
+                    </div>
+
+                    <!-- Get Saldo Button -->
+                    <div class="flex items-end">
+                        <a href="#" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm font-semibold text-sm" id="getsaldo">
+                            <i class="fas fa-sync-alt" id="getsaldo-icon"></i>
+                            <span id="getsaldo-text">Get Saldo</span>
+                            <span id="getsaldo-loading" class="spinner-border spinner-border-sm d-none w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" role="status" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Account Balances Input Table -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm mb-6">
+                    <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 font-semibold sticky top-0 z-10">
+                                    <th class="px-4 py-3">Nama Akun</th>
+                                    <th class="px-4 py-3 text-right">Jumlah (Rp)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="loaddetailsaldo">
+                                <tr id="empty-row">
+                                    <td colspan="2" class="px-4 py-8 text-center text-slate-400 italic text-sm">
+                                        Pilih filter di atas lalu klik "Get Saldo" untuk menampilkan akun.
+                                    </td>
+                                </tr>
+                                <tr id="loading-row" class="d-none">
+                                    <td colspan="2" class="px-4 py-12 text-center text-slate-500">
+                                        <div class="flex flex-col items-center justify-center gap-2">
+                                            <i class="fas fa-circle-notch fa-spin text-emerald-600 text-2xl"></i>
+                                            <p class="text-xs font-semibold text-slate-500">Memuat saldo...</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Form Submit Button -->
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-[#003d9e] hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors shadow-sm shadow-blue-200 flex items-center gap-2">
+                        <i class="fas fa-save"></i>
+                        <span>Simpan Saldo Awal</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 @endsection
+
 @push('myscript')
 <script>
     $(function() {
-        $("#jumlah").maskMoney();
-        const select2Kodeakun = $(".select2Kodeakun");
-        if (select2Kodeakun.length) {
-            select2Kodeakun.each(function() {
-                var $this = $(this);
-                $this.wrap('<div class="position-relative"></div>').select2({
-                    placeholder: 'Pilih Akun',
-                    allowClear: true,
-                    dropdownParent: $this.parent()
-                });
-            });
-        }
-        $("#addsaldoawal").click(function(e) {
-            e.preventDefault();
-            const kode_akun = $("#kode_akun").val();
-            const nama_akun = $("#kode_akun").select2('data')[0].text;
-            const jumlah = $("#jumlah").val();
-            if (kode_akun == "") {
-                Swal.fire({
-                    title: "Oops!",
-                    text: 'Kode Akun Harus Diisi !',
-                    icon: "warning",
-                    showConfirmButton: true,
-                    didClose: (e) => {
-                        $("#kode_akun").focus();
-                    },
-                });
-                return false;
-            } else if (jumlah == "") {
-                Swal.fire({
-                    title: "Oops!",
-                    text: 'Jumlah Harus Diisi !',
-                    icon: "warning",
-                    showConfirmButton: true,
-                    didClose: (e) => {
-                        $("#jumlah").focus();
-                    },
-                });
-                return false;
-            } else {
-                let checkKodeAkun = $("#loaddetailsaldo tr").filter(function() {
-                    return $(this).attr("id") == `idx-${kode_akun}`;
-                }).length;
-                if (checkKodeAkun > 0) {
-                    Swal.fire({
-                        title: "Oops!",
-                        text: 'Kode Akun Sudah Ada !',
-                        icon: "warning",
-                        showConfirmButton: true,
-                    });
+        // Toggle placeholder styling for select elements
+        $('.select-styled').each(function() {
+            const $this = $(this);
+            const checkVal = () => {
+                if ($this.val() === "") {
+                    $this.addClass('text-slate-400').removeClass('text-slate-700');
                 } else {
-                    $("#loaddetailsaldo").append(`
-                    <tr id="idx-${kode_akun}">
-                        <td>
-                            <input type="hidden" name="kode_akun[]" value="${kode_akun}"/>
-                            ${nama_akun}
-                        </td>
-                        <td class="text-end">
-                            <input type="hidden" name="jumlah[]" value="${jumlah}"/>
-                            ${jumlah}
-                        </td>
-                    </tr>
-                    `);
+                    $this.addClass('text-slate-700').removeClass('text-slate-400');
                 }
-            }
+            };
+            $this.on('change', checkVal);
+            checkVal();
         });
-    })
 
-    $(document).on('click', '#getsaldo', function(e) {
-        e.preventDefault();
-        let bulan = $("#bulan").val();
-        let tahun = $("#tahun").val();
-        if (bulan == "" || tahun == "") {
-            Swal.fire({
-                title: "Oops!",
-                text: 'Bulan dan Tahun Harus Diisi !',
-            });
-            return false;
-        } else {
-            // Tampilkan loading
-            $("#getsaldo").addClass('disabled').css('pointer-events', 'none');
+        // Get Saldo Action
+        $(document).on('click', '#getsaldo', function(e) {
+            e.preventDefault();
+            let bulan = $("#bulan").val();
+            let tahun = $("#tahun").val();
+            let kode_cabang = $("#kode_cabang").val();
+
+            if (bulan == "" || tahun == "" || kode_cabang == "") {
+                Swal.fire({
+                    title: "Oops!",
+                    text: 'Cabang, Bulan, dan Tahun harus diisi!',
+                    icon: "warning"
+                });
+                return false;
+            }
+
+            // Show Loading State
+            $("#getsaldo").addClass('opacity-50 pointer-events-none');
+            $("#getsaldo-icon").addClass('d-none');
             $("#getsaldo-text").addClass('d-none');
             $("#getsaldo-loading").removeClass('d-none');
-            $("#loading-row").removeClass('d-none');
+            
+            $("#loaddetailsaldo").html(`
+                <tr id="loading-row">
+                    <td colspan="2" class="px-4 py-12 text-center text-slate-500">
+                        <div class="flex flex-col items-center justify-center gap-2">
+                            <i class="fas fa-circle-notch fa-spin text-emerald-600 text-2xl"></i>
+                            <p class="text-xs font-semibold text-slate-500">Memuat saldo...</p>
+                        </div>
+                    </td>
+                </tr>
+            `);
 
             $.ajax({
                 type: "POST",
@@ -216,17 +162,31 @@
                     _token: "{{ csrf_token() }}",
                     bulan: bulan,
                     tahun: tahun,
-                    kode_cabang: $("#kode_cabang").val()
+                    kode_cabang: kode_cabang
                 },
                 cache: false,
                 success: function(respond) {
                     $("#loaddetailsaldo").html(respond);
-                    $(".money").maskMoney();
+                    // Standardize CSS inside the loaded table rows for Tailwind aesthetics
+                    $("#loaddetailsaldo tr").addClass('hover:bg-slate-50 transition-colors');
+                    $("#loaddetailsaldo td").addClass('px-4 py-2 text-sm text-slate-700 border-b border-slate-100');
+                    $("#loaddetailsaldo td:first-child").addClass('font-medium');
+                    $("#loaddetailsaldo input[type='text']").addClass('w-44 px-3 py-1 text-right border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm transition-all money');
+                    
+                    // Reinitialize maskMoney
+                    $(".money").maskMoney({
+                        prefix: '', 
+                        suffix: '', 
+                        thousands: '.', 
+                        decimal: ',', 
+                        precision: 0,
+                        allowZero: true,
+                        allowNegative: true
+                    });
                 },
                 error: function(xhr, status, error) {
                     let errorMessage = 'Terjadi kesalahan saat mengambil saldo!';
 
-                    // Cek apakah response adalah JSON dengan pesan error
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
                     } else if (xhr.responseText) {
@@ -235,58 +195,59 @@
                             if (response.message) {
                                 errorMessage = response.message;
                             }
-                        } catch (e) {
-                            // Jika bukan JSON, gunakan pesan default
-                        }
+                        } catch (e) {}
                     }
 
                     Swal.fire({
                         title: "Oops!",
                         text: errorMessage,
-                        icon: "error",
+                        icon: "error"
                     });
-                    $("#loaddetailsaldo").html('');
+                    
+                    $("#loaddetailsaldo").html(`
+                        <tr>
+                            <td colspan="2" class="px-4 py-8 text-center text-red-500 text-sm">
+                                <i class="fas fa-exclamation-triangle mr-2"></i> ${errorMessage}
+                            </td>
+                        </tr>
+                    `);
                 },
                 complete: function() {
-                    // Sembunyikan loading
-                    $("#getsaldo").removeClass('disabled').css('pointer-events', 'auto');
+                    $("#getsaldo").removeClass('opacity-50 pointer-events-none');
+                    $("#getsaldo-icon").removeClass('d-none');
                     $("#getsaldo-text").removeClass('d-none');
                     $("#getsaldo-loading").addClass('d-none');
-                    $("#loading-row").addClass('d-none');
                 }
             });
-        }
+        });
+
+        // Submit Form Validation
+        $(document).on('submit', '#formCreatesaldoawal', function(e) {
+            let bulan = $("#bulan").val();
+            let tahun = $("#tahun").val();
+            let kode_cabang = $("#kode_cabang").val();
+            
+            // Check if getsaldo succeeded (checks for empty/loading row)
+            let hasData = $("#loaddetailsaldo tr").length > 0 && 
+                          !$("#loaddetailsaldo tr#empty-row").length && 
+                          !$("#loaddetailsaldo tr#loading-row").length;
+
+            if (bulan == "" || tahun == "" || kode_cabang == "") {
+                Swal.fire({
+                    title: "Oops!",
+                    text: 'Cabang, Bulan, dan Tahun harus diisi!',
+                    icon: "warning"
+                });
+                return false;
+            } else if (!hasData) {
+                Swal.fire({
+                    title: "Oops!",
+                    text: 'Silakan klik "Get Saldo" terlebih dahulu untuk memuat akun!',
+                    icon: "warning"
+                });
+                return false;
+            }
+        });
     });
-
-    $(document).on('submit', '#formCreatesaldoawal', function(e) {
-        let bulan = $("#bulan").val();
-        let tahun = $("#tahun").val();
-        let kode_cabang = $("#kode_cabang").val();
-        let jmldata = $("#loaddetailsaldo tr").length;
-        if (bulan == "" || tahun == "" || kode_cabang == "") {
-            Swal.fire({
-                title: "Oops!",
-                text: 'Cabang, Bulan dan Tahun Harus Diisi !',
-                icon: "warning",
-                showConfirmButton: true,
-                didClose: (e) => {
-                    $("#kode_cabang").focus();
-                },
-            });
-            return false;
-        } else if (jmldata == 0) {
-            Swal.fire({
-                title: "Oops!",
-                text: 'Data Saldo Harus Diisi !',
-                icon: "warning",
-                showConfirmButton: true,
-                didClose: (e) => {
-                    $("#kode_akun").focus();
-                },
-            });
-            return false;
-        }
-
-    })
 </script>
 @endpush
