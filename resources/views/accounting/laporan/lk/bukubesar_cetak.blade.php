@@ -30,7 +30,8 @@
             font-size: 22px;
             font-weight: bold;
             margin: 5px 0;
-            color: #1e3a8a; /* Premium Dark Blue */
+            color: #1e3a8a;
+            /* Premium Dark Blue */
         }
 
         .header .period {
@@ -97,7 +98,8 @@
             background-color: #f8fafc;
         }
 
-        .row-total th, .row-total td {
+        .row-total th,
+        .row-total td {
             font-weight: bold !important;
             border-top: 1.5px solid #1e3a8a;
             border-bottom: 2.5px double #1e3a8a;
@@ -128,9 +130,6 @@
         </h4>
         <h2 class="report-title">BUKU BESAR</h2>
         <h4 class="period">PERIODE {{ DateToIndo($dari) }} s/d {{ DateToIndo($sampai) }}</h4>
-        @if(!empty($nama_cabang))
-            <h5 style="margin: 5px 0 0 0; font-size: 12px; color: #475569; font-weight: normal;">Cabang: {{ $nama_cabang }}</h5>
-        @endif
     </div>
 
     <div class="content">
@@ -181,66 +180,68 @@
                     <tbody>
             @endif
 
-            @php
-                if ($d->jenis_akun == '1') {
-                    $saldo += $d->jml_kredit - $d->jml_debet;
-                } else {
-                    $saldo += $d->jml_debet - $d->jml_kredit;
-                }
-                $total_debet = $total_debet + $d->jml_debet;
-                $total_kredit = $total_kredit + $d->jml_kredit;
-            @endphp
-
-            @if ($d->sumber == 'SALDO AWAL')
-                @if ($d->jenis_akun == '1')
                     @php
-                        $saldo_awal_kredit = $saldo;
-                        $saldo_awal_debet = 0;
+                        if ($d->jenis_akun == '1') {
+                            $saldo += $d->jml_kredit - $d->jml_debet;
+                        } else {
+                            $saldo += $d->jml_debet - $d->jml_kredit;
+                        }
+                        $total_debet = $total_debet + $d->jml_debet;
+                        $total_kredit = $total_kredit + $d->jml_kredit;
                     @endphp
-                @else
+
+                    @if ($d->sumber == 'SALDO AWAL')
+                        @if ($d->jenis_akun == '1')
+                            @php
+                                $saldo_awal_kredit = $saldo;
+                                $saldo_awal_debet = 0;
+                            @endphp
+                        @else
+                            @php
+                                $saldo_awal_kredit = 0;
+                                $saldo_awal_debet = $saldo;
+                            @endphp
+                        @endif
+                        <tr class="row-saldo-awal">
+                            <td colspan="6" style="font-weight: bold;">SALDO AWAL</td>
+                            <td class="text-right" style="font-weight: bold;">{{ formatAngkaDesimal($saldo) }}</td>
+                        </tr>
+                    @else
+                        <tr>
+                            <td class="text-center">{{ formatIndo($d->tanggal) }}</td>
+                            <td class="text-center">{{ $d->no_bukti }}</td>
+                            <td class="text-center">{{ textUpperCase($d->sumber) }}</td>
+                            <td>{{ textCamelCase($d->keterangan) }}</td>
+                            <td class="text-right">{{ $d->jml_debet > 0 ? formatAngkaDesimal($d->jml_debet) : '-' }}</td>
+                            <td class="text-right">{{ $d->jml_kredit > 0 ? formatAngkaDesimal($d->jml_kredit) : '-' }}</td>
+                            <td class="text-right">{{ formatAngkaDesimal($saldo) }}</td>
+                        </tr>
+                    @endif
+
+                    @if ($next_akun != $d->kode_akun)
+                        <tr class="row-total">
+                            <th colspan="4" class="text-right" style="text-align: right !important;">TOTAL {{ $d->kode_akun }} -
+                                {{ $d->nama_akun }}</th>
+                            <td class="text-right">{{ formatAngkaDesimal($total_debet - $saldo_awal_debet) }}</td>
+                            <td class="text-right">{{ formatAngkaDesimal($total_kredit - $saldo_awal_kredit) }}</td>
+                            <td class="text-right">{{ formatAngkaDesimal($saldo) }}</td>
+                        </tr>
+                        @php
+                            $total_debet = 0;
+                            $total_kredit = 0;
+                        @endphp
+                    @endif
+
                     @php
-                        $saldo_awal_kredit = 0;
-                        $saldo_awal_debet = $saldo;
+                        $kode_akun = $d->kode_akun;
                     @endphp
-                @endif
-                <tr class="row-saldo-awal">
-                    <td colspan="6" style="font-weight: bold;">SALDO AWAL</td>
-                    <td class="text-right" style="font-weight: bold;">{{ formatAngkaDesimal($saldo) }}</td>
-                </tr>
-            @else
-                <tr>
-                    <td class="text-center">{{ formatIndo($d->tanggal) }}</td>
-                    <td class="text-center">{{ $d->no_bukti }}</td>
-                    <td class="text-center">{{ textUpperCase($d->sumber) }}</td>
-                    <td>{{ textCamelCase($d->keterangan) }}</td>
-                    <td class="text-right">{{ $d->jml_debet > 0 ? formatAngkaDesimal($d->jml_debet) : '-' }}</td>
-                    <td class="text-right">{{ $d->jml_kredit > 0 ? formatAngkaDesimal($d->jml_kredit) : '-' }}</td>
-                    <td class="text-right">{{ formatAngkaDesimal($saldo) }}</td>
-                </tr>
-            @endif
-
-            @if ($next_akun != $d->kode_akun)
-                <tr class="row-total">
-                    <th colspan="4" class="text-right" style="text-align: right !important;">TOTAL {{ $d->kode_akun }} - {{ $d->nama_akun }}</th>
-                    <td class="text-right">{{ formatAngkaDesimal($total_debet - $saldo_awal_debet) }}</td>
-                    <td class="text-right">{{ formatAngkaDesimal($total_kredit - $saldo_awal_kredit) }}</td>
-                    <td class="text-right">{{ formatAngkaDesimal($saldo) }}</td>
-                </tr>
-                @php
-                    $total_debet = 0;
-                    $total_kredit = 0;
-                @endphp
-            @endif
-
-            @php
-                $kode_akun = $d->kode_akun;
-            @endphp
         @endforeach
 
-        @if ($open_table)
-            </tbody>
-            </table>
-        @endif
+                @if ($open_table)
+                        </tbody>
+                    </table>
+                @endif
     </div>
 </body>
+
 </html>
