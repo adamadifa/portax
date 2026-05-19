@@ -1,5 +1,5 @@
 @if (auth()->user()->hasAnyPermission([
-            'coa.index',
+            'coa_portax.index',
             'costratio.index',
             'jurnalumum.index',
             'hpp.index',
@@ -11,15 +11,15 @@
             'saldoawalbukubesar.index',
         ]))
     <li
-        class="menu-item {{ request()->is(['coa', 'costratio', 'jurnalumum', 'hpp', 'hargaawalhpp', 'laporanaccounting', 'saldoawalbukubesar', 'saldoawalbukubesar/*']) ? 'open' : '' }}">
+        class="menu-item {{ request()->is(['coaportax', 'costratio', 'jurnalumum', 'hpp', 'hargaawalhpp', 'laporanaccounting', 'saldoawalbukubesar', 'saldoawalbukubesar/*']) ? 'open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
             <i class="menu-icon ti ti-scale"></i>
             <div>Accounting</div>
         </a>
         <ul class="menu-sub">
-            @if (auth()->user()->hasAnyPermission(['coa.index']))
-                <li class="menu-item {{ request()->is(['coa']) ? 'active' : '' }}">
-                    <a href="{{ route('coa.index') }}" class="menu-link">
+            @if (auth()->user()->hasAnyPermission(['coa_portax.index']))
+                <li class="menu-item {{ request()->is(['coaportax']) ? 'active' : '' }}">
+                    <a href="{{ route('coa_portax.index') }}" class="menu-link">
                         <div>Chart of Account (COA)</div>
                     </a>
                 </li>

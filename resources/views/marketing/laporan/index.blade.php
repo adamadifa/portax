@@ -34,8 +34,17 @@
         height: 42px !important;
         font-size: 0.875rem !important;
         font-weight: 500 !important;
-        color: #334155 !important;
+        color: #94a3b8 !important;
         padding-left: 2.75rem !important;
+    }
+    .form-select:has(option:checked:not([value=""])) {
+        color: #334155 !important;
+    }
+    .form-select option {
+        color: #334155 !important;
+    }
+    .form-select option[value=""] {
+        color: #94a3b8 !important;
     }
 </style>
 @section('titlepage', 'Laporan Marketing')
@@ -167,6 +176,23 @@
                 // Update Header Title
                 const label = $(e.target).data('label');
                 $('#activeReportTitle').text(label);
+            });
+
+            // Handle select placeholder color dynamically for native select dropdowns
+            $(document).on('change', 'select.form-select', function() {
+                if ($(this).val() === "") {
+                    $(this).css('color', '#94a3b8');
+                } else {
+                    $(this).css('color', '#334155');
+                }
+            });
+            // Initial run
+            $('select.form-select').each(function() {
+                if ($(this).val() === "") {
+                    $(this).css('color', '#94a3b8');
+                } else {
+                    $(this).css('color', '#334155');
+                }
             });
         });
     </script>

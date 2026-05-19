@@ -75,7 +75,9 @@ class DatabaseSeeder extends Seeder
             Kaskecilpermissionseeder::class,
             Ledgerpermissionseeder::class,
             Saldoawalledgerpermissionseeder::class,
-            Mutasibankpermissionseeder::class
+            Mutasibankpermissionseeder::class,
+            CoaPortaxSeeder::class,
+            Coaportaxpermissionseeder::class
         ]);
     }
 }

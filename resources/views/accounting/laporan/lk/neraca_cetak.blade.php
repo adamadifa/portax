@@ -5,245 +5,241 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Neraca {{ date('Y-m-d H:i:s') }}</title>
-    <link rel="stylesheet" href="{{ asset('assets/css/report.css') }}">
-    <script src="https://code.jquery.com/jquery-2.2.4.js"></script>
-    <script src="{{ asset('assets/vendor/libs/freeze/js/freeze-table.min.js') }}"></script>
     <style>
-        .text-red {
-            background-color: red;
-            color: white;
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #111;
+            margin: 30px;
+            background-color: #fff;
         }
 
-        .subtotal-row {
-            background-color: #f0f0f0;
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header .company-name {
+            font-size: 18px;
             font-weight: bold;
-            border-top: 2px solid #333;
-            border-bottom: 1px solid #666;
+            text-transform: uppercase;
+            margin: 0;
+            color: #000;
         }
 
+        .header .report-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 5px 0;
+            color: #900000;
+            /* Dark red matching Neraca Multi Period standard */
+        }
+
+        .header .period {
+            font-size: 14px;
+            margin: 5px 0 0 0;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .content {
+            margin: 0 auto;
+            max-width: 900px;
+        }
+
+        .datatable9 {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .datatable9 th {
+            border-top: 2px solid #000;
+            border-bottom: 2px solid #000;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .datatable9 td {
+            padding: 5px 12px;
+            font-size: 12px;
+            vertical-align: middle;
+            height: 20px;
+        }
+
+        /* Subtotal/Total Rows */
         .subtotal-row td {
+            font-weight: bold !important;
+            border-top: 1px solid #000;
+            border-bottom: 2px double #000;
+            padding-top: 6px;
+            padding-bottom: 6px;
+        }
+
+        .subtotal-row-grand td {
+            font-weight: bold !important;
+            border-top: 1.5px solid #000;
+            border-bottom: 2px double #000;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .section-header td {
             font-weight: bold;
+            font-size: 13px;
+            padding-top: 10px;
+            padding-bottom: 4px;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
     <div class="header">
-        <h4 class="title">
-            NERACA<br>
-        </h4>
-        <h4> PERIODE {{ DateToIndo($dari) }} s/d {{ DateToIndo($sampai) }}</h4>
+        <h4 class="company-name">PT INTIRASA PANGANDARAN</h4>
+        <h2 class="report-title">Neraca</h2>
+        <h4 class="period">Period {{ DateToIndo($dari) }} to {{ DateToIndo($sampai) }}</h4>
     </div>
+
+    @php
+        // Group coas by parent code (sub_akun)
+        $nodesByParent = [];
+        foreach ($neraca as $coa) {
+            $nodesByParent[$coa->sub_akun][] = [
+                'kode_akun' => $coa->kode_akun,
+                'nama_akun' => $coa->nama_akun,
+                'sub_akun' => $coa->sub_akun,
+                'level' => $coa->level,
+                'children' => []
+            ];
+        }
+
+        // Recursive tree builder
+        if (!function_exists('buildTree')) {
+            function buildTree(&$nodesByParent, $parentId = '0')
+            {
+                $branch = [];
+                if (isset($nodesByParent[$parentId])) {
+                    foreach ($nodesByParent[$parentId] as $node) {
+                        $node['children'] = buildTree($nodesByParent, $node['kode_akun']);
+                        $branch[] = $node;
+                    }
+                }
+                return $branch;
+            }
+        }
+
+        // Build the top level trees
+        $tree = buildTree($nodesByParent, '0');
+
+        // Separate Aktiva, Pasiva (Kewajiban), and Ekuitas
+        $aktivaTree = [];
+        $pasivaTree = [];
+        $ekuitasTree = [];
+
+        foreach ($tree as $rootNode) {
+            if ($rootNode['kode_akun'] == '10000') {
+                $aktivaTree = [$rootNode];
+            } elseif ($rootNode['kode_akun'] == '20000') {
+                $pasivaTree = [$rootNode];
+            } elseif ($rootNode['kode_akun'] == '30000') {
+                $ekuitasTree = [$rootNode];
+            }
+        }
+
+        // Rename PASIVA root node to "Kewajiban" as in the format
+        if (!empty($pasivaTree)) {
+            $pasivaTree[0]['nama_akun'] = 'Kewajiban';
+        }
+
+        // Recursive tree rendering function
+        if (!function_exists('renderTree')) {
+            function renderTree($nodes, $level = 0)
+            {
+                foreach ($nodes as $node) {
+                    $indent = $level * 20;
+                    $hasChildren = count($node['children']) > 0;
+
+                    if ($hasChildren) {
+                        // Category Header (Root or Sub-Root)
+                        echo '<tr class="' . ($level == 0 ? 'section-header' : '') . '">';
+                        echo '<td style="padding-left: ' . $indent . 'px; font-weight: bold;">' . $node['kode_akun'] . ' &nbsp; ' . $node['nama_akun'] . '</td>';
+                        echo '<td class="text-right"></td>';
+                        echo '</tr>';
+
+                        // Render children recursively
+                        renderTree($node['children'], $level + 1);
+
+                        // Render Subtotal/Jumlah row
+                        echo '<tr class="subtotal-row">';
+                        echo '<td style="padding-left: ' . $indent . 'px;">Jumlah ' . $node['nama_akun'] . '</td>';
+                        echo '<td class="text-right">-</td>';
+                        echo '</tr>';
+                    } else {
+                        // Leaf account
+                        echo '<tr>';
+                        echo '<td style="padding-left: ' . $indent . 'px;">' . $node['kode_akun'] . ' &nbsp; ' . $node['nama_akun'] . '</td>';
+                        echo '<td class="text-right">-</td>';
+                        echo '</tr>';
+                    }
+                }
+            }
+        }
+    @endphp
+
     <div class="content">
-        <div class="freeze-table">
-            <table class="datatable9">
-                <thead>
-                    <tr>
-                        <th style="font-size:12; text-align:left !important">NAMA AKUN</th>
-                        <th style="font-size:12;">SALDO</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php
-                        // $lastLevel2 = null;
-                        // $subtotalAmount = 0;
-                        // $level2Items = [];
-                        // $currentLevel2Name = '';
+        <table class="datatable9">
+            <thead>
+                <tr>
+                    <th style="text-align: left; width: 80%;">Description</th>
+                    <th class="text-right" style="width: 20%;">
+                        {{ !empty($sampai) ? date('M-y', strtotime($sampai)) : date('M-y') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 1. Render AKTIVA Tree -->
+                @if (!empty($aktivaTree))
+                    @php renderTree($aktivaTree, 0); @endphp
+                @endif
 
-                        $subtotal_level_0 = 0;
-                        $level_0_name = '';
+                <!-- Empty space separating Aktiva and Kewajiban & Ekuitas -->
+                <tr>
+                    <td colspan="2" style="height: 25px;"></td>
+                </tr>
 
-                        $subtotal_level_1 = 0;
-                        $level_1_name = '';
+                <!-- 2. Section Heading: Kewajiban dan Ekuitas -->
+                <tr class="section-header">
+                    <td style="font-weight: bold; font-size: 14px; text-transform: uppercase;">Kewajiban dan Ekuitas
+                    </td>
+                    <td></td>
+                </tr>
 
-                        $subtotal_level_2 = 0;
-                        $level_2_name = '';
+                <!-- Render Kewajiban (PASIVA) -->
+                @if (!empty($pasivaTree))
+                    @php renderTree($pasivaTree, 1); @endphp
+                @endif
 
-                        $kode_akun_kas_bank = ['1-11', '1-12'];
-                        $subtotal_akun_kas_bank = 0;
+                <!-- Render Ekuitas -->
+                @if (!empty($ekuitasTree))
+                    @php renderTree($ekuitasTree, 1); @endphp
+                @endif
 
-                        $kode_akun_hutang = 2;
-                        $subtotal_akun_hutang = 0;
-
-                        $kode_akun_modal = 3;
-                        $subtotal_akun_modal = 0;
-                    @endphp
-
-                    @foreach ($neraca as $index => $d)
-                        @php
-                            $indent = ($d->level ?? 0) * 20;
-                            $next_level = $neraca[$index + 1]->level ?? null;
-                            $next_before_level = $neraca[$index - 1]->level ?? null;
-
-                            $next_kode_akun = $neraca[$index + 1]->kode_akun ?? null;
-
-                            if ($d->kode_akun == '3-2000') {
-                                $saldo_akhir = $d->saldo_akhir + $net_profit_loss;
-                            } else {
-                                $saldo_akhir = $d->saldo_akhir;
-                            }
-                            //Level 0
-                            if ($d->level == 0) {
-                                $level_0_name = $d->nama_akun;
-                            }
-
-                            $subtotal_level_0 += $saldo_akhir;
-
-                            //Level 1
-
-                            if ($d->level == 1) {
-                                $level_1_name = $d->nama_akun;
-                            }
-
-                            $subtotal_level_1 += $saldo_akhir;
-
-                            //Level 2
-                            if ($d->level == 2) {
-                                $level_2_name = $d->nama_akun;
-                            }
-
-                            $subtotal_level_2 += $saldo_akhir;
-
-                            //echo $level_0_name;
-
-                            if (in_array(substr($d->kode_akun, 0, 4), $kode_akun_kas_bank)) {
-                                $subtotal_akun_kas_bank += $saldo_akhir;
-                            }
-
-                            if (substr($d->kode_akun, 0, 1) == $kode_akun_hutang) {
-                                $subtotal_akun_hutang += $saldo_akhir;
-                            }
-
-                            if (substr($d->kode_akun, 0, 1) == $kode_akun_modal) {
-                                $subtotal_akun_modal += $saldo_akhir;
-                            }
-
-                        @endphp
-                        @if (
-                            ($saldo_akhir == 0 && $d->level == 1 && $next_level == 1) ||
-                                ($saldo_akhir == 0 && $d->level == 2 && $next_level == 2) ||
-                                ($saldo_akhir == 0 && $d->level == 1 && $next_level == 0) ||
-                                ($saldo_akhir == 0 && $d->level == 3))
-                        @else
-                            <!-- Tampilkan item -->
-                            <tr>
-                                <td style="padding-left: {{ $indent }}px;">
-                                    @if ($d->level == 0 || $d->level == 1 || $d->level == 2)
-                                        <b>{{ $d->kode_akun }} {{ $d->nama_akun }}</b>
-                                    @else
-                                        {{ $d->kode_akun }} {{ $d->nama_akun }}
-                                    @endif
-
-                                    {{-- {{ $d->saldo_akhir . '+' . $net_profit_loss }} --}}
-                                    {{-- {{ $d->level }} - {{ $next_level }} --}}
-                                </td>
-                                <td style="text-align: right;">
-                                    {{-- 
-                                    Variabel $laba_rugi undefined karena di Blade, assignment variabel dengan @if ... @else ... @endif tidak akan menyimpan nilai ke variabel PHP seperti di kode biasa.
-                                    Solusi: gunakan @php ... @endphp untuk assignment, lalu tampilkan nilainya.
-                                --}}
-
-
-                                    @if ($d->level == 0 || $d->level == 1)
-                                        <b>{{ formatAngka($saldo_akhir) }}</b>
-                                    @else
-                                        {{ formatAngka($saldo_akhir) }}
-                                    @endif
-                                </td>
-                            </tr>
-                        @endif
-
-                        <!-- Jika Next Level 2 dan Next Before Level bukan 1 dan Level bukan 1 atau Next Level 1 -->
-                        {{-- ($next_level == 2 && $next_before_level != 1 && $d->level != 1) ||
-                                ($next_level == 2 && $next_before_level == 1 && $d->level == 2) ||
-                                ($next_level == 1 && $next_before_level == 3 && $d->level != 0) ||
-                                ($next_level == 1 && $next_before_level == 2 && $d->level != 1) ||
-                                ($next_level == 0 && $d->level != 1) --}}
-                        @if (
-                            ($subtotal_level_2 != 0 && $next_level == 2 && $d->level == 2) ||
-                                ($subtotal_level_2 != 0 && $next_level == 2 && $d->level == 3) ||
-                                ($subtotal_level_2 != 0 && $next_level == 1 && $d->level == 3) ||
-                                ($subtotal_level_2 != 0 && $next_level == 1 && $d->level == 2) ||
-                                ($subtotal_level_2 != 0 && $next_level == 0 && $d->level == 3))
-                            <tr class="subtotal-row">
-                                <td style="padding-left:40px;">
-                                    <b>SUBTOTAL {{ strtoupper($level_2_name) }}</b>
-                                </td>
-                                <td style="text-align: right;">
-                                    <b>{{ formatAngka($subtotal_level_2) }}</b>
-                                </td>
-                            </tr>
-                            @php
-                                $subtotal_level_2 = 0;
-                                $level_2_name = '';
-                            @endphp
-                        @endif
-
-                        <!-- Jika Next Level 1 dan Next Before Level bukan 0 dan Level bukan 0 atau Next Level 0 -->
-                        @if (
-                            ($subtotal_level_1 != 0 && $next_level == 1 && $d->level == 3) ||
-                                ($subtotal_level_1 != 0 && $next_level == 0 && $d->level == 3) ||
-                                ($subtotal_level_1 != 0 && $next_level == 1 && $d->level == 2) ||
-                                ($subtotal_level_1 != 0 && $next_level == 1 && $d->level == 1) ||
-                                ($subtotal_level_1 != 0 && $next_level == 0 && $d->level == 1) ||
-                                ($subtotal_level_1 != 0 && $next_level == 0 && $d->level == 2))
-                            <tr class="subtotal-row">
-                                <td style="padding-left:20px;">
-                                    <b>SUBTOTAL {{ strtoupper($level_1_name) }}</b>
-                                </td>
-                                <td style="text-align: right;">
-                                    <b>{{ formatAngka($subtotal_level_1) }}</b>
-                                </td>
-                            </tr>
-                            @php
-                                $subtotal_level_1 = 0;
-                                $level_1_name = '';
-                            @endphp
-                        @endif
-
-
-                        @if ($next_level == 0)
-                            <tr class="subtotal-row">
-                                <td>
-                                    <b>SUBTOTAL {{ strtoupper($level_0_name) }}</b>
-                                </td>
-                                <td style="text-align: right;">
-                                    <b>{{ formatAngka($subtotal_level_0) }}</b>
-                                </td>
-                            </tr>
-                            @php
-                                $subtotal_level_0 = 0;
-                                $level_0_name = '';
-                            @endphp
-                        @endif
-
-                        @if (
-                            !in_array(substr($next_kode_akun, 0, 4), $kode_akun_kas_bank) &&
-                                in_array(substr($d->kode_akun, 0, 4), $kode_akun_kas_bank))
-                            <tr class="subtotal-row">
-                                <td>
-                                    <b>SUBTOTAL KAS BANK</b>
-                                </td>
-                                <td style="text-align: right;">
-                                    <b>{{ formatAngka($subtotal_akun_kas_bank) }}</b>
-                                </td>
-                            </tr>
-                        @endif
-                    @endforeach
-                    <tr class="subtotal-row">
-                        <td>
-                            <b>TOTAL PASIVA</b>
-                        </td>
-                        <td style="text-align: right;">
-                            @php
-                                $total_pasiva = $subtotal_akun_hutang + $subtotal_akun_modal;
-                            @endphp
-                            <b>{{ formatAngka($total_pasiva) }}</b>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                <!-- Grand Total Kewajiban dan Ekuitas -->
+                <tr class="subtotal-row-grand">
+                    <td style="font-weight: bold;">Jumlah Kewajiban dan Ekuitas</td>
+                    <td class="text-right" style="font-weight: bold;">-</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </body>
 

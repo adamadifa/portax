@@ -1678,34 +1678,13 @@ class LaporanaccountingController extends Controller
             // die;
 
             $data['net_profit_loss'] = $net_profit_loss;
-            //Neraca
-            $neraca = array('1,2,3');
-            $akun_jangan_ditampilkan = ['0-0000', '1', '2'];
-            // Ambil hasil union sebagai subquery, lalu lakukan SUM group by kode_akun
-
-            $rekapakun = DB::query()->fromSub($union_data, 'rekap')
-                ->selectRaw('kode_akun, nama_akun,
-                    SUM(IF(jenis_akun = 1, jml_kredit - jml_debet, jml_debet - jml_kredit)) as saldo_akhir')
-                ->whereRaw('LEFT(kode_akun,1) IN (' . implode(',', $neraca) . ')')
-                ->groupBy('kode_akun', 'nama_akun')
-                ->orderBy('kode_akun');
-
-            $data['neraca'] = Coa::leftJoinSub($rekapakun, 'rekapakun', function ($join) {
-                $join->on('coa.kode_akun', '=', 'rekapakun.kode_akun');
-            })
-                ->select('coa.kode_akun', 'coa.nama_akun', 'coa.level', 'coa.sub_akun', 'rekapakun.saldo_akhir')
-                ->whereRaw('LEFT(coa.kode_akun,1) IN (' . implode(',', $neraca) . ')')
-                ->whereNotIn('coa.kode_akun', $akun_jangan_ditampilkan)
-                ->where(function ($query) {
-                    // Hanya tampilkan saldo_akhir yang tidak null,
-                    // atau jika null hanya untuk level 0 dan 1
-                    $query->whereNotNull('rekapakun.saldo_akhir')
-                        ->orWhere(function ($q) {
-                            $q->whereNull('rekapakun.saldo_akhir')
-                                ->whereIn('coa.level', [0, 1, 2]);
-                        });
-                })
-                ->get();
+            $data['neraca'] = \App\Models\CoaPortax::whereRaw('LEFT(kode_akun, 1) IN ("1", "2", "3")')
+                ->orderBy('kode_akun')
+                ->get()
+                ->map(function ($item) {
+                    $item->saldo_akhir = null; // Nominal kosong
+                    return $item;
+                });
 
 
 

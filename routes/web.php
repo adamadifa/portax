@@ -29,6 +29,7 @@ use App\Http\Controllers\BpjstenagakerjaController;
 use App\Http\Controllers\BufferstokController;
 use App\Http\Controllers\CabangController;
 use App\Http\Controllers\CoaController;
+use App\Http\Controllers\CoaPortaxController;
 use App\Http\Controllers\CostratioController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DpbController;
@@ -1570,6 +1571,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/coa/{kode_akun}/edit', 'edit')->name('coa.edit')->can('coa.edit');
         Route::put('/coa/{kode_akun}/update', 'update')->name('coa.update')->can('coa.update');
         Route::delete('/coa/{kode_akun}/delete', 'destroy')->name('coa.delete')->can('coa.delete');
+    });
+
+    Route::controller(CoaPortaxController::class)->group(function () {
+        Route::get('/coaportax', 'index')->name('coa_portax.index')->can('coa_portax.index');
+        Route::get('/coaportax/create', 'create')->name('coa_portax.create')->can('coa_portax.create');
+        Route::post('/coaportax/store', 'store')->name('coa_portax.store')->can('coa_portax.store');
+        Route::get('/coaportax/{kode_akun}/edit', 'edit')->name('coa_portax.edit')->can('coa_portax.edit');
+        Route::put('/coaportax/{kode_akun}/update', 'update')->name('coa_portax.update')->can('coa_portax.update');
+        Route::delete('/coaportax/{kode_akun}/delete', 'destroy')->name('coa_portax.delete')->can('coa_portax.delete');
     });
 
     Route::controller(CostratioController::class)->group(function () {
