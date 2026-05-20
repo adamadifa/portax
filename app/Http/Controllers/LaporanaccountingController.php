@@ -1166,9 +1166,9 @@ class LaporanaccountingController extends Controller
             $kaskecil_transaksi->whereBetween('coa.kode_akun_portax', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
         if(auth()->user()->kode_cabang != "PST"){
-            $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', auth()->user()->kode_cabang);
+            $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabangd', auth()->user()->kode_cabang);
         }else{
-            $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
+            $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabangd', $request->kode_cabang);
         }
         $kaskecil_transaksi->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil');
         $kaskecil_transaksi->orderBy('keuangan_kaskecil.kode_akun');
