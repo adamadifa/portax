@@ -1150,7 +1150,7 @@ class LaporanaccountingController extends Controller
         $kaskecil_transaksi->select(
             'keuangan_kaskecil.kode_akun',
             'coa_portax.jenis_akun',
-            'nama_akun',
+            'coa_portax.nama_akun',
             'keuangan_kaskecil.tanggal',
             'keuangan_kaskecil.no_bukti',
             DB::raw("CONCAT('KAS KECIL ', keuangan_kaskecil.kode_cabang) AS sumber"),
@@ -1159,12 +1159,14 @@ class LaporanaccountingController extends Controller
             DB::raw('IF(debet_kredit="D",jumlah,0) as jml_debet'),
             DB::raw('IF(debet_kredit="D",1,2) as urutan')
         );
+        $kaskecil_transaksi->join('coa','keuangan_kaskecil.kode_akun','=','coa.kode_akun');
+        $kaskecil_transaksi->join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun');
         $kaskecil_transaksi->whereBetween('keuangan_kaskecil.tanggal', [$start_date, $request->sampai]);
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
-            $kaskecil_transaksi->whereBetween('keuangan_kaskecil.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
+            $kaskecil_transaksi->whereBetween('coa.kode_akun_portax', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
+        $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
         $kaskecil_transaksi->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil');
-        $kaskecil_transaksi->join('coa_portax', 'keuangan_kaskecil.kode_akun', '=', 'coa_portax.kode_akun');
         $kaskecil_transaksi->orderBy('keuangan_kaskecil.kode_akun');
         $kaskecil_transaksi->orderBy('keuangan_kaskecil.tanggal');
         $kaskecil_transaksi->orderBy('keuangan_kaskecil.no_bukti');
@@ -1545,6 +1547,7 @@ class LaporanaccountingController extends Controller
 
         $union_data = $ledger->unionAll($saldoawal)
         ->unionAll($kaskecil)
+        ->unionAll($kaskecil_transaksi)
         ;
         if ($request->formatlaporan == '1') {
 
