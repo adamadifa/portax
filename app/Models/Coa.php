@@ -12,4 +12,9 @@ class Coa extends Model
     protected $primaryKey = "kode_akun";
     protected $guarded = [];
     public $incrementing = false;
+
+    public function coaPortax()
+    {
+        return $this->belongsTo(CoaPortax::class, 'kode_akun_portax', 'kode_akun');
+    }
 }

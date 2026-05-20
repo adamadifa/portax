@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Coa;
 use App\Models\Coakategori;
+use App\Models\CoaPortax;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Redirect;
@@ -18,7 +19,7 @@ class CoaController extends Controller
         // // Function to get sub-accounts recursively
         // $accounts = $this->getSubAccounts($accounts);
 
-        $allAccounts = Coa::orderby('kode_akun')->whereNotIn('kode_akun', ['1', '2', '0-0000'])->get();
+        $allAccounts = Coa::with('coaPortax')->orderby('kode_akun')->whereNotIn('kode_akun', ['1', '2', '0-0000'])->get();
 
 
         return view('accounting.coa.index', compact('allAccounts'));
@@ -54,6 +55,7 @@ class CoaController extends Controller
     {
         $data['coa'] = Coa::orderBy('kode_akun')->whereNotIn('kode_akun', ['1', '2'])->get();
         $data['kategori'] = Coakategori::orderBy('kode_kategori')->get();
+        $data['coa_portax'] = CoaPortax::orderBy('kode_akun')->get();
         return view('accounting.coa.create', $data);
     }
 
@@ -64,6 +66,7 @@ class CoaController extends Controller
             'nama_akun' => 'required',
             'sub_akun' => 'required',
             'kode_kategori' => 'required',
+            'kode_akun_portax' => 'nullable',
         ]);
 
         try {
@@ -71,7 +74,8 @@ class CoaController extends Controller
                 'kode_akun' => $request->kode_akun,
                 'nama_akun' => $request->nama_akun,
                 'sub_akun' => $request->sub_akun,
-                'kode_kategori' => $request->kode_kategori
+                'kode_kategori' => $request->kode_kategori,
+                'kode_akun_portax' => $request->kode_akun_portax
             ]);
 
             return Redirect::back()->with(messageSuccess('Data Berhasil Disimpan'));
@@ -91,6 +95,7 @@ class CoaController extends Controller
         $data['coa'] = $coa;
         $data['sub_akun'] = Coa::orderBy('kode_akun')->whereNotIn('kode_akun', ['1', '2'])->get();
         $data['kategori'] = Coakategori::orderBy('kode_kategori')->get();
+        $data['coa_portax'] = CoaPortax::orderBy('kode_akun')->get();
         return view('accounting.coa.edit', $data);
     }
 
@@ -107,6 +112,7 @@ class CoaController extends Controller
             'nama_akun' => 'required',
             'sub_akun' => 'required',
             'kode_kategori' => 'required',
+            'kode_akun_portax' => 'nullable',
         ]);
 
         try {
@@ -114,7 +120,8 @@ class CoaController extends Controller
                 'kode_akun' => $request->kode_akun,
                 'nama_akun' => $request->nama_akun,
                 'sub_akun' => $request->sub_akun,
-                'kode_kategori' => $request->kode_kategori
+                'kode_kategori' => $request->kode_kategori,
+                'kode_akun_portax' => $request->kode_akun_portax
             ]);
 
             return Redirect::back()->with(messageSuccess('Data Berhasil Diupdate'));

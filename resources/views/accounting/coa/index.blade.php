@@ -19,8 +19,10 @@
                         <table class="table table-bordered table-hover">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>Kode Akun</th>
+                                    <th>Kode Akuns</th>
                                     <th>Nama Akun</th>
+                                    <th>Akun Portax</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -30,6 +32,31 @@
                                     <tr>
                                         <td>{{ $account->kode_akun }}</td>
                                         <td>{{ $account->nama_akun }}</td>
+                                        <td>
+                                            @if ($account->coaPortax)
+                                                <span class="badge bg-label-primary">{{ $account->kode_akun_portax }} - {{ $account->coaPortax->nama_akun }}</span>
+                                            @else
+                                                <span class="badge bg-label-secondary text-muted">Belum Dipetakan</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                @can('coa.edit')
+                                                    <a href="#" class="btnEdit me-2" kode_akun="{{ Crypt::encrypt($account->kode_akun) }}">
+                                                        <i class="ti ti-edit text-success fs-4"></i>
+                                                    </a>
+                                                @endcan
+                                                @can('coa.delete')
+                                                    <form method="POST" name="deleteform" class="deleteform m-0" action="{{ route('coa.delete', Crypt::encrypt($account->kode_akun)) }}">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <a href="#" class="delete-confirm">
+                                                            <i class="ti ti-trash text-danger fs-4"></i>
+                                                        </a>
+                                                    </form>
+                                                @endcan
+                                            </div>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

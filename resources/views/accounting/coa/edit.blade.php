@@ -20,6 +20,14 @@
         </select>
     </div>
     <div class="form-group mb-3">
+        <select name="kode_akun_portax" id="kode_akun_portax" class="form-select select2Portax">
+            <option value="">Pilih Akun Portax (Opsional)</option>
+            @foreach ($coa_portax as $d)
+                <option value="{{ $d->kode_akun }}" @selected($coa->kode_akun_portax == $d->kode_akun)>{{ $d->kode_akun }} - {{ $d->nama_akun }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="form-group mb-3">
         <button class="btn btn-primary w-100" id="btnSimpan"><i class="ti ti-send me-1"></i>Submit</button>
     </div>
 </form>
@@ -42,6 +50,18 @@
                 var $this = $(this);
                 $this.wrap('<div class="position-relative"></div>').select2({
                     placeholder: 'Parent Account',
+                    allowClear: true,
+                    dropdownParent: $this.parent()
+                });
+            });
+        }
+
+        const select2Portax = $('.select2Portax');
+        if (select2Portax.length) {
+            select2Portax.each(function() {
+                var $this = $(this);
+                $this.wrap('<div class="position-relative"></div>').select2({
+                    placeholder: 'Pilih Akun Portax (Opsional)',
                     allowClear: true,
                     dropdownParent: $this.parent()
                 });

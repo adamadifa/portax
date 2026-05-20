@@ -954,6 +954,9 @@ class LaporanaccountingController extends Controller
         );
         $saldoawal->where('bukubesar_saldoawal.bulan', $bulan);
         $saldoawal->where('bukubesar_saldoawal.tahun', $tahun);
+        if (!empty($kode_cabang)) {
+            $saldoawal->where('bukubesar_saldoawal.kode_cabang', $kode_cabang);
+        }
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
             $saldoawal->whereBetween('bukubesar_saldoawal_detail.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
@@ -1096,14 +1099,17 @@ class LaporanaccountingController extends Controller
 
 
 
-        //    dd($jurnalumum->get());
-        $coa_kas_kecil = \App\Models\CoaPortax::where('kode_transaksi', 'KKL');
-        $coa_piutangcabang = \App\Models\CoaPortax::where('kode_transaksi', 'PCB');
+        $coa_kas_kecil = \App\Models\Coa::join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun')
+            ->where('coa.kode_transaksi', 'KKL')
+            ->select('coa_portax.kode_akun', 'coa.kode_akun as kode_akun_portal', 'coa_portax.jenis_akun', 'coa_portax.nama_akun', 'coa.kode_cabang_coa');
+        $coa_piutangcabang = \App\Models\Coa::join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun')
+            ->where('coa.kode_transaksi', 'PCB')
+            ->select('coa_portax.kode_akun', 'coa.kode_akun as kode_akun_portal', 'coa_portax.jenis_akun', 'coa_portax.nama_akun', 'coa.kode_cabang_coa');
 
         //Kas Kecil
         $kaskecil = Kaskecil::query();
         $kaskecil->select(
-            'coa_kas_kecil.kode_akun',
+            'coa_kas_kecil.kode_akun_portal as kode_akun',
             'coa_kas_kecil.jenis_akun',
             'nama_akun',
             'keuangan_kaskecil.tanggal',
@@ -1121,6 +1127,7 @@ class LaporanaccountingController extends Controller
             $query->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil')
                 ->orWhere('keuangan_kaskecil.kode_cabang', '=', 'PST');
         });
+        $kaskecil->where('keuangan_kaskecil.kode_cabang',$request->kode_cabang);
 
 
 
@@ -1130,9 +1137,9 @@ class LaporanaccountingController extends Controller
 
         $kaskecil->whereBetween('keuangan_kaskecil.tanggal', [$start_date, $request->sampai]);
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
-            $kaskecil->whereBetween('coa_kas_kecil.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
+            $kaskecil->whereBetween('coa_kas_kecil.kode_akun_portal', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
-        $kaskecil->orderBy('coa_kas_kecil.kode_akun');
+        $kaskecil->orderBy('coa_kas_kecil.kode_akun_portal');
         $kaskecil->orderBy('keuangan_kaskecil.tanggal');
         $kaskecil->orderBy('keuangan_kaskecil.no_bukti');
 
@@ -1191,7 +1198,7 @@ class LaporanaccountingController extends Controller
         //Piutang dari Kas Besar Penjualan
         $piutangcabang = Historibayarpenjualan::query();
         $piutangcabang->select(
-            'coa_piutangcabang.kode_akun',
+            'coa_piutangcabang.kode_akun_portal as kode_akun',
             'coa_piutangcabang.jenis_akun',
             'nama_akun',
             'marketing_penjualan_historibayar.tanggal',
@@ -1210,11 +1217,11 @@ class LaporanaccountingController extends Controller
         });
         $piutangcabang->whereBetween('marketing_penjualan_historibayar.tanggal', [$start_date, $request->sampai]);
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
-            $piutangcabang->whereBetween('coa_piutangcabang.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
+            $piutangcabang->whereBetween('coa_piutangcabang.kode_akun_portal', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
         $piutangcabang->where('marketing_penjualan_historibayar.voucher', 0);
         $piutangcabang->where('marketing_penjualan.status_batal', 0);
-        $piutangcabang->orderBy('coa_piutangcabang.kode_akun');
+        $piutangcabang->orderBy('coa_piutangcabang.kode_akun_portal');
         $piutangcabang->orderBy('marketing_penjualan_historibayar.tanggal');
         $piutangcabang->orderBy('marketing_penjualan_historibayar.no_bukti');
 
@@ -1534,24 +1541,11 @@ class LaporanaccountingController extends Controller
         $data['sampai'] = $request->sampai;
         $data['saldoawalCollection'] = $saldoawalCollection;
 
-        $union_data = $ledger->unionAll($saldoawal)
-            ->unionAll($kaskecil)
-            ->unionAll($kaskecil_transaksi)
-            ->unionAll($kasbankperantara)
-            ->unionAll($ledger_transaksi)
-            ->unionAll($piutangcabang)
-            ->unionAll($pembelian)
-            ->unionAll($jurnalumum)
-            ->unionAll($jurnalkoreksi)
-            ->unionAll($penjualan_produk)
-            ->unionAll($penjualannetto)
-            ->unionAll($kasbesarpiutangdagang)
-            ->unionAll($returpenjualanpiutangdagang)
-            ->unionAll($retur_penjualan)
-            ->unionAll($potongan_penjualan)
-            ->unionAll($penyesuaian_penjualan)
-            ->unionAll($hutangdagangdanlainnya);
+       
 
+        $union_data = $ledger->unionAll($saldoawal)
+        ->unionAll($kaskecil)
+        ;
         if ($request->formatlaporan == '1') {
 
 
