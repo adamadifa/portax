@@ -64,7 +64,7 @@
                 </tbody>
                 <tfoot>
                     <tr style="background-color: #333; color: white; font-weight: bold;">
-                        <td colspan="3" class="center">TOTAL</td>
+                        <td colspan="4" class="center">TOTAL</td>
                         <td class="right">{{ formatAngka($grand_total) }}</td>
                     </tr>
                 </tfoot>
