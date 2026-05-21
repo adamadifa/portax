@@ -158,6 +158,10 @@
 
                 @php
                     $saldo = 0;
+                    $saldo_awal_kredit = 0;
+                    $saldo_awal_debet = 0;
+                    $total_debet = 0;
+                    $total_kredit = 0;
                     $open_table = true;
                 @endphp
 
