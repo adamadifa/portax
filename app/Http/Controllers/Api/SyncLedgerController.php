@@ -502,19 +502,29 @@ class SyncLedgerController extends Controller
             $validator = Validator::make($request->all(), [
                 'dari' => 'required|date',
                 'sampai' => 'required|date',
-                'kode_cabang' => 'nullable|string|max:3'
+                'kode_cabang' => 'nullable|string|max:3',
+                'kode_bank' => 'nullable|string|max:5'
             ]);
 
             if ($validator->fails()) {
                 return response()->json(['success' => false, 'message' => 'Validasi gagal', 'errors' => $validator->errors()], 422);
             }
 
-            // Ledger tidak punya kode_cabang langsung, biasanya lewat bank atau coa? 
-            // Tapi di PacificV4 kita filter berdasarkan kode_cabang report.
-            // Kita hapus yang is_sync = 1 dan dalam periode.
+            // Ledger tidak punya kode_cabang langsung, kita filter lewat bank table.
+            // Kita hapus yang is_sync = 1, dalam periode, dan sesuai filter bank/cabang jika di-set.
             
             $query = Ledger::where('is_sync', 1)
                 ->whereBetween('tanggal', [$request->dari, $request->sampai]);
+
+            if (!empty($request->kode_bank)) {
+                $query->where('kode_bank', $request->kode_bank);
+            }
+
+            if (!empty($request->kode_cabang)) {
+                $query->whereIn('kode_bank', function($q) use ($request) {
+                    $q->select('kode_bank')->from('bank')->where('kode_cabang', $request->kode_cabang);
+                });
+            }
 
             $noBuktis = $query->pluck('no_bukti')->toArray();
             $count = count($noBuktis);
