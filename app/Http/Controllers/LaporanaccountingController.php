@@ -1,4 +1,4 @@
-<?php
+1<?php
 
 namespace App\Http\Controllers;
 
@@ -1750,9 +1750,9 @@ class LaporanaccountingController extends Controller
         // --- Ledger Transaksi (Bank Payments / Transfers) ---
         $ledger_transaksi = Ledger::query();
         $ledger_transaksi->select(
-            'keuangan_ledger.kode_akun',
+            'coa.kode_akun_portax as kode_akun',
             'coa_portax.jenis_akun',
-            'nama_akun',
+            'coa_portax.nama_akun',
             'keuangan_ledger.tanggal',
             'keuangan_ledger.no_bukti',
             DB::raw('CONCAT_WS(" - ", bank.nama_bank, bank.no_rekening) AS sumber'),
@@ -1768,7 +1768,8 @@ class LaporanaccountingController extends Controller
                     ->orWhere('keuangan_ledger.keterangan_peruntukan', $request->kode_cabang);
             });
         }
-        $ledger_transaksi->join('coa_portax', 'keuangan_ledger.kode_akun', '=', 'coa_portax.kode_akun');
+        $ledger_transaksi->join('coa', 'keuangan_ledger.kode_akun', '=', 'coa.kode_akun');
+        $ledger_transaksi->join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun');
         $ledger_transaksi->join('bank', 'keuangan_ledger.kode_bank', '=', 'bank.kode_bank');
         
 
@@ -1776,9 +1777,9 @@ class LaporanaccountingController extends Controller
         // --- Kas Kecil Transaksi (Detail) ---
         $kaskecil_transaksi = Kaskecil::query();
         $kaskecil_transaksi->select(
-            'keuangan_kaskecil.kode_akun',
+            'coa.kode_akun_portax as kode_akun',
             'coa_portax.jenis_akun',
-            'nama_akun',
+            'coa_portax.nama_akun',
             'keuangan_kaskecil.tanggal',
             'keuangan_kaskecil.no_bukti',
             DB::raw("CONCAT('KAS KECIL ', keuangan_kaskecil.kode_cabang) AS sumber"),
@@ -1792,16 +1793,17 @@ class LaporanaccountingController extends Controller
              $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
         }
         $kaskecil_transaksi->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil');
-        $kaskecil_transaksi->join('coa_portax', 'keuangan_kaskecil.kode_akun', '=', 'coa_portax.kode_akun');
+        $kaskecil_transaksi->join('coa', 'keuangan_kaskecil.kode_akun', '=', 'coa.kode_akun');
+        $kaskecil_transaksi->join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun');
         
 
 
         // --- Jurnal Umum ---
         $jurnalumum = Jurnalumum::query();
         $jurnalumum->select(
-            'accounting_jurnalumum.kode_akun',
+            'coa.kode_akun_portax as kode_akun',
             'coa_portax.jenis_akun',
-            'nama_akun',
+            'coa_portax.nama_akun',
             'accounting_jurnalumum.tanggal',
             'accounting_jurnalumum.kode_ju as no_bukti',
             DB::raw("'JURNAL UMUM' AS sumber"),
@@ -1814,7 +1816,8 @@ class LaporanaccountingController extends Controller
         if (!empty($request->kode_cabang)) {
              $jurnalumum->where('accounting_jurnalumum.kode_cabang', $request->kode_cabang);
         }
-        $jurnalumum->join('coa_portax', 'accounting_jurnalumum.kode_akun', '=', 'coa_portax.kode_akun');
+        $jurnalumum->join('coa', 'accounting_jurnalumum.kode_akun', '=', 'coa.kode_akun');
+        $jurnalumum->join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun');
 
 
         // Union Data

@@ -35,7 +35,11 @@ class JurnalumumController extends Controller
 
         $query = Jurnalumum::query();
         $query->select('accounting_jurnalumum.*', 'nama_akun', 'kode_cr');
-        $query->join('coa_portax', 'accounting_jurnalumum.kode_akun', '=', 'coa_portax.kode_akun');
+        $query->leftJoin('coa', 'accounting_jurnalumum.kode_akun', '=', 'coa.kode_akun');
+        $query->join('coa_portax', function ($join) {
+            $join->on('coa.kode_akun_portax', '=', 'coa_portax.kode_akun')
+                 ->orOn('accounting_jurnalumum.kode_akun', '=', 'coa_portax.kode_akun');
+        });
         $query->leftJoin('accounting_jurnalumum_costratio', 'accounting_jurnalumum.kode_ju', '=', 'accounting_jurnalumum_costratio.kode_ju');
         $query->whereBetween('accounting_jurnalumum.tanggal', [$request->dari, $request->sampai]);
         if (!empty($kode_cabang)) {
@@ -57,7 +61,11 @@ class JurnalumumController extends Controller
 
     public function create()
     {
-        $data['coa'] = CoaPortax::orderby('kode_akun')->whereNotIn('kode_akun', ['1', '2'])->get();
+        $data['coa'] = Coa::join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun')
+            ->select('coa.kode_akun', 'coa.kode_akun_portax', 'coa_portax.nama_akun')
+            ->whereNotIn('coa.kode_akun_portax', ['1', '2'])
+            ->orderBy('coa.kode_akun')
+            ->get();
         $cbg = new Cabang();
         $data['cabang'] = $cbg->getCabang();
         return view('accounting.jurnalumum.create', $data);
@@ -146,7 +154,11 @@ class JurnalumumController extends Controller
     public function edit($kode_ju)
     {
         $kode_ju = Crypt::decrypt($kode_ju);
-        $data['coa'] = CoaPortax::orderby('kode_akun')->whereNotIn('kode_akun', ['1', '2'])->get();
+        $data['coa'] = Coa::join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun')
+            ->select('coa.kode_akun', 'coa.kode_akun_portax', 'coa_portax.nama_akun')
+            ->whereNotIn('coa.kode_akun_portax', ['1', '2'])
+            ->orderBy('coa.kode_akun')
+            ->get();
         $cbg = new Cabang();
         $data['cabang'] = $cbg->getCabang();
         $data['jurnalumum'] = Jurnalumum::where('kode_ju', $kode_ju)->first();

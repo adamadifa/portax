@@ -41,7 +41,7 @@
                     <option value="">Pilih Kode Akun</option>
                     @foreach ($coa as $d)
                         <option value="{{ $d->kode_akun }}" {{ $jurnalumum->kode_akun == $d->kode_akun ? 'selected' : '' }}>
-                            {{ $d->kode_akun }} - {{ $d->nama_akun }}
+                            {{ $d->kode_akun_portax }} - {{ $d->nama_akun }}
                         </option>
                     @endforeach
                 </select>
