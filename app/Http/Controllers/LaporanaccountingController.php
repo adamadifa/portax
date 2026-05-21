@@ -1695,33 +1695,104 @@ class LaporanaccountingController extends Controller
             // die;
 
             $data['net_profit_loss'] = $net_profit_loss;
-            $data['neraca'] = \App\Models\CoaPortax::whereRaw('LEFT(kode_akun, 1) IN ("1", "2", "3")')
-                ->orderBy('kode_akun')
+            $kode_neraca = array('1,2,3');
+            $rekapakunneraca = DB::query()->fromSub($union_data, 'rekap')
+                ->selectRaw('kode_akun, nama_akun,
+                    SUM(IF(jenis_akun = 1, jml_kredit - jml_debet, jml_debet - jml_kredit)) as saldo_akhir')
+                ->whereRaw('LEFT(kode_akun,1) IN (' . implode(',', $kode_neraca) . ')')
+                ->groupBy('kode_akun', 'nama_akun')
+                ->orderBy('kode_akun');
+
+            $data['neraca'] = \App\Models\CoaPortax::leftJoinSub($rekapakunneraca, 'rekapakun', function ($join) {
+                $join->on('coa_portax.kode_akun', '=', 'rekapakun.kode_akun');
+            })
+                ->select('coa_portax.kode_akun', 'coa_portax.nama_akun', 'coa_portax.level', 'coa_portax.sub_akun', 'rekapakun.saldo_akhir')
+                ->whereRaw('LEFT(coa_portax.kode_akun,1) IN (' . implode(',', $kode_neraca) . ')')
+                ->whereNotIn('coa_portax.kode_akun', $akun_jangan_ditampilkan)
+                ->orderBy('coa_portax.kode_akun')
                 ->get()
-                ->map(function ($item) {
-                    $item->saldo_akhir = null; // Nominal kosong
+                ->map(function ($item) use ($net_profit_loss) {
+                    if ($item->kode_akun == '33001') {
+                        $item->saldo_akhir = $net_profit_loss;
+                    }
                     return $item;
                 });
 
-
-
-
             if (isset($_POST['exportButton'])) {
                 header("Content-type: application/vnd-ms-excel");
-                // Mendefinisikan nama file ekspor "-SahabatEkspor.xls"
                 header("Content-Disposition: attachment; filename=Neraca.xls");
             }
             return view('accounting.laporan.lk.neraca_cetak', $data);
 
-            // $rekap_akun sekarang berisi total debet dan kredit per kode_akun dari seluruh union
         } else if ($request->formatlaporan == '3') {
-            $data['labarugi'] = \App\Models\CoaPortax::whereRaw('LEFT(kode_akun, 1) IN ("4", "5", "6")')
-                ->orderBy('kode_akun')
-                ->get()
-                ->map(function ($item) {
-                    $item->saldo_akhir = null; // Nominal kosong
-                    return $item;
-                });
+            $kode_laba_rugi = array('4,5,6,7,8,9');
+            $akun_jangan_ditampilkan = ['0-0000', '1', '2'];
+            
+            $rekapakunlabarugi = DB::query()->fromSub($union_data, 'rekap')
+                ->selectRaw('kode_akun, nama_akun,
+                    SUM(IF(jenis_akun = 1, jml_kredit - jml_debet, jml_debet - jml_kredit)) as saldo_akhir')
+                ->whereRaw('LEFT(kode_akun,1) IN (' . implode(',', $kode_laba_rugi) . ')')
+                ->groupBy('kode_akun', 'nama_akun')
+                ->orderBy('kode_akun');
+
+            $data['labarugi'] = \App\Models\CoaPortax::leftJoinSub($rekapakunlabarugi, 'rekapakun', function ($join) {
+                $join->on('coa_portax.kode_akun', '=', 'rekapakun.kode_akun');
+            })
+                ->select('coa_portax.kode_akun', 'coa_portax.nama_akun', 'coa_portax.level', 'coa_portax.sub_akun', 'rekapakun.saldo_akhir')
+                ->whereRaw('LEFT(coa_portax.kode_akun,1) IN (' . implode(',', $kode_laba_rugi) . ')')
+                ->whereNotIn('coa_portax.kode_akun', $akun_jangan_ditampilkan)
+                ->orderBy('coa_portax.kode_akun')
+                ->get();
+
+            $kode_akun_pendapatan = 4;
+            $kode_akun_pokok_penjualan = 5;
+            $kode_akun_pendapatanlain = 8;
+            $kode_akun_biayalain = 9;
+
+            $kode_akun_biaya_penjualan = '6-1';
+            $kode_akun_biaya_adm = '6-2';
+
+            $subtotal_akun_pendapatan = 0;
+            $subtotal_akun_pokok_penjualan = 0;
+            $subtotal_akun_pendapatanlain = 0;
+            $subtotal_akun_biayalain = 0;
+            $subtotal_akun_biaya_penjualan = 0;
+            $subtotal_akun_biaya_adm = 0;
+            foreach ($data['labarugi'] as $index => $d) {
+                $kode_akun_minus = [
+                    '4-2101', '4-2201', '4-2202', '5-1202', '5-3200', '5-3400', '5-3800', '5-1203',
+                ];
+                if (in_array($d->kode_akun, $kode_akun_minus)) {
+                    $saldo_akhir = $d->saldo_akhir * -1;
+                } else {
+                    $saldo_akhir = $d->saldo_akhir;
+                }
+
+                if (substr($d->kode_akun, 0, 1) == $kode_akun_pendapatan) {
+                    $subtotal_akun_pendapatan += $saldo_akhir;
+                }
+                if (substr($d->kode_akun, 0, 1) == $kode_akun_pokok_penjualan) {
+                    $subtotal_akun_pokok_penjualan += $saldo_akhir;
+                }
+                if (substr($d->kode_akun, 0, 1) == $kode_akun_pendapatanlain) {
+                    $subtotal_akun_pendapatanlain += $saldo_akhir;
+                }
+                if (substr($d->kode_akun, 0, 1) == $kode_akun_biayalain) {
+                    $subtotal_akun_biayalain += $saldo_akhir;
+                }
+                if (substr($d->kode_akun, 0, 3) == $kode_akun_biaya_penjualan) {
+                    $subtotal_akun_biaya_penjualan += $saldo_akhir;
+                }
+                if (substr($d->kode_akun, 0, 3) == $kode_akun_biaya_adm) {
+                    $subtotal_akun_biaya_adm += $saldo_akhir;
+                }
+            }
+
+            $gross_profit = $subtotal_akun_pendapatan - $subtotal_akun_pokok_penjualan;
+            $biaya_operasional = $subtotal_akun_biaya_adm + $subtotal_akun_biaya_penjualan;
+            $operating_profit = $gross_profit - $biaya_operasional;
+            $net_profit_loss = $operating_profit + $subtotal_akun_pendapatanlain - $subtotal_akun_biayalain;
+            $data['net_profit_loss'] = $net_profit_loss;
 
             if (isset($_POST['exportButton'])) {
                 header("Content-type: application/vnd-ms-excel");

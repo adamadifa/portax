@@ -34,7 +34,7 @@ class JurnalumumController extends Controller
         }
 
         $query = Jurnalumum::query();
-        $query->select('accounting_jurnalumum.*', 'nama_akun', 'kode_cr');
+        $query->select('accounting_jurnalumum.*', 'coa_portax.nama_akun as nama_akun', 'kode_cr');
         $query->leftJoin('coa', 'accounting_jurnalumum.kode_akun', '=', 'coa.kode_akun');
         $query->join('coa_portax', function ($join) {
             $join->on('coa.kode_akun_portax', '=', 'coa_portax.kode_akun')
