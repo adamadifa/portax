@@ -1751,6 +1751,7 @@ class LaporanaccountingController extends Controller
         $ledger_transaksi = Ledger::query();
         $ledger_transaksi->select(
             'coa.kode_akun_portax as kode_akun',
+            'coa.kode_akun as kode_akun_portal',
             'coa_portax.jenis_akun',
             'coa_portax.nama_akun',
             'keuangan_ledger.tanggal',
@@ -1778,6 +1779,7 @@ class LaporanaccountingController extends Controller
         $kaskecil_transaksi = Kaskecil::query();
         $kaskecil_transaksi->select(
             'coa.kode_akun_portax as kode_akun',
+            'coa.kode_akun as kode_akun_portal',
             'coa_portax.jenis_akun',
             'coa_portax.nama_akun',
             'keuangan_kaskecil.tanggal',
@@ -1802,6 +1804,7 @@ class LaporanaccountingController extends Controller
         $jurnalumum = Jurnalumum::query();
         $jurnalumum->select(
             'coa.kode_akun_portax as kode_akun',
+            'coa.kode_akun as kode_akun_portal',
             'coa_portax.jenis_akun',
             'coa_portax.nama_akun',
             'accounting_jurnalumum.tanggal',
@@ -1826,9 +1829,9 @@ class LaporanaccountingController extends Controller
             ->unionAll($jurnalumum);
 
         $biaya = DB::query()->fromSub($union_data, 'transaksi_biaya')
-               ->where('kode_akun', 'like', '6%')
+               ->where('kode_akun_portal', 'like', '6%')
                ->orderBy('tanggal')
-               ->orderBy('kode_akun')
+               ->orderBy('kode_akun_portal')
                ->get();
         
         $data['biaya'] = $biaya;
@@ -1850,7 +1853,6 @@ class LaporanaccountingController extends Controller
             $data['biaya'] = $biaya_rekap;
             return view('accounting.laporan.cetak_biaya_rekap', $data);
         }
-
         return view('accounting.laporan.cetak_biaya', $data);
     }
 }
