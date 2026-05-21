@@ -119,6 +119,7 @@
                 'nama_akun' => $coa->nama_akun,
                 'sub_akun' => $coa->sub_akun,
                 'level' => $coa->level,
+                'saldo_akhir' => $coa->saldo_akhir ?? 0,
                 'children' => []
             ];
         }
@@ -161,6 +162,26 @@
             $pasivaTree[0]['nama_akun'] = 'Kewajiban';
         }
 
+        // Recursive balance calculator
+        if (!function_exists('calculateTreeBalances')) {
+            function calculateTreeBalances(&$nodes)
+            {
+                $total = 0;
+                foreach ($nodes as &$node) {
+                    if (count($node['children']) > 0) {
+                        $node['saldo_akhir'] = calculateTreeBalances($node['children']);
+                    }
+                    $total += $node['saldo_akhir'];
+                }
+                return $total;
+            }
+        }
+
+        // Calculate recursive balances
+        calculateTreeBalances($aktivaTree);
+        calculateTreeBalances($pasivaTree);
+        calculateTreeBalances($ekuitasTree);
+
         // Recursive tree rendering function
         if (!function_exists('renderTree')) {
             function renderTree($nodes, $level = 0)
@@ -182,13 +203,13 @@
                         // Render Subtotal/Jumlah row
                         echo '<tr class="subtotal-row">';
                         echo '<td style="padding-left: ' . $indent . 'px;">Jumlah ' . $node['nama_akun'] . '</td>';
-                        echo '<td class="text-right">-</td>';
+                        echo '<td class="text-right">' . ($node['saldo_akhir'] != 0 ? formatAngkaDesimal($node['saldo_akhir']) : '-') . '</td>';
                         echo '</tr>';
                     } else {
                         // Leaf account
                         echo '<tr>';
                         echo '<td style="padding-left: ' . $indent . 'px;">' . $node['kode_akun'] . ' &nbsp; ' . $node['nama_akun'] . '</td>';
-                        echo '<td class="text-right">-</td>';
+                        echo '<td class="text-right">' . ($node['saldo_akhir'] != 0 ? formatAngkaDesimal($node['saldo_akhir']) : '-') . '</td>';
                         echo '</tr>';
                     }
                 }
@@ -236,7 +257,14 @@
                 <!-- Grand Total Kewajiban dan Ekuitas -->
                 <tr class="subtotal-row-grand">
                     <td style="font-weight: bold;">Jumlah Kewajiban dan Ekuitas</td>
-                    <td class="text-right" style="font-weight: bold;">-</td>
+                    <td class="text-right" style="font-weight: bold;">
+                        @php
+                            $totalKewajiban = !empty($pasivaTree) ? $pasivaTree[0]['saldo_akhir'] : 0;
+                            $totalEkuitas = !empty($ekuitasTree) ? $ekuitasTree[0]['saldo_akhir'] : 0;
+                            $grandTotal = $totalKewajiban + $totalEkuitas;
+                            echo $grandTotal != 0 ? formatAngkaDesimal($grandTotal) : '-';
+                        @endphp
+                    </td>
                 </tr>
             </tbody>
         </table>

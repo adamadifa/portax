@@ -1002,24 +1002,30 @@ class LaporanaccountingController extends Controller
 
         $ledger_transaksi = Ledger::query();
         $ledger_transaksi->select(
-            'keuangan_ledger.kode_akun',
+            'coa.kode_akun_portax as kode_akun',
             'coa_portax.jenis_akun',
-            'nama_akun',
+            'coa_portax.nama_akun',
             'keuangan_ledger.tanggal',
             'keuangan_ledger.no_bukti',
             DB::raw('CONCAT_WS(" - ", bank.nama_bank, bank.no_rekening) AS sumber'),
             'keuangan_ledger.keterangan',
             DB::raw('IF(debet_kredit="K",jumlah,0) as jml_kredit'),
             DB::raw('IF(debet_kredit="D",jumlah,0) as jml_debet'),
-            DB::raw('IF((coa_portax.jenis_akun = "1" AND debet_kredit = "K") OR ((coa_portax.jenis_akun = "1" OR coa_portax.jenis_akun IS NULL) AND debet_kredit = "D"), 1, 2) as urutan')
+            DB::raw('IF(debet_kredit="D",1,2) as urutan')
         );
+        $ledger_transaksi->join('coa', 'keuangan_ledger.kode_akun', '=', 'coa.kode_akun');
+        $ledger_transaksi->join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun');
+        $ledger_transaksi->join('bank', 'keuangan_ledger.kode_bank', '=', 'bank.kode_bank');
         $ledger_transaksi->whereBetween('keuangan_ledger.tanggal', [$start_date, $request->sampai]);
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
-            $ledger_transaksi->whereBetween('keuangan_ledger.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
+            $ledger_transaksi->whereBetween('coa.kode_akun_portax', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
-        $ledger_transaksi->join('coa_portax', 'keuangan_ledger.kode_akun', '=', 'coa_portax.kode_akun');
-        $ledger_transaksi->join('bank', 'keuangan_ledger.kode_bank', '=', 'bank.kode_bank');
-        $ledger_transaksi->orderBy('keuangan_ledger.kode_akun');
+        if (auth()->user()->kode_cabang != "PST") {
+            $ledger_transaksi->where('bank.kode_cabang', auth()->user()->kode_cabang);
+        } else {
+            $ledger_transaksi->where('bank.kode_cabang', $request->kode_cabang);
+        }
+        $ledger_transaksi->orderBy('coa.kode_akun_portax');
         $ledger_transaksi->orderBy('keuangan_ledger.tanggal');
         $ledger_transaksi->orderBy('keuangan_ledger.no_bukti');
 
@@ -1555,7 +1561,8 @@ class LaporanaccountingController extends Controller
 
         $union_data = $ledger->unionAll($saldoawal)
         ->unionAll($kaskecil)
-        ->unionAll($kaskecil_transaksi);
+        ->unionAll($kaskecil_transaksi)
+        ->unionAll($ledger_transaksi);
         if ($request->formatlaporan == '1') {
 
 
@@ -1587,136 +1594,50 @@ class LaporanaccountingController extends Controller
             return view('accounting.laporan.lk.bukubesar_cetak', $data);
         } else if ($request->formatlaporan == '2') {
 
+            // ============================================================
+            // NERACA - Hitung saldo_akhir dari union_data (sama dengan buku besar)
+            // ============================================================
 
-
-            //Labarugi
-            $kode_laba_rugi = array('4,5,6,7,8,9');
-            $akun_jangan_ditampilkan = ['0-0000', '1', '2'];
-            // Ambil hasil union sebagai subquery, lalu lakukan SUM group by kode_akun
-
-            $rekapakunlabarugi = DB::query()->fromSub($union_data, 'rekap')
-                ->selectRaw('kode_akun, nama_akun,
-                    SUM(IF(jenis_akun = 1, jml_kredit - jml_debet, jml_debet - jml_kredit)) as saldo_akhir')
-                ->whereRaw('LEFT(kode_akun,1) IN (' . implode(',', $kode_laba_rugi) . ')')
-                ->groupBy('kode_akun', 'nama_akun')
-                ->orderBy('kode_akun');
-
-            $labarugi = CoaPortax::leftJoinSub($rekapakunlabarugi, 'rekapakun', function ($join) {
-                $join->on('coa_portax.kode_akun', '=', 'rekapakun.kode_akun');
-            })
-                ->select('coa_portax.kode_akun', 'coa_portax.nama_akun', 'coa_portax.level', 'coa_portax.sub_akun', 'rekapakun.saldo_akhir')
-                ->whereRaw('LEFT(coa_portax.kode_akun,1) IN (' . implode(',', $kode_laba_rugi) . ')')
-                ->whereNotIn('coa_portax.kode_akun', $akun_jangan_ditampilkan)
-                ->where(function ($query) {
-                    // Hanya tampilkan saldo_akhir yang tidak null,
-                    // atau jika null hanya untuk level 0 dan 1
-                    $query->whereNotNull('rekapakun.saldo_akhir')
-                        ->orWhere(function ($q) {
-                            $q->whereNull('rekapakun.saldo_akhir')
-                                ->whereIn('coa_portax.level', [0, 1, 2]);
-                        });
-                })
+            // 1. Hitung saldo_akhir per kode_akun dari semua data union
+            $rekapakun = DB::query()->fromSub($union_data, 'rekap')
+                ->selectRaw('kode_akun, SUM(jml_debet - jml_kredit) as saldo_akhir')
+                ->groupBy('kode_akun')
                 ->get();
-            $kode_akun_pendapatan = 4;
-            $kode_akun_pokok_penjualan = 5;
-            $kode_akun_pendapatanlain = 8;
-            $kode_akun_biayalain = 9;
 
-            $kode_akun_biaya_penjualan = '6-1';
-            $kode_akun_biaya_adm = '6-2';
+            $saldo_map = [];
+            foreach ($rekapakun as $r) {
+                $saldo_map[$r->kode_akun] = (float) $r->saldo_akhir;
+            }
 
-            $subtotal_akun_pendapatan = 0;
-            $subtotal_akun_pokok_penjualan = 0;
-            $subtotal_akun_pendapatanlain = 0;
-            $subtotal_akun_biayalain = 0;
-            $subtotal_akun_biaya_penjualan = 0;
-            $subtotal_akun_biaya_adm = 0;
-            foreach ($labarugi as $index => $d) {
-
-                $kode_akun_minus = [
-                    '4-2101',
-                    '4-2201',
-                    '4-2202',
-                    '5-1202',
-                    '5-3200',
-                    '5-3400',
-                    '5-3800',
-                    '5-1203',
-                ];
-                // Hitung indentasi berdasarkan level (misal: 20px per level)
-                // $indent = ($d->level ?? 0) * 20;
-                if (in_array($d->kode_akun, $kode_akun_minus)) {
-                    $saldo_akhir = $d->saldo_akhir * -1;
-                    $test = 'minus';
-                } else {
-                    $saldo_akhir = $d->saldo_akhir;
-                    $test = 'plus';
-                }
-
-
-
-                if (substr($d->kode_akun, 0, 1) == $kode_akun_pendapatan) {
-                    $subtotal_akun_pendapatan += $saldo_akhir;
-                }
-
-                if (substr($d->kode_akun, 0, 1) == $kode_akun_pokok_penjualan) {
-                    $subtotal_akun_pokok_penjualan += $saldo_akhir;
-                }
-
-                if (substr($d->kode_akun, 0, 1) == $kode_akun_pendapatanlain) {
-                    $subtotal_akun_pendapatanlain += $saldo_akhir;
-                }
-
-                if (substr($d->kode_akun, 0, 1) == $kode_akun_biayalain) {
-                    $subtotal_akun_biayalain += $saldo_akhir;
-                }
-
-                if (substr($d->kode_akun, 0, 3) == $kode_akun_biaya_penjualan) {
-                    $subtotal_akun_biaya_penjualan += $saldo_akhir;
-                }
-
-                if (substr($d->kode_akun, 0, 3) == $kode_akun_biaya_adm) {
-                    $subtotal_akun_biaya_adm += $saldo_akhir;
+            // 2. Hitung net_profit_loss dari akun laba rugi (4,5,6,7,8,9)
+            //    Revenue (4,8): saldo negatif (kredit > debet)
+            //    Expense (5,6,9): saldo positif (debet > kredit)
+            //    Net P/L = -(sum semua akun P&L)
+            $net_profit_loss = 0;
+            foreach ($saldo_map as $kode => $saldo) {
+                $first = substr($kode, 0, 1);
+                if (in_array($first, ['4', '5', '6', '7', '8', '9'])) {
+                    $net_profit_loss -= $saldo;
                 }
             }
 
-            $gross_profit = $subtotal_akun_pendapatan - $subtotal_akun_pokok_penjualan;
-            $biaya_operasional = $subtotal_akun_biaya_adm + $subtotal_akun_biaya_penjualan;
-            $operating_profit = $gross_profit - $biaya_operasional;
-            $net_profit_loss = $operating_profit + $subtotal_akun_pendapatanlain - $subtotal_akun_biayalain;
-            // echo "Pendapatan: " . $subtotal_akun_pendapatan . "<br>";
-            // echo "Pokok Penjualan: " . $subtotal_akun_pokok_penjualan . "<br>";
-            // echo "Gross Profit: " . $gross_profit . "<br>";
-            // echo "Biaya Operasional: " . $biaya_operasional . "<br>";
-            // echo "Operating Profit: " . $operating_profit . "<br>";
-            // echo "Pendapatan Lain: " . $subtotal_akun_pendapatanlain . "<br>";
-            // echo "Biaya Lain: " . $subtotal_akun_biayalain . "<br>";
-            // echo "Net Profit Loss: " . $net_profit_loss . "<br>";
-            // die;
+            // 3. Hitung saldo 33001 (Laba Tahun Berjalan) = saldo_awal_33001 + net_profit_loss
+            $saldo_33001 = ($saldo_map['33001'] ?? 0) + $net_profit_loss;
 
-            $data['net_profit_loss'] = $net_profit_loss;
-            $kode_neraca = array('1,2,3');
-            $rekapakunneraca = DB::query()->fromSub($union_data, 'rekap')
-                ->selectRaw('kode_akun, nama_akun,
-                    SUM(IF(jenis_akun = 1, jml_kredit - jml_debet, jml_debet - jml_kredit)) as saldo_akhir')
-                ->whereRaw('LEFT(kode_akun,1) IN (' . implode(',', $kode_neraca) . ')')
-                ->groupBy('kode_akun', 'nama_akun')
-                ->orderBy('kode_akun');
-
-            $data['neraca'] = \App\Models\CoaPortax::leftJoinSub($rekapakunneraca, 'rekapakun', function ($join) {
-                $join->on('coa_portax.kode_akun', '=', 'rekapakun.kode_akun');
-            })
-                ->select('coa_portax.kode_akun', 'coa_portax.nama_akun', 'coa_portax.level', 'coa_portax.sub_akun', 'rekapakun.saldo_akhir')
-                ->whereRaw('LEFT(coa_portax.kode_akun,1) IN (' . implode(',', $kode_neraca) . ')')
-                ->whereNotIn('coa_portax.kode_akun', $akun_jangan_ditampilkan)
-                ->orderBy('coa_portax.kode_akun')
+            // 4. Ambil semua coa_portax untuk neraca (1=Aktiva, 2=Kewajiban, 3=Ekuitas)
+            $data['neraca'] = CoaPortax::whereRaw('LEFT(kode_akun, 1) IN (1,2,3)')
+                ->orderBy('kode_akun')
                 ->get()
-                ->map(function ($item) use ($net_profit_loss) {
+                ->map(function ($item) use ($saldo_map, $saldo_33001) {
                     if ($item->kode_akun == '33001') {
-                        $item->saldo_akhir = $net_profit_loss;
+                        $item->saldo_akhir = $saldo_33001;
+                    } else {
+                        $item->saldo_akhir = $saldo_map[$item->kode_akun] ?? 0;
                     }
                     return $item;
                 });
+
+            $data['net_profit_loss'] = $net_profit_loss;
 
             if (isset($_POST['exportButton'])) {
                 header("Content-type: application/vnd-ms-excel");

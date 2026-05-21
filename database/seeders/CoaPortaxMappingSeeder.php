@@ -26,12 +26,17 @@ class CoaPortaxMappingSeeder extends Seeder
                         $kode_portax = '11101';
                     } elseif ($suffix >= 1102 && $suffix <= 1122) {
                         $kode_portax = '11102';
-                    } elseif ($suffix >= 1258 && $suffix <= 1271) {
-                        $kode_portax = '11201';
-                    } elseif ($suffix >= 1244 && $suffix <= 1257) {
-                        $kode_portax = '11202';
-                    } elseif ($suffix >= 1272 && $suffix <= 1285) {
-                        $kode_portax = '11203';
+                    } elseif ($suffix >= 1200 && $suffix <= 1299) {
+                        $name = strtolower($coa->nama_akun);
+                        if (str_contains($name, 'bca')) {
+                            $kode_portax = '11203';
+                        } elseif (str_contains($name, 'bni taplus')) {
+                            $kode_portax = '11202';
+                        } elseif (str_contains($name, 'bni')) {
+                            $kode_portax = '11201';
+                        } else {
+                            $kode_portax = '11200';
+                        }
                     } elseif ($suffix >= 1401 && $suffix <= 1499) {
                         $kode_portax = '11301';
                     } elseif ($suffix >= 1705 && $suffix <= 1749) {

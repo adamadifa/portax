@@ -118,6 +118,7 @@
                 'nama_akun' => $coa->nama_akun,
                 'sub_akun' => $coa->sub_akun,
                 'level' => $coa->level,
+                'saldo_akhir' => $coa->saldo_akhir ?? 0,
                 'children' => []
             ];
         }
@@ -155,6 +156,26 @@
             }
         }
 
+        // Recursive balance calculator
+        if (!function_exists('calculateTreeBalances')) {
+            function calculateTreeBalances(&$nodes)
+            {
+                $total = 0;
+                foreach ($nodes as &$node) {
+                    if (count($node['children']) > 0) {
+                        $node['saldo_akhir'] = calculateTreeBalances($node['children']);
+                    }
+                    $total += $node['saldo_akhir'];
+                }
+                return $total;
+            }
+        }
+
+        // Calculate recursive balances
+        calculateTreeBalances($pendapatanTree);
+        calculateTreeBalances($biayaTree);
+        calculateTreeBalances($ikhtisarTree);
+
         // Recursive tree rendering function
         if (!function_exists('renderTree')) {
             function renderTree($nodes, $level = 0)
@@ -176,13 +197,13 @@
                         // Render Subtotal/Jumlah row
                         echo '<tr class="subtotal-row">';
                         echo '<td style="padding-left: ' . $indent . 'px;">Jumlah ' . $node['nama_akun'] . '</td>';
-                        echo '<td class="text-right">-</td>';
+                        echo '<td class="text-right">' . ($node['saldo_akhir'] != 0 ? formatAngkaDesimal($node['saldo_akhir']) : '-') . '</td>';
                         echo '</tr>';
                     } else {
                         // Leaf account
                         echo '<tr>';
                         echo '<td style="padding-left: ' . $indent . 'px;">' . $node['kode_akun'] . ' &nbsp; ' . $node['nama_akun'] . '</td>';
-                        echo '<td class="text-right">-</td>';
+                        echo '<td class="text-right">' . ($node['saldo_akhir'] != 0 ? formatAngkaDesimal($node['saldo_akhir']) : '-') . '</td>';
                         echo '</tr>';
                     }
                 }
@@ -233,7 +254,9 @@
                 <!-- Grand Total Laba/Rugi Bersih -->
                 <tr class="subtotal-row-grand">
                     <td style="font-weight: bold;">Laba (Rugi) Bersih</td>
-                    <td class="text-right" style="font-weight: bold;">-</td>
+                    <td class="text-right" style="font-weight: bold;">
+                        {{ $net_profit_loss != 0 ? formatAngkaDesimal($net_profit_loss) : '-' }}
+                    </td>
                 </tr>
             </tbody>
         </table>
