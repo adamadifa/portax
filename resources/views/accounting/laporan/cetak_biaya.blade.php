@@ -38,7 +38,8 @@
                 <thead>
                     <tr>
                         <th>TANGGAL</th>
-                        <th>AKUN</th>
+                        <th>KODE AKUN</th>
+                        <th>NAMA AKUN</th>
                         <th>KETERANGAN</th>
                         <th>JUMLAH</th>
                     </tr>
@@ -54,7 +55,8 @@
                         @endphp
                         <tr>
                             <td>{{ DateToIndo($d->tanggal) }}</td>
-                            <td>{{ $d->kode_akun }} - {{ $d->nama_akun }}</td>
+                            <td>{{ $d->kode_akun }}</td>
+                            <td>{{ $d->nama_akun }}</td>
                             <td>{{ $d->keterangan }}</td>
                             <td class="right">{{ formatAngka($jumlah) }}</td>
                         </tr>
