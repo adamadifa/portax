@@ -7,6 +7,7 @@ use App\Models\Penjualan;
 use App\Models\Detailpenjualan;
 use App\Models\Salesman;
 use App\Models\Pelanggan;
+use App\Models\Wilayah;
 use App\Models\User;
 use App\Models\Kategorisalesman;
 use App\Models\Historibayarpenjualan;
@@ -73,6 +74,9 @@ class SyncPenjualanController extends Controller
 
                 // Data Master Optional (Pelanggan)
                 'pelanggan' => 'nullable|array',
+
+                // Data Master Optional (Wilayah)
+                'wilayah' => 'nullable|array',
 
                 // Detail penjualan (array)
                 'detail' => 'required|array|min:1',
@@ -153,6 +157,21 @@ class SyncPenjualanController extends Controller
                 $filteredData = array_intersect_key($salesmanData, array_flip($tableColumns));
 
                 Salesman::create($filteredData);
+            }
+
+            // Check & Create Wilayah
+            if ($request->has('wilayah') && !empty($request->wilayah)) {
+                $wilayahData = $request->wilayah;
+                if (isset($wilayahData['kode_wilayah'])) {
+                    // Filter columns to prevent "Column not found" error
+                    $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('wilayah');
+                    $filteredData = array_intersect_key($wilayahData, array_flip($tableColumns));
+
+                    Wilayah::updateOrCreate(
+                        ['kode_wilayah' => $wilayahData['kode_wilayah']],
+                        $filteredData
+                    );
+                }
             }
 
             // Check & Create Pelanggan
@@ -412,6 +431,7 @@ class SyncPenjualanController extends Controller
                 // Data Master Optional Batch
                 'data.*.salesman' => 'nullable|array',
                 'data.*.pelanggan' => 'nullable|array',
+                'data.*.wilayah' => 'nullable|array',
 
                 'data.*.detail' => 'required|array|min:1',
 
@@ -505,6 +525,20 @@ class SyncPenjualanController extends Controller
                         $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('salesman');
                         $filteredData = array_intersect_key($salesmanData, array_flip($tableColumns));
                         Salesman::create($filteredData);
+                    }
+
+                    // Check & Create Wilayah
+                    if (isset($penjualanData['wilayah']) && !empty($penjualanData['wilayah'])) {
+                        $wilayahData = $penjualanData['wilayah'];
+                        if (isset($wilayahData['kode_wilayah'])) {
+                            // Filter columns
+                            $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('wilayah');
+                            $filteredData = array_intersect_key($wilayahData, array_flip($tableColumns));
+                            Wilayah::updateOrCreate(
+                                ['kode_wilayah' => $wilayahData['kode_wilayah']],
+                                $filteredData
+                            );
+                        }
                     }
 
                     // Check & Create Pelanggan
