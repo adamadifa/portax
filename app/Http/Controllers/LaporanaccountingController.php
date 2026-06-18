@@ -459,7 +459,7 @@ class LaporanaccountingController extends Controller
         if (!empty($kode_cabang)) {
             $cabang = Cabang::where('kode_cabang', $kode_cabang)->get();
         } else {
-            $cabang =  Cabang::orderBy('kode_cabang')->get();
+            $cabang = Cabang::orderBy('kode_cabang')->get();
         }
 
         $selectColumncabang = [];
@@ -496,13 +496,13 @@ class LaporanaccountingController extends Controller
             ) as bahan_" . $c->kode_cabang);
 
 
-            $selectColumnbruto[] =  DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang' AND produk.kode_kategori_produk='P01',subtotal,0)) as bruto_aida_" . $c->kode_cabang);
-            $selectColumnbruto[] =  DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang' AND produk.kode_kategori_produk='P02',subtotal,0)) as bruto_swan_" . $c->kode_cabang);
-            $selectColumnpotongan[] =  DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang',(potongan_aida + potis_aida + peny_aida),0)) as potongan_aida_" . $c->kode_cabang);
-            $selectColumnpotongan[] =  DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang',(potongan_swan + potongan_sp + potongan_sambal + potongan_stick + potis_swan + potis_stick + peny_swan + peny_stick),0)) as potongan_swan_" . $c->kode_cabang);
-            $selectColumnpotongan[] =  DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang',ppn,0)) as ppn_" . $c->kode_cabang);
-            $selectColumnretur[] =  DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang' AND produk.kode_kategori_produk='P01',subtotal,0)) as retur_aida_" . $c->kode_cabang);
-            $selectColumnretur[] =  DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang' AND produk.kode_kategori_produk='P02',subtotal,0)) as retur_swan_" . $c->kode_cabang);
+            $selectColumnbruto[] = DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang' AND produk.kode_kategori_produk='P01',subtotal,0)) as bruto_aida_" . $c->kode_cabang);
+            $selectColumnbruto[] = DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang' AND produk.kode_kategori_produk='P02',subtotal,0)) as bruto_swan_" . $c->kode_cabang);
+            $selectColumnpotongan[] = DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang',(potongan_aida + potis_aida + peny_aida),0)) as potongan_aida_" . $c->kode_cabang);
+            $selectColumnpotongan[] = DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang',(potongan_swan + potongan_sp + potongan_sambal + potongan_stick + potis_swan + potis_stick + peny_swan + peny_stick),0)) as potongan_swan_" . $c->kode_cabang);
+            $selectColumnpotongan[] = DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang',ppn,0)) as ppn_" . $c->kode_cabang);
+            $selectColumnretur[] = DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang' AND produk.kode_kategori_produk='P01',subtotal,0)) as retur_aida_" . $c->kode_cabang);
+            $selectColumnretur[] = DB::raw("SUM(IF(salesman.kode_cabang='$c->kode_cabang' AND produk.kode_kategori_produk='P02',subtotal,0)) as retur_swan_" . $c->kode_cabang);
 
 
             $selectColumnsaldoawalpiutang[] = DB::raw("SUM(IF(salesman.kode_cabang = '$c->kode_cabang',
@@ -887,7 +887,7 @@ class LaporanaccountingController extends Controller
     {
         $user = User::findorfail(auth()->user()->id);
 
-        $query =  Jurnalumum::query();
+        $query = Jurnalumum::query();
         $query->join('coa_portax', 'accounting_jurnalumum.kode_akun', '=', 'coa_portax.kode_akun');
         $query->whereBetween('tanggal', [$request->dari, $request->sampai]);
 
@@ -1140,9 +1140,9 @@ class LaporanaccountingController extends Controller
             $query->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil')
                 ->orWhere('keuangan_kaskecil.kode_cabang', '=', 'PST');
         });
-        if(auth()->user()->kode_cabang != "PST"){
+        if (auth()->user()->kode_cabang != "PST") {
             $kaskecil->where('keuangan_kaskecil.kode_cabang', auth()->user()->kode_cabang);
-        }else{
+        } else {
             $kaskecil->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
         }
 
@@ -1170,15 +1170,15 @@ class LaporanaccountingController extends Controller
             DB::raw('IF(debet_kredit="D",jumlah,0) as jml_debet'),
             DB::raw('IF(debet_kredit="D",1,2) as urutan')
         );
-        $kaskecil_transaksi->join('coa','keuangan_kaskecil.kode_akun','=','coa.kode_akun');
+        $kaskecil_transaksi->join('coa', 'keuangan_kaskecil.kode_akun', '=', 'coa.kode_akun');
         $kaskecil_transaksi->join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun');
         $kaskecil_transaksi->whereBetween('keuangan_kaskecil.tanggal', [$start_date, $request->sampai]);
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
             $kaskecil_transaksi->whereBetween('coa.kode_akun_portax', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
-        if(auth()->user()->kode_cabang != "PST"){
+        if (auth()->user()->kode_cabang != "PST") {
             $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', auth()->user()->kode_cabang);
-        }else{
+        } else {
             $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
         }
         $kaskecil_transaksi->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil');
@@ -1275,49 +1275,49 @@ class LaporanaccountingController extends Controller
 
         // //Putang Datang 1-1401
 
-        // //Retur Penjualan
-        // $returpenjualan = Detailretur::query();
-        // $returpenjualan->select('marketing_retur.no_faktur', DB::raw('SUM(subtotal) as jml_retur'));
-        // $returpenjualan->join('marketing_retur', 'marketing_retur_detail.no_retur', '=', 'marketing_retur.no_retur');
-        // $returpenjualan->where('jenis_retur', 'PF');
-        // $returpenjualan->whereBetween('marketing_retur.tanggal', [$start_date, $request->sampai]);
-        // $returpenjualan->groupBy('marketing_retur.no_faktur');
+        //Retur Penjualan
+        $returpenjualan = Detailretur::query();
+        $returpenjualan->select('marketing_retur.no_faktur', DB::raw('SUM(subtotal) as jml_retur'));
+        $returpenjualan->join('marketing_retur', 'marketing_retur_detail.no_retur', '=', 'marketing_retur.no_retur');
+        $returpenjualan->where('jenis_retur', 'PF');
+        $returpenjualan->whereBetween('marketing_retur.tanggal', [$start_date, $request->sampai]);
+        $returpenjualan->groupBy('marketing_retur.no_faktur');
 
-        // $detailpenjualan = Detailpenjualan::query();
-        // $detailpenjualan->select('marketing_penjualan.no_faktur', DB::raw('SUM(subtotal) as jml_bruto_penjualan'));
-        // $detailpenjualan->join('marketing_penjualan', 'marketing_penjualan_detail.no_faktur', '=', 'marketing_penjualan.no_faktur');
-        // $detailpenjualan->whereBetween('marketing_penjualan.tanggal', [$start_date, $request->sampai]);
-        // $detailpenjualan->where('status_batal', 0);
-        // $detailpenjualan->groupBy('marketing_penjualan.no_faktur');
+        $detailpenjualan = Detailpenjualan::query();
+        $detailpenjualan->select('marketing_penjualan.no_faktur', DB::raw('SUM(subtotal) as jml_bruto_penjualan'));
+        $detailpenjualan->join('marketing_penjualan', 'marketing_penjualan_detail.no_faktur', '=', 'marketing_penjualan.no_faktur');
+        $detailpenjualan->whereBetween('marketing_penjualan.tanggal', [$start_date, $request->sampai]);
+        $detailpenjualan->where('status_batal', 0);
+        $detailpenjualan->groupBy('marketing_penjualan.no_faktur');
 
-        // $penjualannetto = Penjualan::query();
-        // $penjualannetto->select(
-        //     'marketing_penjualan.kode_akun',
-        //     'coa_portax.jenis_akun',
-        //     'nama_akun',
-        //     'marketing_penjualan.tanggal',
-        //     'marketing_penjualan.no_faktur as no_bukti',
-        //     DB::raw("'PENJUALAN' AS sumber"),
-        //     DB::raw("CONCAT(' Penjualan ',pelanggan.nama_pelanggan) as keterangan"),
-        //     DB::raw('0 as jml_kredit'),
-        //     DB::raw('(IFNULL(jml_bruto_penjualan,0) - IFNULL(potongan,0) - IFNULL(potongan_istimewa,0) - IFNULL(penyesuaian,0) - IFNULL(jml_retur,0)) as jml_debet'),
-        //     DB::raw('1 as urutan')
-        // );
-        // $penjualannetto->join('pelanggan', 'marketing_penjualan.kode_pelanggan', '=', 'pelanggan.kode_pelanggan');
-        // $penjualannetto->join('coa_portax', 'marketing_penjualan.kode_akun', '=', 'coa_portax.kode_akun');
-        // $penjualannetto->leftJoinSub($returpenjualan, 'returpenjualan', function ($join) {
-        //     $join->on('marketing_penjualan.no_faktur', '=', 'returpenjualan.no_faktur');
-        // });
-        // $penjualannetto->leftJoinSub($detailpenjualan, 'detailpenjualan', function ($join) {
-        //     $join->on('marketing_penjualan.no_faktur', '=', 'detailpenjualan.no_faktur');
-        // });
-        // $penjualannetto->where('marketing_penjualan.status_batal', 0);
-        // $penjualannetto->whereBetween('marketing_penjualan.tanggal', [$start_date, $request->sampai]);
-        // if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
-        //     $penjualannetto->whereBetween('marketing_penjualan.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
-        // }
-        // $penjualannetto->orderBy('marketing_penjualan.kode_akun');
-        // $penjualannetto->orderBy('marketing_penjualan.tanggal');
+        $penjualannetto = Penjualan::query();
+        $penjualannetto->select(
+            'marketing_penjualan.kode_akun',
+            'coa_portax.jenis_akun',
+            'nama_akun',
+            'marketing_penjualan.tanggal',
+            'marketing_penjualan.no_faktur as no_bukti',
+            DB::raw("'PENJUALAN' AS sumber"),
+            DB::raw("CONCAT(' Penjualan ',pelanggan.nama_pelanggan) as keterangan"),
+            DB::raw('0 as jml_kredit'),
+            DB::raw('(IFNULL(jml_bruto_penjualan,0) - IFNULL(potongan,0) - IFNULL(potongan_istimewa,0) - IFNULL(penyesuaian,0) - IFNULL(jml_retur,0)) as jml_debet'),
+            DB::raw('1 as urutan')
+        );
+        $penjualannetto->join('pelanggan', 'marketing_penjualan.kode_pelanggan', '=', 'pelanggan.kode_pelanggan');
+        $penjualannetto->join('coa_portax', 'marketing_penjualan.kode_akun', '=', 'coa_portax.kode_akun');
+        $penjualannetto->leftJoinSub($returpenjualan, 'returpenjualan', function ($join) {
+            $join->on('marketing_penjualan.no_faktur', '=', 'returpenjualan.no_faktur');
+        });
+        $penjualannetto->leftJoinSub($detailpenjualan, 'detailpenjualan', function ($join) {
+            $join->on('marketing_penjualan.no_faktur', '=', 'detailpenjualan.no_faktur');
+        });
+        $penjualannetto->where('marketing_penjualan.status_batal', 0);
+        $penjualannetto->whereBetween('marketing_penjualan.tanggal', [$start_date, $request->sampai]);
+        if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
+            $penjualannetto->whereBetween('marketing_penjualan.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
+        }
+        $penjualannetto->orderBy('marketing_penjualan.kode_akun');
+        $penjualannetto->orderBy('marketing_penjualan.tanggal');
 
 
 
@@ -1558,13 +1558,14 @@ class LaporanaccountingController extends Controller
         $data['sampai'] = $request->sampai;
         $data['saldoawalCollection'] = $saldoawalCollection;
 
-       
+
 
         $union_data = $ledger->unionAll($saldoawal)
-        ->unionAll($kaskecil)
-        ->unionAll($kaskecil_transaksi)
-        ->unionAll($ledger_transaksi)
-        ->unionAll($jurnalumum);
+            ->unionAll($penjualannetto)
+            ->unionAll($kaskecil)
+            ->unionAll($kaskecil_transaksi)
+            ->unionAll($ledger_transaksi)
+            ->unionAll($jurnalumum);
 
         if ($request->formatlaporan == '1') {
 
@@ -1651,7 +1652,7 @@ class LaporanaccountingController extends Controller
         } else if ($request->formatlaporan == '3') {
             $kode_laba_rugi = array('4,5,6,7,8,9');
             $akun_jangan_ditampilkan = ['0-0000', '1', '2'];
-            
+
             $rekapakunlabarugi = DB::query()->fromSub($union_data, 'rekap')
                 ->selectRaw('kode_akun, nama_akun,
                     SUM(IF(jenis_akun = 1, jml_kredit - jml_debet, jml_debet - jml_kredit)) as saldo_akhir')
@@ -1684,7 +1685,14 @@ class LaporanaccountingController extends Controller
             $subtotal_akun_biaya_adm = 0;
             foreach ($data['labarugi'] as $index => $d) {
                 $kode_akun_minus = [
-                    '4-2101', '4-2201', '4-2202', '5-1202', '5-3200', '5-3400', '5-3800', '5-1203',
+                    '4-2101',
+                    '4-2201',
+                    '4-2202',
+                    '5-1202',
+                    '5-3200',
+                    '5-3400',
+                    '5-3800',
+                    '5-1203',
                 ];
                 if (in_array($d->kode_akun, $kode_akun_minus)) {
                     $saldo_akhir = $d->saldo_akhir * -1;
@@ -1767,7 +1775,7 @@ class LaporanaccountingController extends Controller
         $ledger_transaksi->join('coa', 'keuangan_ledger.kode_akun', '=', 'coa.kode_akun');
         $ledger_transaksi->join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun');
         $ledger_transaksi->join('bank', 'keuangan_ledger.kode_bank', '=', 'bank.kode_bank');
-        
+
 
 
         // --- Kas Kecil Transaksi (Detail) ---
@@ -1787,12 +1795,12 @@ class LaporanaccountingController extends Controller
         );
         $kaskecil_transaksi->whereBetween('keuangan_kaskecil.tanggal', [$dari, $sampai]);
         if (!empty($request->kode_cabang)) {
-             $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
+            $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
         }
         $kaskecil_transaksi->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil');
         $kaskecil_transaksi->join('coa', 'keuangan_kaskecil.kode_akun', '=', 'coa.kode_akun');
         $kaskecil_transaksi->join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun');
-        
+
 
 
         // --- Jurnal Umum ---
@@ -1812,7 +1820,7 @@ class LaporanaccountingController extends Controller
         );
         $jurnalumum->whereBetween('accounting_jurnalumum.tanggal', [$dari, $sampai]);
         if (!empty($request->kode_cabang)) {
-             $jurnalumum->where('accounting_jurnalumum.kode_cabang', $request->kode_cabang);
+            $jurnalumum->where('accounting_jurnalumum.kode_cabang', $request->kode_cabang);
         }
         $jurnalumum->join('coa', 'accounting_jurnalumum.kode_akun', '=', 'coa.kode_akun');
         $jurnalumum->join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun');
@@ -1824,13 +1832,13 @@ class LaporanaccountingController extends Controller
             ->unionAll($jurnalumum);
 
         $biaya = DB::query()->fromSub($union_data, 'transaksi_biaya')
-               ->where('kode_akun_portal', 'like', '6%')
-               ->orderBy('tanggal')
-               ->orderBy('kode_akun_portal')
-               ->get();
-        
+            ->where('kode_akun_portal', 'like', '6%')
+            ->orderBy('tanggal')
+            ->orderBy('kode_akun_portal')
+            ->get();
+
         $data['biaya'] = $biaya;
-        
+
         if (isset($_POST['exportButton'])) {
             header("Content-type: application/vnd-ms-excel");
             // Mendefinisikan nama file ekspor
