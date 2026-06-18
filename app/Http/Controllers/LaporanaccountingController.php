@@ -1304,6 +1304,7 @@ class LaporanaccountingController extends Controller
             DB::raw('1 as urutan')
         );
         $penjualannetto->join('pelanggan', 'marketing_penjualan.kode_pelanggan', '=', 'pelanggan.kode_pelanggan');
+        $penjualannetto->join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman');
         $penjualannetto->join('coa', 'marketing_penjualan.kode_akun', '=', 'coa.kode_akun');
         $penjualannetto->join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun');
         $penjualannetto->leftJoinSub($returpenjualan, 'returpenjualan', function ($join) {
@@ -1316,6 +1317,11 @@ class LaporanaccountingController extends Controller
         $penjualannetto->whereBetween('marketing_penjualan.tanggal', [$start_date, $request->sampai]);
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
             $penjualannetto->whereBetween('coa.kode_akun_portax', [$request->kode_akun_dari, $request->kode_akun_sampai]);
+        }
+        if (auth()->user()->kode_cabang != "PST") {
+            $penjualannetto->where('salesman.kode_cabang', auth()->user()->kode_cabang);
+        } else {
+            $penjualannetto->where('salesman.kode_cabang', $request->kode_cabang);
         }
         $penjualannetto->orderBy('coa.kode_akun_portax');
         $penjualannetto->orderBy('marketing_penjualan.tanggal');
