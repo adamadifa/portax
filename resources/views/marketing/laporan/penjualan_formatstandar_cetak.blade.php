@@ -125,6 +125,7 @@
                         $grand_total_ppn_global = 0;
                         $grand_total_jumlah_global = 0;
                         $grand_total_diskon_global = 0;
+                        $grand_total_subtotal_dpp = 0;
 
                         $total = 0;
                     @endphp
@@ -222,6 +223,7 @@
                                     $d__jumlah = $d__dpp + $d__ppn;
  
                                     $grand_total_dpp_global += $d__dpp;
+                                    $grand_total_subtotal_dpp += ($d->subtotal * (100 / 111));
                                     $grand_total_ppn_global += $d__ppn;
                                     $grand_total_jumlah_global += $d__jumlah;
                                     if ($d->status_promosi == '1') {
@@ -336,14 +338,14 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="19">TOTAL</th>
+                        <th colspan="18">TOTAL</th>
+                        <th class="right">{{ formatAngka($grand_total_subtotal_dpp) }}</th>
                         <th class="right">{{ formatAngka($grand_total_diskon_global) }}</th>
                         <th class="right">{{ formatAngka($grand_total_dpp_global) }}</th>
                         <th class="right"></th>
                         <th class="right">{{ formatAngka($grand_total_ppn_global) }}</th>
                         <th class="right">{{ formatAngka($grand_total_jumlah_global) }}</th>
                         <th colspan="5"></th>
-
                     </tr>
                 </tfoot>
             </table>
