@@ -1319,11 +1319,11 @@ class LaporanaccountingController extends Controller
         $penjualannetto->orderBy('marketing_penjualan.kode_akun');
         $penjualannetto->orderBy('marketing_penjualan.tanggal');
 
-
+        dd($penjualannetto->get());
 
         // //Piutang Datang
 
-        // //Kas Besar
+        // //Kas Besar  
         // $kasbesarpiutangdagang = Historibayarpenjualan::query();
         // $kasbesarpiutangdagang->select(
         //     'marketing_penjualan_historibayar.kode_akun',
