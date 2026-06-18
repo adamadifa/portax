@@ -159,6 +159,38 @@
                                     break;
                                 }
                             }
+
+                            $invoice_total_dpp = 0;
+                            $invoice_total_dpp_lain = 0;
+                            $invoice_total_ppn = 0;
+                            $invoice_total_jumlah = 0;
+                            foreach ($val as $idx => $item) {
+                                $item_diskon = 0;
+                                $qty_dus_floored = floor($item->jumlah / $item->isi_pcs_dus);
+                                if ($item->status_promosi != 1 && !empty($item->kode_kategori_diskon)) {
+                                    $rate = $cat_diskon_rate[$item->kode_kategori_diskon] ?? 0;
+                                    if ($item->kode_produk == 'BP500') {
+                                        $rate += 2000;
+                                    }
+                                    $item_diskon = ($qty_dus_floored * $rate) * (100 / 111);
+                                }
+
+                                if ($idx == $first_non_promosi_index && $first_non_promosi_index != -1) {
+                                    $item_diskon += ($item->potongan_istimewa * (100 / 111));
+                                }
+
+                                if (!empty($item->isi_pcs_dus) && $item->status_batal == 0) {
+                                    $item_dpp = ($item->subtotal * (100 / 111)) - $item_diskon;
+                                    $item_dpp_lain = $item_dpp * (11 / 12);
+                                    $item_ppn = $item_dpp_lain * 0.12;
+                                    $item_jumlah = $item_dpp + $item_ppn;
+
+                                    $invoice_total_dpp += $item_dpp;
+                                    $invoice_total_dpp_lain += $item_dpp_lain;
+                                    $invoice_total_ppn += $item_ppn;
+                                    $invoice_total_jumlah += $item_jumlah;
+                                }
+                            }
                         @endphp
                         @foreach ($val as $k => $d)
                             @php
@@ -188,7 +220,7 @@
                                     $d__dpp = ($d->subtotal * (100/111)) - $diskon;
                                     $d__ppn = ($d__dpp * (11/12) * 0.12);
                                     $d__jumlah = $d__dpp + $d__ppn;
-
+ 
                                     $grand_total_dpp_global += $d__dpp;
                                     $grand_total_ppn_global += $d__ppn;
                                     $grand_total_jumlah_global += $d__jumlah;
@@ -243,15 +275,15 @@
                                 @if ($k == 0)
                                     <td rowspan="{{ count($val) }}" class="right" style="background-color: {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                         {{ formatAngka((100 / 111) * $d->potongan) }}</td>
+                                    <td rowspan="{{ count($val) }}" class="right" style="background-color: {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
+                                        {{ formatAngka($invoice_total_dpp) }}</td>
+                                    <td rowspan="{{ count($val) }}" class="right" style="background-color: {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
+                                        {{ formatAngka($invoice_total_dpp_lain) }}</td>
+                                    <td rowspan="{{ count($val) }}" class="right" style="background-color: {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
+                                        {{ formatAngka($invoice_total_ppn) }}</td>
+                                    <td rowspan="{{ count($val) }}" class="right" style="background-color: {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
+                                        {{ formatAngka($invoice_total_jumlah) }}</td>
                                 @endif
-                                <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
-                                    {{ formatAngka(($d->subtotal * (100/111)) - $diskon) }}</td>
-                                <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
-                                    {{ formatAngka((($d->subtotal * (100/111)) - $diskon) * (11/12)) }}</td>
-                                <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
-                                    {{ formatAngka((($d->subtotal * (100/111)) - $diskon) * (11/12) * 0.12) }}</td>
-                                <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
-                                    {{ formatAngka( (($d->subtotal * (100/111)) - $diskon) + ((($d->subtotal * (100/111)) - $diskon) * (11/12) * 0.12) ) }}</td>
 
 
                                 @if ($k == 0)
