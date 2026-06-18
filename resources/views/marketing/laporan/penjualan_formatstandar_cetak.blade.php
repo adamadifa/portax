@@ -161,13 +161,14 @@
                                 }
                             }
 
-                            $invoice_total_subtotal_dpp = 0;
+                            $invoice_total_subtotal_bruto = 0;
                             foreach ($val as $idx => $item) {
                                 if (!empty($item->isi_pcs_dus) && $item->status_batal == 0) {
-                                    $invoice_total_subtotal_dpp += ($item->subtotal * (100 / 111));
+                                    $invoice_total_subtotal_bruto += $item->subtotal;
                                 }
                             }
-                            $invoice_total_diskon_dpp = (100 / 111) * $val[0]->potongan;
+                            $invoice_total_subtotal_dpp = $invoice_total_subtotal_bruto * (100 / 111);
+                            $invoice_total_diskon_dpp = (100 / 111) * ($val[0]->potongan + $val[0]->potongan_istimewa + $val[0]->penyesuaian);
                             $invoice_total_dpp = $invoice_total_subtotal_dpp - $invoice_total_diskon_dpp;
                             $invoice_total_dpp_lain = $invoice_total_dpp * (11 / 12);
                             $invoice_total_ppn = $invoice_total_dpp_lain * 0.12;
@@ -248,7 +249,7 @@
                                     {{ formatAngka($d->subtotal * (100 / 111)) }}</td>
                                 @if ($k == 0)
                                     <td rowspan="{{ count($val) }}" class="right" style="background-color: {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
-                                        {{ formatAngka((100 / 111) * $d->potongan) }}</td>
+                                        {{ formatAngka($invoice_total_diskon_dpp) }}</td>
                                     <td rowspan="{{ count($val) }}" class="right" style="background-color: {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                         {{ formatAngka($invoice_total_dpp) }}</td>
                                     <td rowspan="{{ count($val) }}" class="right" style="background-color: {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
@@ -272,7 +273,7 @@
                                         $grandtotal_potongan_stick += $d->potongan_stick;
                                         $grandtotal_potongan_sp += $d->potongan_sp;
                                         $grandtotal_potongan_sc += $d->potongan_sambal;
-                                        $grand_total_diskon_global += (100 / 111) * $d->potongan;
+                                        $grand_total_diskon_global += $invoice_total_diskon_dpp;
                                         $grand_total_dpp_global += $invoice_total_dpp;
                                         $grand_total_ppn_global += $invoice_total_ppn;
                                         $grand_total_jumlah_global += $invoice_total_jumlah;
