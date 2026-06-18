@@ -239,7 +239,7 @@
                                 <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                     {{ !empty($pcs) ? formatAngka($d->harga_pcs * (100/111)) : '' }}</td>
                                 <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
-                                    {{ formatAngka($d->subtotal) }}</td>
+                                    {{ formatAngka($d->subtotal * (100 / 111)) }}</td>
                                 @if ($k == 0)
                                     <td rowspan="{{ count($val) }}" class="right" style="background-color: {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                         {{ formatAngka((100 / 111) * $d->potongan) }}</td>
