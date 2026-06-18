@@ -1294,7 +1294,7 @@ class LaporanaccountingController extends Controller
         $penjualannetto->select(
             'marketing_penjualan.kode_akun',
             'coa_portax.jenis_akun',
-            'nama_akun',
+            'coa_portax.nama_akun',
             'marketing_penjualan.tanggal',
             'marketing_penjualan.no_faktur as no_bukti',
             DB::raw("'PENJUALAN' AS sumber"),
