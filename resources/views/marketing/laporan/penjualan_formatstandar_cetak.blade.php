@@ -189,7 +189,6 @@
                                     $d__ppn = ($d__dpp * (11/12) * 0.12);
                                     $d__jumlah = $d__dpp + $d__ppn;
 
-                                    $grand_total_diskon_global += $diskon;
                                     $grand_total_dpp_global += $d__dpp;
                                     $grand_total_ppn_global += $d__ppn;
                                     $grand_total_jumlah_global += $d__jumlah;
@@ -241,8 +240,10 @@
                                     {{ !empty($pcs) ? formatAngka($d->harga_pcs * (100/111)) : '' }}</td>
                                 <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                     {{ formatAngka($d->subtotal) }}</td>
-                                <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
-                                    {{ formatAngka($diskon) }}</td>
+                                @if ($k == 0)
+                                    <td rowspan="{{ count($val) }}" class="right" style="background-color: {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
+                                        {{ formatAngka((100 / 111) * $d->potongan) }}</td>
+                                @endif
                                 <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
                                     {{ formatAngka(($d->subtotal * (100/111)) - $diskon) }}</td>
                                 <td class="right" style="background-color:  {{ !empty($bgcolorpromosi) ? $bgcolorpromosi : $bgcolor }}">
@@ -266,6 +267,7 @@
                                         $grandtotal_potongan_sp += $d->potongan_sp;
                                         $grandtotal_potongan_sc += $d->potongan_sambal;
                                         $grandtotal_potongan += $d->potongan;
+                                        $grand_total_diskon_global += (100 / 111) * $d->potongan;
                                         $grandtotal_dpp += $dpp;
                                         $grandtotal_ppn += $d->ppn;
                                         $grandtotal_retur += $d->total_retur;
