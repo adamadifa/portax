@@ -1292,7 +1292,7 @@ class LaporanaccountingController extends Controller
 
         $penjualannetto = Penjualan::query();
         $penjualannetto->select(
-            'marketing_penjualan.kode_akun',
+            'coa.kode_akun_portax as kode_akun',
             'coa_portax.jenis_akun',
             'coa_portax.nama_akun',
             'marketing_penjualan.tanggal',
@@ -1305,7 +1305,7 @@ class LaporanaccountingController extends Controller
         );
         $penjualannetto->join('pelanggan', 'marketing_penjualan.kode_pelanggan', '=', 'pelanggan.kode_pelanggan');
         $penjualannetto->join('coa', 'marketing_penjualan.kode_akun', '=', 'coa.kode_akun');
-        $penjualannetto->join('coa_portax', 'coa.kode_akun', '=', 'coa_portax.kode_akun');
+        $penjualannetto->join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun');
         $penjualannetto->leftJoinSub($returpenjualan, 'returpenjualan', function ($join) {
             $join->on('marketing_penjualan.no_faktur', '=', 'returpenjualan.no_faktur');
         });
@@ -1315,9 +1315,9 @@ class LaporanaccountingController extends Controller
         $penjualannetto->where('marketing_penjualan.status_batal', 0);
         $penjualannetto->whereBetween('marketing_penjualan.tanggal', [$start_date, $request->sampai]);
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
-            $penjualannetto->whereBetween('marketing_penjualan.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
+            $penjualannetto->whereBetween('coa.kode_akun_portax', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
-        $penjualannetto->orderBy('marketing_penjualan.kode_akun');
+        $penjualannetto->orderBy('coa.kode_akun_portax');
         $penjualannetto->orderBy('marketing_penjualan.tanggal');
 
         //dd($penjualannetto->get());
