@@ -161,37 +161,17 @@
                                 }
                             }
 
-                            $invoice_total_dpp = 0;
-                            $invoice_total_dpp_lain = 0;
-                            $invoice_total_ppn = 0;
-                            $invoice_total_jumlah = 0;
+                            $invoice_total_subtotal_dpp = 0;
                             foreach ($val as $idx => $item) {
-                                $item_diskon = 0;
-                                $qty_dus_floored = floor($item->jumlah / $item->isi_pcs_dus);
-                                if ($item->status_promosi != 1 && !empty($item->kode_kategori_diskon)) {
-                                    $rate = $cat_diskon_rate[$item->kode_kategori_diskon] ?? 0;
-                                    if ($item->kode_produk == 'BP500') {
-                                        $rate += 2000;
-                                    }
-                                    $item_diskon = ($qty_dus_floored * $rate) * (100 / 111);
-                                }
-
-                                if ($idx == $first_non_promosi_index && $first_non_promosi_index != -1) {
-                                    $item_diskon += ($item->potongan_istimewa * (100 / 111));
-                                }
-
                                 if (!empty($item->isi_pcs_dus) && $item->status_batal == 0) {
-                                    $item_dpp = ($item->subtotal * (100 / 111)) - $item_diskon;
-                                    $item_dpp_lain = $item_dpp * (11 / 12);
-                                    $item_ppn = $item_dpp_lain * 0.12;
-                                    $item_jumlah = $item_dpp + $item_ppn;
-
-                                    $invoice_total_dpp += $item_dpp;
-                                    $invoice_total_dpp_lain += $item_dpp_lain;
-                                    $invoice_total_ppn += $item_ppn;
-                                    $invoice_total_jumlah += $item_jumlah;
+                                    $invoice_total_subtotal_dpp += ($item->subtotal * (100 / 111));
                                 }
                             }
+                            $invoice_total_diskon_dpp = (100 / 111) * $val[0]->potongan;
+                            $invoice_total_dpp = $invoice_total_subtotal_dpp - $invoice_total_diskon_dpp;
+                            $invoice_total_dpp_lain = $invoice_total_dpp * (11 / 12);
+                            $invoice_total_ppn = $invoice_total_dpp_lain * 0.12;
+                            $invoice_total_jumlah = $invoice_total_dpp + $invoice_total_ppn;
                         @endphp
                         @foreach ($val as $k => $d)
                             @php
@@ -218,14 +198,6 @@
                                     $pcs = $jml[2];
                                     $total += $d->subtotal;
                                     
-                                    $d__dpp = ($d->subtotal * (100/111)) - $diskon;
-                                    $d__ppn = ($d__dpp * (11/12) * 0.12);
-                                    $d__jumlah = $d__dpp + $d__ppn;
- 
-                                    $grand_total_dpp_global += $d__dpp;
-                                    $grand_total_subtotal_dpp += ($d->subtotal * (100 / 111));
-                                    $grand_total_ppn_global += $d__ppn;
-                                    $grand_total_jumlah_global += $d__jumlah;
                                     if ($d->status_promosi == '1') {
                                         $bgcolorpromosi = 'yellow';
                                     } else {
@@ -300,18 +272,16 @@
                                         $grandtotal_potongan_stick += $d->potongan_stick;
                                         $grandtotal_potongan_sp += $d->potongan_sp;
                                         $grandtotal_potongan_sc += $d->potongan_sambal;
-                                        $grandtotal_potongan += $d->potongan;
                                         $grand_total_diskon_global += (100 / 111) * $d->potongan;
+                                        $grand_total_dpp_global += $invoice_total_dpp;
+                                        $grand_total_ppn_global += $invoice_total_ppn;
+                                        $grand_total_jumlah_global += $invoice_total_jumlah;
                                         $grandtotal_dpp += $dpp;
                                         $grandtotal_ppn += $d->ppn;
                                         $grandtotal_retur += $d->total_retur;
                                         $grandtotal_netto += $netto;
+                                        $grand_total_subtotal_dpp += $invoice_total_subtotal_dpp;
                                     @endphp
-                                    {{-- <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->total_bruto) }}</td>
-                                    <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->penyesuaian) }}</td>
-                                    <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->potongan_aida) }}</td>
-                                    <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->potongan_swan) }}</td>
-                                    <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->potongan_stick) }}</td>
                                     <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->potongan_sp) }}</td>
                                     <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->potongan_sambal) }}</td>
                                     <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->potongan) }}</td>
