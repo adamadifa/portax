@@ -1299,7 +1299,7 @@ class LaporanaccountingController extends Controller
             'marketing_penjualan.no_faktur as no_bukti',
             DB::raw("'PENJUALAN' AS sumber"),
             DB::raw("CONCAT(' Penjualan ',pelanggan.nama_pelanggan) as keterangan"),
-            DB::raw('((IFNULL(jml_bruto_penjualan,0) - IFNULL(potongan,0) - IFNULL(potongan_istimewa,0) - IFNULL(penyesuaian,0)  * 100 / 111) as jml_kredit'),
+            DB::raw('((IFNULL(jml_bruto_penjualan,0) - IFNULL(potongan,0) - IFNULL(potongan_istimewa,0) - IFNULL(penyesuaian,0)) * 100 / 111) as jml_kredit'),
             DB::raw('0 as jml_debet'),
 
             DB::raw('1 as urutan')
