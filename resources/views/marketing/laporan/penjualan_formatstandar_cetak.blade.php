@@ -282,7 +282,7 @@
                                         $grandtotal_netto += $netto;
                                         $grand_total_subtotal_dpp += $invoice_total_subtotal_dpp;
                                     @endphp
-                                    <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->potongan_sp) }}</td>
+                                    {{-- <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->potongan_sp) }}</td>
                                     <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->potongan_sambal) }}</td>
                                     <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->potongan) }}</td>
                                     <td rowspan="{{ count($val) }}" class="right">{{ formatAngka($d->potongan_istimewa) }}</td>
