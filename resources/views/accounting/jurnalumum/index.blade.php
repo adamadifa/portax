@@ -92,7 +92,19 @@
                         </td>
                         <td class="px-4 py-3 text-slate-600 text-sm">{{ formatIndo($d->tanggal) }}</td>
                         <td class="px-4 py-3 text-slate-800 text-sm font-medium">{{ $d->keterangan }}</td>
-                        <td class="px-4 py-3 text-slate-600 text-sm font-medium">{{ $d->kode_akun }} - {{ $d->nama_akun }}</td>
+                        <td class="px-4 py-3 text-slate-600 text-sm font-medium">
+                            @if (!empty($d->kode_akun_portax))
+                                {{ $d->kode_akun_portax }} - {{ $d->nama_akun }}
+                            @else
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100 text-xs font-semibold inline-flex items-center gap-1 w-max">
+                                        <i class="ti ti-alert-circle text-xs"></i>
+                                        Belum Dihubungkan ({{ $d->kode_akun }})
+                                    </span>
+                                    <span class="text-slate-400 text-xs">{{ $d->nama_akun_portal ?? 'Nama Akun Portal Tidak Ditemukan' }}</span>
+                                </div>
+                            @endif
+                        </td>
 
                         <td class="px-4 py-3 text-right text-emerald-600 font-semibold text-sm">
                             {{ $debet > 0 ? formatAngkaDesimal($debet) : '-' }}
