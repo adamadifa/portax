@@ -93,6 +93,9 @@ class SyncJurnalumumController extends Controller
             $jurnalumum = Jurnalumum::find($request->kode_ju);
             $isUpdate = $jurnalumum !== null;
 
+            $coa = Coa::where('kode_akun', $request->kode_akun)->first();
+            $kodeAkunPortax = $coa ? $coa->kode_akun_portax : null;
+
             // Prepare data jurnal umum
             $jurnalumumData = [
                 'kode_ju' => $request->kode_ju,
@@ -101,6 +104,7 @@ class SyncJurnalumumController extends Controller
                 'jumlah' => $request->jumlah,
                 'debet_kredit' => $request->debet_kredit,
                 'kode_akun' => $request->kode_akun,
+                'kode_akun_portax' => $kodeAkunPortax,
                 'kode_dept' => $request->kode_dept,
                 'kode_peruntukan' => $request->kode_peruntukan, // Note: typo di migration menggunakan kode_pruntukan
                 'kode_cabang' => $request->kode_cabang,
@@ -319,6 +323,9 @@ class SyncJurnalumumController extends Controller
                     $jurnalumum = Jurnalumum::find($jurnalumumData['kode_ju']);
                     $isUpdate = $jurnalumum !== null;
 
+                    $coa = Coa::where('kode_akun', $jurnalumumData['kode_akun'])->first();
+                    $kodeAkunPortax = $coa ? $coa->kode_akun_portax : null;
+
                     // Prepare header
                     $header = [
                         'kode_ju' => $jurnalumumData['kode_ju'],
@@ -327,6 +334,7 @@ class SyncJurnalumumController extends Controller
                         'jumlah' => $jurnalumumData['jumlah'],
                         'debet_kredit' => $jurnalumumData['debet_kredit'],
                         'kode_akun' => $jurnalumumData['kode_akun'],
+                        'kode_akun_portax' => $kodeAkunPortax,
                         'kode_dept' => $jurnalumumData['kode_dept'],
                         'kode_peruntukan' => $jurnalumumData['kode_peruntukan'],
                         'kode_cabang' => $jurnalumumData['kode_cabang'] ?? null,

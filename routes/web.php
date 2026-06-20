@@ -1596,6 +1596,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/jurnalumum', 'index')->name('jurnalumum.index')->can('jurnalumum.index');
         Route::get('/jurnalumum/create', 'create')->name('jurnalumum.create')->can('jurnalumum.create');
         Route::post('/jurnalumum/store', 'store')->name('jurnalumum.store')->can('jurnalumum.store');
+        Route::post('/jurnalumum/synccoaportax', 'syncCoaPortax')->name('jurnalumum.synccoaportax')->can('jurnalumum.index');
         Route::get('/jurnalumum/{id}/show', 'show')->name('jurnalumum.show')->can('jurnalumum.show');
         Route::get('/jurnalumum/{id}/edit', 'edit')->name('jurnalumum.edit')->can('jurnalumum.edit');
         Route::put('/jurnalumum/{id}/update', 'update')->name('jurnalumum.update')->can('jurnalumum.update');

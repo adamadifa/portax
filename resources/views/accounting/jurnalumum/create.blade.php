@@ -42,7 +42,7 @@
                 <select name="kode_akun" id="kode_akun" class="form-select select2Kodeakun">
                     <option value="">Pilih Kode Akun</option>
                     @foreach ($coa as $d)
-                        <option value="{{ $d->kode_akun }}">{{ $d->kode_akun_portax }} - {{ $d->nama_akun }}</option>
+                        <option value="{{ $d->kode_akun }}">{{ $d->kode_akun }} - {{ $d->nama_akun }}</option>
                     @endforeach
                 </select>
             </div>

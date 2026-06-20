@@ -38,6 +38,7 @@ class JurnalumumController extends Controller
         $query->leftJoin('coa', 'accounting_jurnalumum.kode_akun', '=', 'coa.kode_akun');
         $query->leftJoin('coa_portax', function ($join) {
             $join->on('coa.kode_akun_portax', '=', 'coa_portax.kode_akun')
+                 ->orOn('accounting_jurnalumum.kode_akun_portax', '=', 'coa_portax.kode_akun')
                  ->orOn('accounting_jurnalumum.kode_akun', '=', 'coa_portax.kode_akun');
         });
         $query->leftJoin('accounting_jurnalumum_costratio', 'accounting_jurnalumum.kode_ju', '=', 'accounting_jurnalumum_costratio.kode_ju');
@@ -61,10 +62,8 @@ class JurnalumumController extends Controller
 
     public function create()
     {
-        $data['coa'] = Coa::join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun')
-            ->select('coa.kode_akun', 'coa.kode_akun_portax', 'coa_portax.nama_akun')
-            ->whereNotIn('coa.kode_akun_portax', ['1', '2'])
-            ->orderBy('coa.kode_akun')
+        $data['coa'] = CoaPortax::whereNotIn('kode_akun', ['1', '2'])
+            ->orderBy('kode_akun')
             ->get();
         $cbg = new Cabang();
         $data['cabang'] = $cbg->getCabang();
@@ -104,10 +103,14 @@ class JurnalumumController extends Controller
                 $last_kode_ju = $lastjurnalumum != null ?  $lastjurnalumum->kode_ju : '';
                 $kode_ju = buatkode($last_kode_ju, 'JL' . date('ym', strtotime($tanggal[$i])), 3);
 
+                $coa = Coa::where('kode_akun_portax', $kode_akun[$i])->first();
+                $portal_kode_akun = $coa ? $coa->kode_akun : null;
+
                 Jurnalumum::create([
                     'kode_ju' => $kode_ju,
                     'tanggal' => $tanggal[$i],
-                    'kode_akun' => $kode_akun[$i],
+                    'kode_akun' => $portal_kode_akun,
+                    'kode_akun_portax' => $kode_akun[$i],
                     'keterangan' => $keterangan[$i],
                     'debet_kredit' => $debet_kredit[$i],
                     'kode_peruntukan' => $kode_peruntukan[$i],
@@ -154,10 +157,8 @@ class JurnalumumController extends Controller
     public function edit($kode_ju)
     {
         $kode_ju = Crypt::decrypt($kode_ju);
-        $data['coa'] = Coa::join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun')
-            ->select('coa.kode_akun', 'coa.kode_akun_portax', 'coa_portax.nama_akun')
-            ->whereNotIn('coa.kode_akun_portax', ['1', '2'])
-            ->orderBy('coa.kode_akun')
+        $data['coa'] = CoaPortax::whereNotIn('kode_akun', ['1', '2'])
+            ->orderBy('kode_akun')
             ->get();
         $cbg = new Cabang();
         $data['cabang'] = $cbg->getCabang();
@@ -196,9 +197,14 @@ class JurnalumumController extends Controller
             if ($cektutuplaporanjurnalumum > 0) {
                 return Redirect::back()->with(messageError('Periode Laporan Sudah Ditutup'));
             }
+
+            $coa = Coa::where('kode_akun_portax', $request->kode_akun)->first();
+            $portal_kode_akun = $coa ? $coa->kode_akun : null;
+
             $jurnalumum->update([
                 'tanggal' => $request->tanggal,
-                'kode_akun' => $request->kode_akun,
+                'kode_akun' => $portal_kode_akun,
+                'kode_akun_portax' => $request->kode_akun,
                 'keterangan' => $request->keterangan,
                 'jumlah' => toNumber($request->jumlah),
                 'debet_kredit' => $request->debet_kredit,
@@ -270,6 +276,33 @@ class JurnalumumController extends Controller
             $jurnalumum->delete();
             DB::commit();
             return Redirect::back()->with(messageSuccess('Data berhasil dihapus'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return Redirect::back()->with(messageError($e->getMessage()));
+        }
+    }
+
+    public function syncCoaPortax()
+    {
+        DB::beginTransaction();
+        try {
+            $records = Jurnalumum::whereNull('kode_akun_portax')
+                ->whereNotNull('kode_akun')
+                ->get();
+
+            $updatedCount = 0;
+            foreach ($records as $record) {
+                $coa = Coa::where('kode_akun', $record->kode_akun)->first();
+                if ($coa && !empty($coa->kode_akun_portax)) {
+                    $record->update([
+                        'kode_akun_portax' => $coa->kode_akun_portax
+                    ]);
+                    $updatedCount++;
+                }
+            }
+
+            DB::commit();
+            return Redirect::back()->with(messageSuccess("Berhasil menyinkronkan {$updatedCount} data akun Portax."));
         } catch (\Exception $e) {
             DB::rollBack();
             return Redirect::back()->with(messageError($e->getMessage()));

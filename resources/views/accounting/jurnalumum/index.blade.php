@@ -12,12 +12,21 @@
         <h2 class="text-2xl font-bold text-slate-800">Jurnal Umum</h2>
         <p class="text-slate-500 text-sm">Kelola data pencatatan jurnal umum perusahaan.</p>
     </div>
-    @can('jurnalumum.create')
-        <a href="#" id="btnCreate" class="bg-[#003d9e] hover:bg-blue-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-sm shadow-blue-200 text-sm font-semibold">
-            <i class="ti ti-plus"></i>
-            <span>Input Jurnal Umum</span>
-        </a>
-    @endcan
+    <div class="flex items-center gap-2">
+        <form action="{{ route('jurnalumum.synccoaportax') }}" method="POST" class="inline-block">
+            @csrf
+            <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-sm shadow-amber-200 text-sm font-semibold">
+                <i class="ti ti-refresh"></i>
+                <span>Sync Akun Portax</span>
+            </button>
+        </form>
+        @can('jurnalumum.create')
+            <a href="#" id="btnCreate" class="bg-[#003d9e] hover:bg-blue-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-sm shadow-blue-200 text-sm font-semibold">
+                <i class="ti ti-plus"></i>
+                <span>Input Jurnal Umum</span>
+            </a>
+        @endcan
+    </div>
 </div>
 
 <!-- Content Card -->
