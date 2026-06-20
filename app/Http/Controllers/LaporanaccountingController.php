@@ -1061,7 +1061,7 @@ class LaporanaccountingController extends Controller
 
         $jurnalumum = Jurnalumum::query();
         $jurnalumum->select(
-            'coa.kode_akun_portax as kode_akun',
+            'coa_portax.kode_akun as kode_akun',
             'coa_portax.jenis_akun',
             'coa_portax.nama_akun',
             'accounting_jurnalumum.tanggal',
@@ -1072,14 +1072,13 @@ class LaporanaccountingController extends Controller
             DB::raw('IF(accounting_jurnalumum.debet_kredit="D",accounting_jurnalumum.jumlah,0) as jml_debet'),
             DB::raw('IF(accounting_jurnalumum.debet_kredit="D",2,1) as urutan')
         );
+        $jurnalumum->join('coa_portax', 'accounting_jurnalumum.kode_akun_portax', '=', 'coa_portax.kode_akun');
         $jurnalumum->whereBetween('accounting_jurnalumum.tanggal', [$start_date, $request->sampai]);
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
-            $jurnalumum->whereBetween('coa.kode_akun_portax', [$request->kode_akun_dari, $request->kode_akun_sampai]);
+            $jurnalumum->whereBetween('coa_portax.kode_akun', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
-        $jurnalumum->join('coa', 'coa.kode_akun', '=', 'accounting_jurnalumum.kode_akun');
-        $jurnalumum->join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun');
 
-        $jurnalumum->orderBy('coa.kode_akun_portax');
+        $jurnalumum->orderBy('coa_portax.kode_akun');
         $jurnalumum->orderBy('accounting_jurnalumum.tanggal');
         $jurnalumum->orderBy('accounting_jurnalumum.kode_ju');
 

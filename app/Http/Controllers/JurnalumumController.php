@@ -103,13 +103,10 @@ class JurnalumumController extends Controller
                 $last_kode_ju = $lastjurnalumum != null ?  $lastjurnalumum->kode_ju : '';
                 $kode_ju = buatkode($last_kode_ju, 'JL' . date('ym', strtotime($tanggal[$i])), 3);
 
-                $coa = Coa::where('kode_akun_portax', $kode_akun[$i])->first();
-                $portal_kode_akun = $coa ? $coa->kode_akun : null;
-
                 Jurnalumum::create([
                     'kode_ju' => $kode_ju,
                     'tanggal' => $tanggal[$i],
-                    'kode_akun' => $portal_kode_akun,
+                    'kode_akun' => null,
                     'kode_akun_portax' => $kode_akun[$i],
                     'keterangan' => $keterangan[$i],
                     'debet_kredit' => $debet_kredit[$i],
@@ -198,12 +195,9 @@ class JurnalumumController extends Controller
                 return Redirect::back()->with(messageError('Periode Laporan Sudah Ditutup'));
             }
 
-            $coa = Coa::where('kode_akun_portax', $request->kode_akun)->first();
-            $portal_kode_akun = $coa ? $coa->kode_akun : null;
-
             $jurnalumum->update([
                 'tanggal' => $request->tanggal,
-                'kode_akun' => $portal_kode_akun,
+                'kode_akun' => null,
                 'kode_akun_portax' => $request->kode_akun,
                 'keterangan' => $request->keterangan,
                 'jumlah' => toNumber($request->jumlah),
