@@ -1332,10 +1332,10 @@ class LaporanaccountingController extends Controller
 
         // Pembelian Marketing Netto
         $detailpembelianmarketing = Detailpembelianmarketing::query();
-        $detailpembelianmarketing->select('marketing_pembelian.no_bukti', DB::raw('SUM(subtotal) as jml_bruto_pembelian'));
+        $detailpembelianmarketing->select('marketing_pembelian.no_bukti', DB::raw('SUM(subtotal + (subtotal * (11/12) * 0.12)) as jml_bruto_pembelian'));
         $detailpembelianmarketing->join('marketing_pembelian', 'marketing_pembelian_detail.no_bukti', '=', 'marketing_pembelian.no_bukti');
         $detailpembelianmarketing->whereBetween('marketing_pembelian.tanggal', [$start_date, $request->sampai]);
-        $detailpembelianmarketing->where('status_batal', 0);
+        $detailpembelianmarketing->where('marketing_pembelian.status_batal', 0);
         $detailpembelianmarketing->groupBy('marketing_pembelian.no_bukti');
 
         $pembelianmarketingnetto = Pembelianmarketing::query();
