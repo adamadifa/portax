@@ -223,10 +223,10 @@
             let total_debet = 0;
             let total_kredit = 0;
             form.find("tbody tr").each(function() {
-                const debet = $(this).find(".jmldebet").text().replace(/\./g, '') || 0;
-                const kredit = $(this).find(".jmlkredit").text().replace(/\./g, '') || 0;
-                total_debet += parseInt(debet);
-                total_kredit += parseInt(kredit);
+                const debet = parseInt($(this).find(".jmldebet").text().replace(/\./g, '')) || 0;
+                const kredit = parseInt($(this).find(".jmlkredit").text().replace(/\./g, '')) || 0;
+                total_debet += debet;
+                total_kredit += kredit;
             });
             total_debet_set = total_debet;
             total_kredit_set = total_kredit;
