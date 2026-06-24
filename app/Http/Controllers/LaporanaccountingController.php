@@ -1335,7 +1335,6 @@ class LaporanaccountingController extends Controller
         $detailpembelianmarketing->select('marketing_pembelian.no_bukti', DB::raw('SUM(subtotal + (subtotal * (11/12) * 0.12)) as jml_bruto_pembelian'));
         $detailpembelianmarketing->join('marketing_pembelian', 'marketing_pembelian_detail.no_bukti', '=', 'marketing_pembelian.no_bukti');
         $detailpembelianmarketing->whereBetween('marketing_pembelian.tanggal', [$start_date, $request->sampai]);
-        $detailpembelianmarketing->where('marketing_pembelian.status_batal', 0);
         $detailpembelianmarketing->groupBy('marketing_pembelian.no_bukti');
 
         $pembelianmarketingnetto = Pembelianmarketing::query();
@@ -1348,7 +1347,7 @@ class LaporanaccountingController extends Controller
             DB::raw("'PEMBELIAN' AS sumber"),
             DB::raw("CONCAT(' Pembelian ',supplier_marketing.nama_supplier) as keterangan"),
             DB::raw('0 as jml_kredit'),
-            DB::raw('((IFNULL(jml_bruto_pembelian,0) - IFNULL(potongan,0) - IFNULL(potongan_istimewa,0) - IFNULL(penyesuaian,0)) * 100 / 111) as jml_debet'),
+            DB::raw('(IFNULL(jml_bruto_pembelian,0) * 100 / 111) as jml_debet'),
             DB::raw('1 as urutan')
         );
         $pembelianmarketingnetto->join('supplier_marketing', 'marketing_pembelian.kode_supplier', '=', 'supplier_marketing.kode_supplier');
@@ -1356,7 +1355,6 @@ class LaporanaccountingController extends Controller
         $pembelianmarketingnetto->leftJoinSub($detailpembelianmarketing, 'detailpembelianmarketing', function ($join) {
             $join->on('marketing_pembelian.no_bukti', '=', 'detailpembelianmarketing.no_bukti');
         });
-        $pembelianmarketingnetto->where('marketing_pembelian.status_batal', 0);
         $pembelianmarketingnetto->whereBetween('marketing_pembelian.tanggal', [$start_date, $request->sampai]);
         if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
             $pembelianmarketingnetto->whereBetween('marketing_pembelian.kode_akun_portax', [$request->kode_akun_dari, $request->kode_akun_sampai]);
