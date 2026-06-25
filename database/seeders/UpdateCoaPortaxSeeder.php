@@ -150,7 +150,7 @@ class UpdateCoaPortaxSeeder extends Seeder
                 if ($record) {
                     // If the old code is one of the new Pembelian codes (50000, 51000, 51001)
                     // but it has already been converted/created as Pembelian, we should skip updating it.
-                    if (in_array((string) $oldCode, ['50000', '51000', '51001']) && strtolower($record->nama_akun) === 'pembelian') {
+                    if (in_array((string) $oldCode, ['50000', '51000', '51001']) && (strtolower($record->nama_akun) === 'pembelian' || strtolower($record->nama_akun) === 'harga pokok penjualan')) {
                         continue;
                     }
 
@@ -180,12 +180,12 @@ class UpdateCoaPortaxSeeder extends Seeder
                 }
             }
 
-            // 6. Create the new PEMBELIAN accounts in the now-vacant 5xxxx range
+            // 6. Create the new HPP and PEMBELIAN/IKHTISAR LABA RUGI accounts in the now-vacant 5xxxx range
             $pembelianAccounts = [
-                // 50000 PEMBELIAN (level 0)
+                // 50000 HARGA POKOK PENJUALAN (level 0)
                 [
                     'kode_akun' => '50000',
-                    'nama_akun' => 'PEMBELIAN',
+                    'nama_akun' => 'HARGA POKOK PENJUALAN',
                     'sub_akun' => '0',
                     'level' => 0,
                     'jenis_akun' => null,
@@ -205,6 +205,33 @@ class UpdateCoaPortaxSeeder extends Seeder
                     'kode_akun' => '51001',
                     'nama_akun' => 'Pembelian',
                     'sub_akun' => '51000',
+                    'level' => 2,
+                    'jenis_akun' => null,
+                    'kode_kategori' => 'C00',
+                ],
+                // 52000 Ikhtisar Laba Rugi (level 1)
+                [
+                    'kode_akun' => '52000',
+                    'nama_akun' => 'Ikhtisar Laba Rugi',
+                    'sub_akun' => '50000',
+                    'level' => 1,
+                    'jenis_akun' => null,
+                    'kode_kategori' => 'C00',
+                ],
+                // 52001 P/L Persediaan Awal (level 2)
+                [
+                    'kode_akun' => '52001',
+                    'nama_akun' => 'P/L Persediaan Awal',
+                    'sub_akun' => '52000',
+                    'level' => 2,
+                    'jenis_akun' => null,
+                    'kode_kategori' => 'C00',
+                ],
+                // 52002 P/L Persediaan Akhir (level 2)
+                [
+                    'kode_akun' => '52002',
+                    'nama_akun' => 'P/L Persediaan Akhir',
+                    'sub_akun' => '52000',
                     'level' => 2,
                     'jenis_akun' => null,
                     'kode_kategori' => 'C00',

@@ -66,37 +66,37 @@ class CoaPortaxMappingSeeder extends Seeder
                     }
                 } elseif ($prefix === 5) {
                     if ($suffix === 1301) {
-                        $kode_portax = '52001';
+                        $kode_portax = '62001';
                     } elseif ($suffix === 3000) {
                         $kode_portax = '61001';
                     }
                 } elseif ($prefix === 6) {
                     if ($suffix === 1106) {
-                        $kode_portax = '51001';
+                        $kode_portax = '61001';
                     } elseif ($suffix === 1108) {
-                        $kode_portax = '51002';
+                        $kode_portax = '61002';
                     } elseif ($suffix === 1110) {
-                        $kode_portax = '51003';
+                        $kode_portax = '61003';
                     } elseif ($suffix === 1112) {
-                        $kode_portax = '51004';
+                        $kode_portax = '61004';
                     } elseif ($suffix === 1116) {
-                        $kode_portax = '51005';
+                        $kode_portax = '61005';
                     } elseif ($suffix === 1119) {
-                        $kode_portax = '51006';
+                        $kode_portax = '61006';
                     } elseif ($suffix === 1120) {
-                        $kode_portax = '51007';
+                        $kode_portax = '61007';
                     } elseif ($suffix === 1121) {
-                        $kode_portax = '51008';
+                        $kode_portax = '61008';
                     } elseif ($suffix === 1123) {
-                        $kode_portax = '51009';
+                        $kode_portax = '61009';
                     } elseif ($suffix === 1134) {
-                        $kode_portax = '51010';
+                        $kode_portax = '61010';
                     } elseif ($suffix === 1135) {
-                        $kode_portax = '51011';
+                        $kode_portax = '61011';
                     } elseif ($suffix === 1205) {
-                        $kode_portax = '51012';
+                        $kode_portax = '61012';
                     } elseif ($suffix === 1101) {
-                        $kode_portax = '52002';
+                        $kode_portax = '62002';
                     }
                 } elseif ($prefix === 8) {
                     if ($suffix === 1000) {
