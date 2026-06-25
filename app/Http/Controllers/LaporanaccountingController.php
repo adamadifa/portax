@@ -890,7 +890,12 @@ class LaporanaccountingController extends Controller
         $user = User::findorfail(auth()->user()->id);
 
         $query = Jurnalumum::query();
-        $query->join('coa_portax', 'accounting_jurnalumum.kode_akun', '=', 'coa_portax.kode_akun');
+        $query->select(
+            'accounting_jurnalumum.*',
+            'coa_portax.kode_akun as kode_akun',
+            'coa_portax.nama_akun'
+        );
+        $query->join('coa_portax', 'accounting_jurnalumum.kode_akun_portax', '=', 'coa_portax.kode_akun');
         $query->whereBetween('tanggal', [$request->dari, $request->sampai]);
 
         if ($user->hasRole('general affair') || $user->hasRole('manager general affair')) {
