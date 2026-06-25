@@ -1366,7 +1366,11 @@ class LaporanaccountingController extends Controller
 
         // Pembelian Marketing Netto
         $detailpembelianmarketing = Detailpembelianmarketing::query();
-        $detailpembelianmarketing->select('marketing_pembelian.no_bukti', DB::raw('SUM(subtotal + (subtotal * (11/12) * 0.12)) as jml_bruto_pembelian'));
+        $detailpembelianmarketing->select(
+            'marketing_pembelian.no_bukti',
+            DB::raw('SUM(subtotal + (subtotal * (11/12) * 0.12)) as jml_bruto_pembelian'),
+            DB::raw('SUM(subtotal) as subtotal_dpp')
+        );
         $detailpembelianmarketing->join('marketing_pembelian', 'marketing_pembelian_detail.no_bukti', '=', 'marketing_pembelian.no_bukti');
         $detailpembelianmarketing->whereBetween('marketing_pembelian.tanggal', [$start_date, $request->sampai]);
         $detailpembelianmarketing->groupBy('marketing_pembelian.no_bukti');
@@ -1400,6 +1404,37 @@ class LaporanaccountingController extends Controller
         }
         $pembelianmarketingnetto->orderBy('marketing_pembelian.kode_akun_portax');
         $pembelianmarketingnetto->orderBy('marketing_pembelian.tanggal');
+
+        // PPN Masukan
+        $ppnmasukan = Pembelianmarketing::query();
+        $ppnmasukan->select(
+            'marketing_pembelian.kode_akun_ppn as kode_akun',
+            'coa_portax.jenis_akun',
+            'coa_portax.nama_akun',
+            'marketing_pembelian.tanggal',
+            'marketing_pembelian.no_bukti as no_bukti',
+            DB::raw("'PEMBELIAN' AS sumber"),
+            DB::raw("CONCAT(' PPN Masukan ', supplier_marketing.nama_supplier) as keterangan"),
+            DB::raw('0 as jml_kredit'),
+            DB::raw('(IFNULL(subtotal_dpp,0) * (11/12) * 0.12) as jml_debet'),
+            DB::raw('1 as urutan')
+        );
+        $ppnmasukan->join('supplier_marketing', 'marketing_pembelian.kode_supplier', '=', 'supplier_marketing.kode_supplier');
+        $ppnmasukan->join('coa_portax', 'marketing_pembelian.kode_akun_ppn', '=', 'coa_portax.kode_akun');
+        $ppnmasukan->leftJoinSub($detailpembelianmarketing, 'detailpembelianmarketing', function ($join) {
+            $join->on('marketing_pembelian.no_bukti', '=', 'detailpembelianmarketing.no_bukti');
+        });
+        $ppnmasukan->whereBetween('marketing_pembelian.tanggal', [$start_date, $request->sampai]);
+        if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
+            $ppnmasukan->whereBetween('marketing_pembelian.kode_akun_ppn', [$request->kode_akun_dari, $request->kode_akun_sampai]);
+        }
+        if (auth()->user()->kode_cabang != "PST") {
+            $ppnmasukan->where('marketing_pembelian.kode_cabang', auth()->user()->kode_cabang);
+        } else {
+            $ppnmasukan->where('marketing_pembelian.kode_cabang', $request->kode_cabang);
+        }
+        $ppnmasukan->orderBy('marketing_pembelian.kode_akun_ppn');
+        $ppnmasukan->orderBy('marketing_pembelian.tanggal');
 
         // //Piutang Datang
 
@@ -1644,6 +1679,7 @@ class LaporanaccountingController extends Controller
             ->unionAll($penjualannetto)
             ->unionAll($ppnkeluaran)
             ->unionAll($pembelianmarketingnetto)
+            ->unionAll($ppnmasukan)
             ->unionAll($kaskecil)
             ->unionAll($kaskecil_transaksi)
             ->unionAll($ledger_transaksi)
