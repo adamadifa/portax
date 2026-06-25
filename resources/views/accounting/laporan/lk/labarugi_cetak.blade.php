@@ -295,19 +295,23 @@
                 @foreach ($beban_penjualan_list as $item)
                     @php renderLabaRugiRow($item['nama'], $item['val'], 2, false, false, true); @endphp
                 @endforeach
+                @php renderLabaRugiRow('Jumlah Beban Penjualan', $total_beban_penjualan, 1, true, false, false); @endphp
 
                 <!-- Biaya Umum & Administrasi -->
                 @php renderLabaRugiRow('Biaya Umum & Administrasi', null, 1, true, false, false); @endphp
                 @php renderLabaRugiRow('Gaji & Tunjangan Karyawan', null, 2, true, false, false); @endphp
                 @php renderLabaRugiRow('GAJI, TUNJANGAN, DLL', $gaji_tunjangan, 3, false, false, true); @endphp
                 @php renderLabaRugiRow('Komisi', $komisi, 3, false, false, true); @endphp
+                @php renderLabaRugiRow('Jumlah Gaji & Tunjangan Karyawan', $total_gaji_komisi, 2, true, false, false); @endphp
                 
                 <!-- Jasa -->
                 @php renderLabaRugiRow('JASA', null, 2, true, false, false); @endphp
                 @foreach ($jasa_list as $item)
                     @php renderLabaRugiRow($item['nama'], $item['val'], 3, false, false, true); @endphp
                 @endforeach
+                @php renderLabaRugiRow('Jumlah JASA', $total_jasa, 2, true, false, false); @endphp
 
+                @php renderLabaRugiRow('Jumlah Biaya Umum & Administrasi', $total_umum_adm, 1, true, false, false); @endphp
                 @php renderLabaRugiRow('Jumlah Beban Operasi', $total_beban_operasi, 0, true, false, false); @endphp
 
                 <!-- Empty space -->
