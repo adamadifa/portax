@@ -132,7 +132,13 @@
                 echo '<td style="' . $indentStyle . $boldStyle . '">' . $label . '</td>';
                 echo '<td class="text-right" style="' . $boldStyle . '">';
                 if ($value !== null) {
-                    echo $value != 0 ? formatAngkaDesimal($value) : '-';
+                    if ($value < 0) {
+                        echo '(' . formatAngkaDesimal(abs($value)) . ')';
+                    } elseif ($value > 0) {
+                        echo formatAngkaDesimal($value);
+                    } else {
+                        echo '-';
+                    }
                 }
                 echo '</td>';
                 echo '</tr>';
@@ -345,7 +351,13 @@
                 <tr class="subtotal-row-grand">
                     <td style="font-weight: bold;">LABA(RUGI) BERSIH (After Tax)</td>
                     <td class="text-right" style="font-weight: bold;">
-                        {{ $laba_bersih_after_tax != 0 ? formatAngkaDesimal($laba_bersih_after_tax) : '-' }}
+                        @if ($laba_bersih_after_tax < 0)
+                            ({{ formatAngkaDesimal(abs($laba_bersih_after_tax)) }})
+                        @elseif ($laba_bersih_after_tax > 0)
+                            {{ formatAngkaDesimal($laba_bersih_after_tax) }}
+                        @else
+                            -
+                        @endif
                     </td>
                 </tr>
             </tbody>
