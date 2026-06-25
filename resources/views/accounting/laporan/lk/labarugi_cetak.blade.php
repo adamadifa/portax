@@ -120,7 +120,10 @@
 
         // Helper function to render a row
         if (!function_exists('renderLabaRugiRow')) {
-            function renderLabaRugiRow($label, $value, $indent = 0, $isBold = false, $isHeader = false) {
+            function renderLabaRugiRow($label, $value, $indent = 0, $isBold = false, $isHeader = false, $hideIfZero = true) {
+                if ($hideIfZero && $value !== null && $value == 0) {
+                    return;
+                }
                 $indentStyle = $indent > 0 ? 'padding-left: ' . ($indent * 20) . 'px;' : '';
                 $boldStyle = $isBold ? 'font-weight: bold;' : '';
                 $class = $isHeader ? 'section-header' : '';
@@ -223,6 +226,7 @@
         $pendapatan_lain = $balances['42001'] ?? 0;
         foreach ($balances as $code => $val) {
             if (str_starts_with($code, '42') && $code !== '42001' && $code !== '42000') {
+                $ppnkeluaran_val = $val; // Dummy variable to represent values
                 $pendapatan_lain += $val;
             }
         }
@@ -256,83 +260,83 @@
             </thead>
             <tbody>
                 <!-- 1. Pendapatan -->
-                @php renderLabaRugiRow('Pendapatan', null, 0, true, true); @endphp
-                @php renderLabaRugiRow('Pendapatan', null, 1, true); @endphp
-                @php renderLabaRugiRow('Penjualan', $penjualan, 2); @endphp
-                @php renderLabaRugiRow('Jumlah Pendapatan', $total_pendapatan, 0, true); @endphp
+                @php renderLabaRugiRow('Pendapatan', null, 0, true, true, false); @endphp
+                @php renderLabaRugiRow('Pendapatan', null, 1, true, false, false); @endphp
+                @php renderLabaRugiRow('Penjualan', $penjualan, 2, false, false, true); @endphp
+                @php renderLabaRugiRow('Jumlah Pendapatan', $total_pendapatan, 0, true, false, false); @endphp
 
                 <!-- Empty space -->
                 <tr><td colspan="2" style="height: 10px;"></td></tr>
 
                 <!-- 2. Harga Pokok Penjualan -->
-                @php renderLabaRugiRow('Harga Pokok Penjualan', null, 0, true, true); @endphp
-                @php renderLabaRugiRow('Persediaan Awal', $persediaan_awal, 1); @endphp
-                @php renderLabaRugiRow('Pembelian', $pembelian, 1); @endphp
-                @php renderLabaRugiRow('Persediaan Akhir', $abs_persediaan_akhir != 0 ? -$abs_persediaan_akhir : 0, 1); @endphp
-                @php renderLabaRugiRow('Jumlah Harga Pokok Penjualan', $total_hpp, 0, true); @endphp
+                @php renderLabaRugiRow('Harga Pokok Penjualan', null, 0, true, true, false); @endphp
+                @php renderLabaRugiRow('Persediaan Awal', $persediaan_awal, 1, false, false, true); @endphp
+                @php renderLabaRugiRow('Pembelian', $pembelian, 1, false, false, true); @endphp
+                @php renderLabaRugiRow('Persediaan Akhir', $abs_persediaan_akhir != 0 ? -$abs_persediaan_akhir : 0, 1, false, false, true); @endphp
+                @php renderLabaRugiRow('Jumlah Harga Pokok Penjualan', $total_hpp, 0, true, false, false); @endphp
 
                 <!-- Empty space -->
                 <tr><td colspan="2" style="height: 10px;"></td></tr>
 
                 <!-- 3. Laba Kotor -->
-                @php renderLabaRugiRow('LABA KOTOR', $laba_kotor, 0, true, true); @endphp
+                @php renderLabaRugiRow('LABA KOTOR', $laba_kotor, 0, true, true, false); @endphp
 
                 <!-- Empty space -->
                 <tr><td colspan="2" style="height: 10px;"></td></tr>
 
                 <!-- 4. Beban Operasi -->
-                @php renderLabaRugiRow('Beban Operasi', null, 0, true, true); @endphp
+                @php renderLabaRugiRow('Beban Operasi', null, 0, true, true, false); @endphp
                 
                 <!-- Beban Penjualan -->
-                @php renderLabaRugiRow('BEBAN PENJUALAN', null, 1, true); @endphp
+                @php renderLabaRugiRow('BEBAN PENJUALAN', null, 1, true, false, false); @endphp
                 @foreach ($beban_penjualan_list as $item)
-                    @php renderLabaRugiRow($item['nama'], $item['val'], 2); @endphp
+                    @php renderLabaRugiRow($item['nama'], $item['val'], 2, false, false, true); @endphp
                 @endforeach
 
                 <!-- Biaya Umum & Administrasi -->
-                @php renderLabaRugiRow('Biaya Umum & Administrasi', null, 1, true); @endphp
-                @php renderLabaRugiRow('Gaji & Tunjangan Karyawan', null, 2, true); @endphp
-                @php renderLabaRugiRow('GAJI, TUNJANGAN, DLL', $gaji_tunjangan, 3); @endphp
-                @php renderLabaRugiRow('Komisi', $komisi, 3); @endphp
+                @php renderLabaRugiRow('Biaya Umum & Administrasi', null, 1, true, false, false); @endphp
+                @php renderLabaRugiRow('Gaji & Tunjangan Karyawan', null, 2, true, false, false); @endphp
+                @php renderLabaRugiRow('GAJI, TUNJANGAN, DLL', $gaji_tunjangan, 3, false, false, true); @endphp
+                @php renderLabaRugiRow('Komisi', $komisi, 3, false, false, true); @endphp
                 
                 <!-- Jasa -->
-                @php renderLabaRugiRow('JASA', null, 2, true); @endphp
+                @php renderLabaRugiRow('JASA', null, 2, true, false, false); @endphp
                 @foreach ($jasa_list as $item)
-                    @php renderLabaRugiRow($item['nama'], $item['val'], 3); @endphp
+                    @php renderLabaRugiRow($item['nama'], $item['val'], 3, false, false, true); @endphp
                 @endforeach
 
-                @php renderLabaRugiRow('Jumlah Beban Operasi', $total_beban_operasi, 0, true); @endphp
+                @php renderLabaRugiRow('Jumlah Beban Operasi', $total_beban_operasi, 0, true, false, false); @endphp
 
                 <!-- Empty space -->
                 <tr><td colspan="2" style="height: 10px;"></td></tr>
 
                 <!-- 5. Pendapatan Operasi -->
-                @php renderLabaRugiRow('PENDAPATAN OPERASI', $pendapatan_operasi, 0, true, true); @endphp
+                @php renderLabaRugiRow('PENDAPATAN OPERASI', $pendapatan_operasi, 0, true, true, false); @endphp
 
                 <!-- Empty space -->
                 <tr><td colspan="2" style="height: 10px;"></td></tr>
 
                 <!-- 6. Pendapatan dan Beban Lain -->
-                @php renderLabaRugiRow('Pendapatan dan Beban Lain', null, 0, true, true); @endphp
-                @php renderLabaRugiRow('Pendapatan lain', $pendapatan_lain, 1, true); @endphp
-                @php renderLabaRugiRow('Jumlah Pendapatan lain', $pendapatan_lain, 1, true); @endphp
-                @php renderLabaRugiRow('Beban lain-lain', $beban_lain, 1, true); @endphp
-                @php renderLabaRugiRow('Jumlah Beban lain-lain', $beban_lain, 1, true); @endphp
-                @php renderLabaRugiRow('Jumlah Pendapatan dan Beban Lain', $total_lain_lain, 0, true); @endphp
+                @php renderLabaRugiRow('Pendapatan dan Beban Lain', null, 0, true, true, false); @endphp
+                @php renderLabaRugiRow('Pendapatan lain', $pendapatan_lain, 1, true, false, false); @endphp
+                @php renderLabaRugiRow('Jumlah Pendapatan lain', $pendapatan_lain, 1, true, false, false); @endphp
+                @php renderLabaRugiRow('Beban lain-lain', $beban_lain, 1, true, false, false); @endphp
+                @php renderLabaRugiRow('Jumlah Beban lain-lain', $beban_lain, 1, true, false, false); @endphp
+                @php renderLabaRugiRow('Jumlah Pendapatan dan Beban Lain', $total_lain_lain, 0, true, false, false); @endphp
 
                 <!-- Empty space -->
                 <tr><td colspan="2" style="height: 10px;"></td></tr>
 
                 <!-- 7. Laba Bersih Before Tax -->
-                @php renderLabaRugiRow('LABA(RUGI) BERSIH (Before Tax)', $laba_bersih_before_tax, 0, true, true); @endphp
+                @php renderLabaRugiRow('LABA(RUGI) BERSIH (Before Tax)', $laba_bersih_before_tax, 0, true, true, false); @endphp
 
                 <!-- Empty space -->
                 <tr><td colspan="2" style="height: 10px;"></td></tr>
 
                 <!-- PPh -->
-                @php renderLabaRugiRow('PPh terutang', $pph_terutang, 0); @endphp
-                @php renderLabaRugiRow('PPh 25', $pph_25, 0); @endphp
-                @php renderLabaRugiRow('PPh 29', $pph_29, 0); @endphp
+                @php renderLabaRugiRow('PPh terutang', $pph_terutang, 0, false, false, true); @endphp
+                @php renderLabaRugiRow('PPh 25', $pph_25, 0, false, false, true); @endphp
+                @php renderLabaRugiRow('PPh 29', $pph_29, 0, false, false, true); @endphp
 
                 <!-- Empty space -->
                 <tr><td colspan="2" style="height: 15px;"></td></tr>
