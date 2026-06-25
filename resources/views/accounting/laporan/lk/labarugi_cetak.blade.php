@@ -113,9 +113,11 @@
         // Map balances by code for easy retrieval
         $balances = [];
         $names = [];
+        $levels = [];
         foreach ($labarugi as $coa) {
             $balances[$coa->kode_akun] = (float)($coa->saldo_akhir ?? 0);
             $names[$coa->kode_akun] = $coa->nama_akun;
+            $levels[$coa->kode_akun] = (int)$coa->level;
         }
 
         // Helper function to render a row
@@ -164,7 +166,7 @@
         $beban_penjualan_list = [];
         $total_beban_penjualan = 0;
         foreach ($balances as $code => $val) {
-            if (str_starts_with($code, '61') && $code !== '61000') {
+            if (str_starts_with($code, '61') && ($levels[$code] ?? 0) > 1) {
                 $beban_penjualan_list[$code] = [
                     'nama' => $names[$code] ?? '',
                     'val' => $val
@@ -185,7 +187,6 @@
         $sewa_bangunan = $balances['63001'] ?? 0;
         $sewa_angkutan = $balances['63002'] ?? 0;
         $sewa_mesin_fc = $balances['63003'] ?? 0;
-        $total_jasa = $sewa_bangunan + $sewa_angkutan + $sewa_mesin_fc;
         
         $jasa_list = [
             '63001' => [
@@ -201,7 +202,7 @@
                 'val' => $sewa_mesin_fc
             ]
         ];
-        // Gather any other remaining 6xxxx codes
+        // Gather any other remaining 6xxxx codes where level > 1
         foreach ($balances as $code => $val) {
             if (str_starts_with($code, '6') && 
                 !str_starts_with($code, '61') && 
@@ -209,15 +210,16 @@
                 $code !== '63001' && 
                 $code !== '63002' && 
                 $code !== '63003' && 
-                $code !== '60000') {
+                ($levels[$code] ?? 0) > 1) {
                 $jasa_list[$code] = [
                     'nama' => strtoupper($names[$code] ?? ''),
                     'val' => $val
                 ];
-                $total_jasa += $val;
             }
         }
         ksort($jasa_list);
+
+        $total_jasa = array_sum(array_column($jasa_list, 'val'));
 
         $total_umum_adm = $total_gaji_komisi + $total_jasa;
         $total_beban_operasi = $total_beban_penjualan + $total_umum_adm;
