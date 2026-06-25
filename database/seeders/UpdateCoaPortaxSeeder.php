@@ -32,79 +32,21 @@ class UpdateCoaPortaxSeeder extends Seeder
                 }
             }
 
-            // 2. Move 60000 (old IKHTISAR LABA RUGI level 0) to 32000 (Ikhtisar Laba Rugi level 1)
-            $old60000 = DB::table('coa_portax')->where('kode_akun', '60000')->first();
-            if ($old60000 && strtolower($old60000->nama_akun) === 'ikhtisar laba rugi') {
-                DB::table('coa_portax')
-                    ->where('kode_akun', '60000')
-                    ->update([
-                        'kode_akun' => '32000',
-                        'nama_akun' => 'Ikhtisar Laba Rugi',
-                        'sub_akun' => '30000',
-                        'level' => 1,
-                        'jenis_akun' => null,
-                        'kode_kategori' => 'C00',
-                    ]);
-            } else {
-                // Ensure 32000 exists
-                DB::table('coa_portax')->updateOrInsert(
-                    ['kode_akun' => '32000'],
-                    [
-                        'nama_akun' => 'Ikhtisar Laba Rugi',
-                        'sub_akun' => '30000',
-                        'level' => 1,
-                        'jenis_akun' => null,
-                        'kode_kategori' => 'C00',
-                    ]
-                );
+            // 2. Redirect old Ikhtisar Laba Rugi references to new 52000/52001 range and delete 32000/32001
+            if (Schema::hasColumn('coa', 'kode_akun_portax')) {
+                DB::table('coa')->whereIn('kode_akun_portax', ['61000', '32000'])->update(['kode_akun_portax' => '52000']);
+                DB::table('coa')->whereIn('kode_akun_portax', ['61001', '32001'])->update(['kode_akun_portax' => '52001']);
+            }
+            if (Schema::hasColumn('accounting_jurnalumum', 'kode_akun_portax')) {
+                DB::table('accounting_jurnalumum')->whereIn('kode_akun_portax', ['61000', '32000'])->update(['kode_akun_portax' => '52000']);
+                DB::table('accounting_jurnalumum')->whereIn('kode_akun_portax', ['61001', '32001'])->update(['kode_akun_portax' => '52001']);
+            }
+            if (Schema::hasTable('bukubesar_saldoawal_detail')) {
+                DB::table('bukubesar_saldoawal_detail')->whereIn('kode_akun', ['61000', '32000'])->update(['kode_akun' => '52000']);
+                DB::table('bukubesar_saldoawal_detail')->whereIn('kode_akun', ['61001', '32001'])->update(['kode_akun' => '52001']);
             }
 
-            // 3. Move 61001 (old Ikhtisar Laba Rugi level 2) to 32001 (Ikhtisar Laba Rugi level 2)
-            $old61001 = DB::table('coa_portax')->where('kode_akun', '61001')->first();
-            if ($old61001 && strtolower($old61001->nama_akun) === 'ikhtisar laba rugi') {
-                DB::table('coa_portax')
-                    ->where('kode_akun', '61001')
-                    ->update([
-                        'kode_akun' => '32001',
-                        'nama_akun' => 'Ikhtisar Laba Rugi',
-                        'sub_akun' => '32000',
-                        'level' => 2,
-                        'jenis_akun' => null,
-                        'kode_kategori' => 'C00',
-                    ]);
-            } else {
-                // Ensure 32001 exists
-                DB::table('coa_portax')->updateOrInsert(
-                    ['kode_akun' => '32001'],
-                    [
-                        'nama_akun' => 'Ikhtisar Laba Rugi',
-                        'sub_akun' => '32000',
-                        'level' => 2,
-                        'jenis_akun' => null,
-                        'kode_kategori' => 'C00',
-                    ]
-                );
-            }
-
-            // 4. Handle 61000 (old Ikhtisar Laba Rugi level 1)
-            // Redirect any foreign key references to 32000 first, then delete 61000
-            $old61000 = DB::table('coa_portax')->where('kode_akun', '61000')->first();
-            if ($old61000 && strtolower($old61000->nama_akun) === 'ikhtisar laba rugi') {
-                // Update references in coa table if any
-                if (Schema::hasColumn('coa', 'kode_akun_portax')) {
-                    DB::table('coa')->where('kode_akun_portax', '61000')->update(['kode_akun_portax' => '32000']);
-                }
-                // Update references in accounting_jurnalumum table if any
-                if (Schema::hasColumn('accounting_jurnalumum', 'kode_akun_portax')) {
-                    DB::table('accounting_jurnalumum')->where('kode_akun_portax', '61000')->update(['kode_akun_portax' => '32000']);
-                }
-                // Update references in bukubesar_saldoawal_detail table if any
-                if (Schema::hasTable('bukubesar_saldoawal_detail')) {
-                    DB::table('bukubesar_saldoawal_detail')->where('kode_akun', '61000')->update(['kode_akun' => '32000']);
-                }
-
-                DB::table('coa_portax')->where('kode_akun', '61000')->delete();
-            }
+            DB::table('coa_portax')->whereIn('kode_akun', ['32000', '32001', '61000', '61001'])->delete();
 
             // 5. Update BIAYA accounts from 5xxxx to 6xxxx
             $biayaUpdates = [

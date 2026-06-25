@@ -1328,7 +1328,41 @@ class LaporanaccountingController extends Controller
         $penjualannetto->orderBy('coa.kode_akun_portax');
         $penjualannetto->orderBy('marketing_penjualan.tanggal');
 
-        //dd($penjualannetto->get());
+        // PPN Keluaran
+        $ppnkeluaran = Penjualan::query();
+        $ppnkeluaran->select(
+            'marketing_penjualan.kode_akun_ppn as kode_akun',
+            'coa_portax.jenis_akun',
+            'coa_portax.nama_akun',
+            'marketing_penjualan.tanggal',
+            'marketing_penjualan.no_faktur as no_bukti',
+            DB::raw("'PENJUALAN' AS sumber"),
+            DB::raw("CONCAT(' PPN Keluar ', pelanggan.nama_pelanggan) as keterangan"),
+            DB::raw('(((IFNULL(jml_bruto_penjualan,0) - IFNULL(potongan,0) - IFNULL(potongan_istimewa,0) - IFNULL(penyesuaian,0)) * 100 / 111) * (11/12) * 0.12) as jml_kredit'),
+            DB::raw('0 as jml_debet'),
+            DB::raw('1 as urutan')
+        );
+        $ppnkeluaran->join('pelanggan', 'marketing_penjualan.kode_pelanggan', '=', 'pelanggan.kode_pelanggan');
+        $ppnkeluaran->join('salesman', 'marketing_penjualan.kode_salesman', '=', 'salesman.kode_salesman');
+        $ppnkeluaran->join('coa_portax', 'marketing_penjualan.kode_akun_ppn', '=', 'coa_portax.kode_akun');
+        $ppnkeluaran->leftJoinSub($returpenjualan, 'returpenjualan', function ($join) {
+            $join->on('marketing_penjualan.no_faktur', '=', 'returpenjualan.no_faktur');
+        });
+        $ppnkeluaran->leftJoinSub($detailpenjualan, 'detailpenjualan', function ($join) {
+            $join->on('marketing_penjualan.no_faktur', '=', 'detailpenjualan.no_faktur');
+        });
+        $ppnkeluaran->where('marketing_penjualan.status_batal', 0);
+        $ppnkeluaran->whereBetween('marketing_penjualan.tanggal', [$start_date, $request->sampai]);
+        if (!empty($request->kode_akun_dari) && !empty($request->kode_akun_sampai)) {
+            $ppnkeluaran->whereBetween('marketing_penjualan.kode_akun_ppn', [$request->kode_akun_dari, $request->kode_akun_sampai]);
+        }
+        if (auth()->user()->kode_cabang != "PST") {
+            $ppnkeluaran->where('salesman.kode_cabang', auth()->user()->kode_cabang);
+        } else {
+            $ppnkeluaran->where('salesman.kode_cabang', $request->kode_cabang);
+        }
+        $ppnkeluaran->orderBy('marketing_penjualan.kode_akun_ppn');
+        $ppnkeluaran->orderBy('marketing_penjualan.tanggal');
 
         // Pembelian Marketing Netto
         $detailpembelianmarketing = Detailpembelianmarketing::query();
@@ -1608,6 +1642,7 @@ class LaporanaccountingController extends Controller
 
         $union_data = $ledger->unionAll($saldoawal)
             ->unionAll($penjualannetto)
+            ->unionAll($ppnkeluaran)
             ->unionAll($pembelianmarketingnetto)
             ->unionAll($kaskecil)
             ->unionAll($kaskecil_transaksi)
