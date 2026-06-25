@@ -110,105 +110,139 @@
     </div>
 
     @php
-        // Group coas by parent code (sub_akun)
-        $nodesByParent = [];
+        // Map balances by code for easy retrieval
+        $balances = [];
+        $names = [];
         foreach ($labarugi as $coa) {
-            $nodesByParent[$coa->sub_akun][] = [
-                'kode_akun' => $coa->kode_akun,
-                'nama_akun' => $coa->nama_akun,
-                'sub_akun' => $coa->sub_akun,
-                'level' => $coa->level,
-                'saldo_akhir' => $coa->saldo_akhir ?? 0,
-                'children' => []
-            ];
+            $balances[$coa->kode_akun] = (float)($coa->saldo_akhir ?? 0);
+            $names[$coa->kode_akun] = $coa->nama_akun;
         }
 
-        // Recursive tree builder
-        if (!function_exists('buildTree')) {
-            function buildTree(&$nodesByParent, $parentId = '0')
-            {
-                $branch = [];
-                if (isset($nodesByParent[$parentId])) {
-                    foreach ($nodesByParent[$parentId] as $node) {
-                        $node['children'] = buildTree($nodesByParent, $node['kode_akun']);
-                        $branch[] = $node;
-                    }
+        // Helper function to render a row
+        if (!function_exists('renderLabaRugiRow')) {
+            function renderLabaRugiRow($label, $value, $indent = 0, $isBold = false, $isHeader = false) {
+                $indentStyle = $indent > 0 ? 'padding-left: ' . ($indent * 20) . 'px;' : '';
+                $boldStyle = $isBold ? 'font-weight: bold;' : '';
+                $class = $isHeader ? 'section-header' : '';
+                
+                echo '<tr class="' . $class . '">';
+                echo '<td style="' . $indentStyle . $boldStyle . '">' . $label . '</td>';
+                echo '<td class="text-right" style="' . $boldStyle . '">';
+                if ($value !== null) {
+                    echo $value != 0 ? formatAngkaDesimal($value) : '-';
                 }
-                return $branch;
+                echo '</td>';
+                echo '</tr>';
             }
         }
 
-        // Build the top level trees
-        $tree = buildTree($nodesByParent, '0');
+        // 1. Pendapatan
+        $penjualan = $balances['41001'] ?? 0;
+        $total_pendapatan = $penjualan;
 
-        // Separate Pendapatan, Biaya, and Ikhtisar Laba Rugi
-        $pendapatanTree = [];
-        $biayaTree = [];
-        $ikhtisarTree = [];
+        // 2. HPP
+        $persediaan_awal = $balances['52001'] ?? 0;
+        $pembelian = $balances['51001'] ?? 0;
+        $persediaan_akhir = $balances['52002'] ?? 0;
+        // Persediaan akhir reduces HPP, handle as subtraction
+        $abs_persediaan_akhir = abs($persediaan_akhir);
+        $total_hpp = $persediaan_awal + $pembelian - $abs_persediaan_akhir;
 
-        foreach ($tree as $rootNode) {
-            if ($rootNode['kode_akun'] == '40000') {
-                $pendapatanTree = [$rootNode];
-            } elseif ($rootNode['kode_akun'] == '50000') {
-                $biayaTree = [$rootNode];
-            } elseif ($rootNode['kode_akun'] == '60000') {
-                $ikhtisarTree = [$rootNode];
+        // 3. Laba Kotor
+        $laba_kotor = $total_pendapatan - $total_hpp;
+
+        // 4. Beban Operasi - Beban Penjualan
+        $beban_penjualan_list = [];
+        $total_beban_penjualan = 0;
+        foreach ($balances as $code => $val) {
+            if (str_starts_with($code, '61') && $code !== '61000') {
+                $beban_penjualan_list[$code] = [
+                    'nama' => $names[$code] ?? '',
+                    'val' => $val
+                ];
+                $total_beban_penjualan += $val;
             }
         }
+        // Add Sewa Bangunan (63001) and Sewa Angkutan (63002) to Beban Penjualan list
+        $sewa_bangunan = $balances['63001'] ?? 0;
+        $sewa_angkutan = $balances['63002'] ?? 0;
+        
+        $beban_penjualan_list['63001'] = [
+            'nama' => 'Sewa BANGUNAN',
+            'val' => $sewa_bangunan
+        ];
+        $beban_penjualan_list['63002'] = [
+            'nama' => 'Sewa Angkutan',
+            'val' => $sewa_angkutan
+        ];
+        $total_beban_penjualan += $sewa_bangunan + $sewa_angkutan;
 
-        // Recursive balance calculator
-        if (!function_exists('calculateTreeBalances')) {
-            function calculateTreeBalances(&$nodes)
-            {
-                $total = 0;
-                foreach ($nodes as &$node) {
-                    if (count($node['children']) > 0) {
-                        $node['saldo_akhir'] = calculateTreeBalances($node['children']);
-                    }
-                    $total += $node['saldo_akhir'];
-                }
-                return $total;
+        // Sort by code keys
+        ksort($beban_penjualan_list);
+
+        // 5. Beban Operasi - Biaya Umum & Administrasi
+        $gaji_tunjangan = $balances['62001'] ?? 0;
+        $komisi = $balances['62002'] ?? 0;
+        $total_gaji_komisi = $gaji_tunjangan + $komisi;
+
+        // Jasa
+        $sewa_mesin_fc = $balances['63003'] ?? 0;
+        $total_jasa = $sewa_mesin_fc;
+        
+        $jasa_list = [
+            '63003' => [
+                'nama' => 'SEWA MESIN FC',
+                'val' => $sewa_mesin_fc
+            ]
+        ];
+        // Gather any other remaining 6xxxx codes
+        foreach ($balances as $code => $val) {
+            if (str_starts_with($code, '6') && 
+                !str_starts_with($code, '61') && 
+                !str_starts_with($code, '62') && 
+                $code !== '63001' && 
+                $code !== '63002' && 
+                $code !== '63003' && 
+                $code !== '60000') {
+                $jasa_list[$code] = [
+                    'nama' => strtoupper($names[$code] ?? ''),
+                    'val' => $val
+                ];
+                $total_jasa += $val;
             }
         }
+        ksort($jasa_list);
 
-        // Calculate recursive balances
-        calculateTreeBalances($pendapatanTree);
-        calculateTreeBalances($biayaTree);
-        calculateTreeBalances($ikhtisarTree);
+        $total_umum_adm = $total_gaji_komisi + $total_jasa;
+        $total_beban_operasi = $total_beban_penjualan + $total_umum_adm;
 
-        // Recursive tree rendering function
-        if (!function_exists('renderTree')) {
-            function renderTree($nodes, $level = 0)
-            {
-                foreach ($nodes as $node) {
-                    $indent = $level * 20;
-                    $hasChildren = count($node['children']) > 0;
+        // 6. Pendapatan Operasi
+        $pendapatan_operasi = $laba_kotor - $total_beban_operasi;
 
-                    if ($hasChildren) {
-                        // Category Header (Root or Sub-Root)
-                        echo '<tr class="' . ($level == 0 ? 'section-header' : '') . '">';
-                        echo '<td style="padding-left: ' . $indent . 'px; font-weight: bold;">' . $node['kode_akun'] . ' &nbsp; ' . $node['nama_akun'] . '</td>';
-                        echo '<td class="text-right"></td>';
-                        echo '</tr>';
-
-                        // Render children recursively
-                        renderTree($node['children'], $level + 1);
-
-                        // Render Subtotal/Jumlah row
-                        echo '<tr class="subtotal-row">';
-                        echo '<td style="padding-left: ' . $indent . 'px;">Jumlah ' . $node['nama_akun'] . '</td>';
-                        echo '<td class="text-right">' . ($node['saldo_akhir'] != 0 ? formatAngkaDesimal($node['saldo_akhir']) : '-') . '</td>';
-                        echo '</tr>';
-                    } else {
-                        // Leaf account
-                        echo '<tr>';
-                        echo '<td style="padding-left: ' . $indent . 'px;">' . $node['kode_akun'] . ' &nbsp; ' . $node['nama_akun'] . '</td>';
-                        echo '<td class="text-right">' . ($node['saldo_akhir'] != 0 ? formatAngkaDesimal($node['saldo_akhir']) : '-') . '</td>';
-                        echo '</tr>';
-                    }
-                }
+        // 7. Pendapatan dan Beban Lain
+        $pendapatan_lain = $balances['42001'] ?? 0;
+        foreach ($balances as $code => $val) {
+            if (str_starts_with($code, '42') && $code !== '42001' && $code !== '42000') {
+                $pendapatan_lain += $val;
             }
         }
+        
+        $beban_lain = 0;
+        foreach ($balances as $code => $val) {
+            if (str_starts_with($code, '9')) {
+                $beban_lain += $val;
+            }
+        }
+        $total_lain_lain = $pendapatan_lain - $beban_lain;
+
+        // 8. Laba Rugi Bersih Before Tax
+        $laba_bersih_before_tax = $pendapatan_operasi + $total_lain_lain;
+
+        // PPh Expenses
+        $pph_terutang = 0;
+        $pph_25 = 0;
+        $pph_29 = 0;
+        $laba_bersih_after_tax = $laba_bersih_before_tax - $pph_terutang - $pph_25 - $pph_29;
     @endphp
 
     <div class="content">
@@ -221,41 +255,93 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- 1. Render PENDAPATAN Tree -->
-                @if (!empty($pendapatanTree))
-                    @php renderTree($pendapatanTree, 0); @endphp
-                @endif
+                <!-- 1. Pendapatan -->
+                @php renderLabaRugiRow('Pendapatan', null, 0, true, true); @endphp
+                @php renderLabaRugiRow('Pendapatan', null, 1, true); @endphp
+                @php renderLabaRugiRow('Penjualan', $penjualan, 2); @endphp
+                @php renderLabaRugiRow('Jumlah Pendapatan', $total_pendapatan, 0, true); @endphp
 
                 <!-- Empty space -->
-                <tr>
-                    <td colspan="2" style="height: 15px;"></td>
-                </tr>
+                <tr><td colspan="2" style="height: 10px;"></td></tr>
 
-                <!-- 2. Render BIAYA Tree -->
-                @if (!empty($biayaTree))
-                    @php renderTree($biayaTree, 0); @endphp
-                @endif
-
-                <!-- Empty space -->
-                <tr>
-                    <td colspan="2" style="height: 15px;"></td>
-                </tr>
-
-                <!-- 3. Render IKHTISAR LABA RUGI Tree -->
-                @if (!empty($ikhtisarTree))
-                    @php renderTree($ikhtisarTree, 0); @endphp
-                @endif
+                <!-- 2. Harga Pokok Penjualan -->
+                @php renderLabaRugiRow('Harga Pokok Penjualan', null, 0, true, true); @endphp
+                @php renderLabaRugiRow('Persediaan Awal', $persediaan_awal, 1); @endphp
+                @php renderLabaRugiRow('Pembelian', $pembelian, 1); @endphp
+                @php renderLabaRugiRow('Persediaan Akhir', $abs_persediaan_akhir != 0 ? -$abs_persediaan_akhir : 0, 1); @endphp
+                @php renderLabaRugiRow('Jumlah Harga Pokok Penjualan', $total_hpp, 0, true); @endphp
 
                 <!-- Empty space -->
-                <tr>
-                    <td colspan="2" style="height: 25px;"></td>
-                </tr>
+                <tr><td colspan="2" style="height: 10px;"></td></tr>
 
-                <!-- Grand Total Laba/Rugi Bersih -->
+                <!-- 3. Laba Kotor -->
+                @php renderLabaRugiRow('LABA KOTOR', $laba_kotor, 0, true, true); @endphp
+
+                <!-- Empty space -->
+                <tr><td colspan="2" style="height: 10px;"></td></tr>
+
+                <!-- 4. Beban Operasi -->
+                @php renderLabaRugiRow('Beban Operasi', null, 0, true, true); @endphp
+                
+                <!-- Beban Penjualan -->
+                @php renderLabaRugiRow('BEBAN PENJUALAN', null, 1, true); @endphp
+                @foreach ($beban_penjualan_list as $item)
+                    @php renderLabaRugiRow($item['nama'], $item['val'], 2); @endphp
+                @endforeach
+
+                <!-- Biaya Umum & Administrasi -->
+                @php renderLabaRugiRow('Biaya Umum & Administrasi', null, 1, true); @endphp
+                @php renderLabaRugiRow('Gaji & Tunjangan Karyawan', null, 2, true); @endphp
+                @php renderLabaRugiRow('GAJI, TUNJANGAN, DLL', $gaji_tunjangan, 3); @endphp
+                @php renderLabaRugiRow('Komisi', $komisi, 3); @endphp
+                
+                <!-- Jasa -->
+                @php renderLabaRugiRow('JASA', null, 2, true); @endphp
+                @foreach ($jasa_list as $item)
+                    @php renderLabaRugiRow($item['nama'], $item['val'], 3); @endphp
+                @endforeach
+
+                @php renderLabaRugiRow('Jumlah Beban Operasi', $total_beban_operasi, 0, true); @endphp
+
+                <!-- Empty space -->
+                <tr><td colspan="2" style="height: 10px;"></td></tr>
+
+                <!-- 5. Pendapatan Operasi -->
+                @php renderLabaRugiRow('PENDAPATAN OPERASI', $pendapatan_operasi, 0, true, true); @endphp
+
+                <!-- Empty space -->
+                <tr><td colspan="2" style="height: 10px;"></td></tr>
+
+                <!-- 6. Pendapatan dan Beban Lain -->
+                @php renderLabaRugiRow('Pendapatan dan Beban Lain', null, 0, true, true); @endphp
+                @php renderLabaRugiRow('Pendapatan lain', $pendapatan_lain, 1, true); @endphp
+                @php renderLabaRugiRow('Jumlah Pendapatan lain', $pendapatan_lain, 1, true); @endphp
+                @php renderLabaRugiRow('Beban lain-lain', $beban_lain, 1, true); @endphp
+                @php renderLabaRugiRow('Jumlah Beban lain-lain', $beban_lain, 1, true); @endphp
+                @php renderLabaRugiRow('Jumlah Pendapatan dan Beban Lain', $total_lain_lain, 0, true); @endphp
+
+                <!-- Empty space -->
+                <tr><td colspan="2" style="height: 10px;"></td></tr>
+
+                <!-- 7. Laba Bersih Before Tax -->
+                @php renderLabaRugiRow('LABA(RUGI) BERSIH (Before Tax)', $laba_bersih_before_tax, 0, true, true); @endphp
+
+                <!-- Empty space -->
+                <tr><td colspan="2" style="height: 10px;"></td></tr>
+
+                <!-- PPh -->
+                @php renderLabaRugiRow('PPh terutang', $pph_terutang, 0); @endphp
+                @php renderLabaRugiRow('PPh 25', $pph_25, 0); @endphp
+                @php renderLabaRugiRow('PPh 29', $pph_29, 0); @endphp
+
+                <!-- Empty space -->
+                <tr><td colspan="2" style="height: 15px;"></td></tr>
+
+                <!-- Grand Total Laba/Rugi Bersih After Tax -->
                 <tr class="subtotal-row-grand">
-                    <td style="font-weight: bold;">Laba (Rugi) Bersih</td>
+                    <td style="font-weight: bold;">LABA(RUGI) BERSIH (After Tax)</td>
                     <td class="text-right" style="font-weight: bold;">
-                        {{ $net_profit_loss != 0 ? formatAngkaDesimal($net_profit_loss) : '-' }}
+                        {{ $laba_bersih_after_tax != 0 ? formatAngkaDesimal($laba_bersih_after_tax) : '-' }}
                     </td>
                 </tr>
             </tbody>
@@ -264,3 +350,4 @@
 </body>
 
 </html>
+
