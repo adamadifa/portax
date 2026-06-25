@@ -172,19 +172,6 @@
                 $total_beban_penjualan += $val;
             }
         }
-        // Add Sewa Bangunan (63001) and Sewa Angkutan (63002) to Beban Penjualan list
-        $sewa_bangunan = $balances['63001'] ?? 0;
-        $sewa_angkutan = $balances['63002'] ?? 0;
-        
-        $beban_penjualan_list['63001'] = [
-            'nama' => 'Sewa BANGUNAN',
-            'val' => $sewa_bangunan
-        ];
-        $beban_penjualan_list['63002'] = [
-            'nama' => 'Sewa Angkutan',
-            'val' => $sewa_angkutan
-        ];
-        $total_beban_penjualan += $sewa_bangunan + $sewa_angkutan;
 
         // Sort by code keys
         ksort($beban_penjualan_list);
@@ -195,10 +182,20 @@
         $total_gaji_komisi = $gaji_tunjangan + $komisi;
 
         // Jasa
+        $sewa_bangunan = $balances['63001'] ?? 0;
+        $sewa_angkutan = $balances['63002'] ?? 0;
         $sewa_mesin_fc = $balances['63003'] ?? 0;
-        $total_jasa = $sewa_mesin_fc;
+        $total_jasa = $sewa_bangunan + $sewa_angkutan + $sewa_mesin_fc;
         
         $jasa_list = [
+            '63001' => [
+                'nama' => 'Sewa BANGUNAN',
+                'val' => $sewa_bangunan
+            ],
+            '63002' => [
+                'nama' => 'Sewa Angkutan',
+                'val' => $sewa_angkutan
+            ],
             '63003' => [
                 'nama' => 'SEWA MESIN FC',
                 'val' => $sewa_mesin_fc
