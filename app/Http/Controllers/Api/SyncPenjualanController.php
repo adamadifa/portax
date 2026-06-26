@@ -641,6 +641,7 @@ class SyncPenjualanController extends Controller
                     unset($header['historibayar']);
                     unset($header['salesman']);
                     unset($header['pelanggan']);
+                    unset($header['wilayah']);
 
                     // Create or Update Record
                     Penjualan::updateOrCreate(
