@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('laporan_keuangan', function (Blueprint $table) {
-            $table->string('kode_lk')->primary(); // Format: LK-MM-YYYY-CABANG (e.g. LK-06-2026-BDG)
+            $table->string('kode_lk')->primary(); // Format: LK-TIPE-MM-YYYY-CABANG (e.g. LK-N-06-2026-BDG)
+            $table->string('jenis_laporan'); // 'N' for Neraca, 'LR' for Laba Rugi
             $table->integer('bulan');
             $table->integer('tahun');
             $table->string('kode_cabang')->nullable(); // Nullable for 'Semua Cabang' (ALL)

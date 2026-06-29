@@ -130,7 +130,8 @@
                     _token: '{{ csrf_token() }}',
                     bulan: '{{ $bulan_angka }}',
                     tahun: '{{ $tahun_angka }}',
-                    kode_cabang: '{{ $kode_cabang_param }}'
+                    kode_cabang: '{{ $kode_cabang_param }}',
+                    jenis_laporan: 'LR'
                 }, function(res) {
                     alert(res.message);
                     location.reload();
@@ -145,7 +146,8 @@
                     _token: '{{ csrf_token() }}',
                     bulan: '{{ $bulan_angka }}',
                     tahun: '{{ $tahun_angka }}',
-                    kode_cabang: '{{ $kode_cabang_param }}'
+                    kode_cabang: '{{ $kode_cabang_param }}',
+                    jenis_laporan: 'LR'
                 }, function(res) {
                     alert(res.message);
                     location.reload();

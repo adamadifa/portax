@@ -4,22 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Neraca {{ date('Y-m-d H:i:s') }}</title>
+    <title>Neraca Tahunan {{ $tahun }}</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             color: #111;
-            margin: 30px;
+            margin: 15px;
             background-color: #fff;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .header .company-name {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             text-transform: uppercase;
             margin: 0;
@@ -27,15 +27,14 @@
         }
 
         .header .report-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
             margin: 5px 0;
             color: #900000;
-            /* Dark red matching Neraca Multi Period standard */
         }
 
         .header .period {
-            font-size: 14px;
+            font-size: 13px;
             margin: 5px 0 0 0;
             color: #333;
             font-weight: bold;
@@ -43,7 +42,8 @@
 
         .content {
             margin: 0 auto;
-            max-width: 900px;
+            width: 100%;
+            overflow-x: auto;
         }
 
         .datatable9 {
@@ -55,42 +55,18 @@
         .datatable9 th {
             border-top: 2px solid #000;
             border-bottom: 2px solid #000;
-            padding: 8px 12px;
-            font-size: 13px;
+            padding: 6px 4px;
+            font-size: 11px;
             font-weight: bold;
             text-transform: uppercase;
+            text-align: center;
         }
 
         .datatable9 td {
-            padding: 5px 12px;
-            font-size: 12px;
+            padding: 4px 4px;
+            font-size: 10.5px;
             vertical-align: middle;
-            height: 20px;
-        }
-
-        /* Subtotal/Total Rows */
-        .subtotal-row td {
-            font-weight: bold !important;
-            border-top: 1px solid #000;
-            border-bottom: 2px double #000;
-            padding-top: 6px;
-            padding-bottom: 6px;
-        }
-
-        .subtotal-row-grand td {
-            font-weight: bold !important;
-            border-top: 1.5px solid #000;
-            border-bottom: 2px double #000;
-            padding-top: 8px;
-            padding-bottom: 8px;
-            font-size: 13px;
-        }
-
-        .section-header td {
-            font-weight: bold;
-            font-size: 13px;
-            padding-top: 10px;
-            padding-bottom: 4px;
+            height: 18px;
         }
 
         .text-right {
@@ -100,89 +76,64 @@
         .text-center {
             text-align: center;
         }
+
+        /* Subtotal/Total Rows */
+        .subtotal-row td {
+            font-weight: bold !important;
+            border-top: 1px solid #000;
+            border-bottom: 1.5px solid #000;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .subtotal-row-grand td {
+            font-weight: bold !important;
+            border-top: 1.5px solid #000;
+            border-bottom: 2px double #000;
+            padding-top: 6px;
+            padding-bottom: 6px;
+            font-size: 11px;
+        }
+
+        .section-header td {
+            font-weight: bold;
+            font-size: 11px;
+            padding-top: 8px;
+        }
+
+        @media print {
+            body {
+                margin: 5px;
+            }
+        }
     </style>
 </head>
 
 <body>
-    @if(!isset($_POST['exportButton']))
-    <div class="lock-bar" style="background: #f8f9fa; border-bottom: 1px solid #dee2e6; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; font-family: sans-serif; margin-bottom: 20px;">
-        <div style="font-size: 13px;">
-            Status Laporan: 
-            @if($is_locked)
-                <span style="color: #d9534f; font-weight: bold;">🔒 TERKUNCI</span>
-                <span style="font-size: 12px; color: #777;">(Oleh User ID: {{ $lock_info->user_id }} pada {{ $lock_info->created_at }})</span>
-            @else
-                <span style="color: #5cb85c; font-weight: bold;">🔓 TERBUKA (DINAMIS)</span>
-            @endif
-        </div>
-        <div>
-            @if($is_locked)
-                <button onclick="bukaKunci()" style="background: #d9534f; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Buka Kunci Laporan</button>
-            @else
-                <button onclick="kunciLaporan()" style="background: #5cb85c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Kunci Laporan</button>
-            @endif
-        </div>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        function kunciLaporan() {
-            if(confirm('Apakah Anda yakin ingin mengunci laporan keuangan periode ini? Nilai akhir saldo akan disimpan tetap.')) {
-                $.post('{{ route("laporanaccounting.kuncilaporan") }}', {
-                    _token: '{{ csrf_token() }}',
-                    bulan: '{{ $bulan_angka }}',
-                    tahun: '{{ $tahun_angka }}',
-                    kode_cabang: '{{ $kode_cabang_param }}',
-                    jenis_laporan: 'N'
-                }, function(res) {
-                    alert(res.message);
-                    location.reload();
-                }).fail(function(xhr) {
-                    alert(xhr.responseJSON?.message || 'Gagal mengunci laporan.');
-                });
-            }
-        }
-        function bukaKunci() {
-            if(confirm('Apakah Anda yakin ingin membuka kunci laporan keuangan periode ini? Laporan akan kembali dihitung dinamis.')) {
-                $.post('{{ route("laporanaccounting.bukakuncilaporan") }}', {
-                    _token: '{{ csrf_token() }}',
-                    bulan: '{{ $bulan_angka }}',
-                    tahun: '{{ $tahun_angka }}',
-                    kode_cabang: '{{ $kode_cabang_param }}',
-                    jenis_laporan: 'N'
-                }, function(res) {
-                    alert(res.message);
-                    location.reload();
-                }).fail(function(xhr) {
-                    alert(xhr.responseJSON?.message || 'Gagal membuka kunci laporan.');
-                });
-            }
-        }
-    </script>
-    <style>
-        @media print {
-            .lock-bar {
-                display: none !important;
-            }
-        }
-    </style>
-    @endif
-
     <div class="header">
         <h4 class="company-name">{{ $nama_pt }}</h4>
-        <h2 class="report-title">Neraca</h2>
-        <h4 class="period">Period {{ DateToIndo($dari) }} to {{ DateToIndo($sampai) }}</h4>
+        <h2 class="report-title">Neraca Tahunan</h2>
+        <h4 class="period">Tahun {{ $tahun }} ({{ $nama_cabang }})</h4>
     </div>
 
     @php
         // Group coas by parent code (sub_akun)
         $nodesByParent = [];
         foreach ($neraca as $coa) {
+            $node_monthly_balances = [];
+            for ($m = 1; $m <= 12; $m++) {
+                if ($coa->kode_akun == '33001') {
+                    $node_monthly_balances[$m] = ($balances['33001'][$m] ?? 0.0) + ($net_profit_loss[$m] ?? 0.0);
+                } else {
+                    $node_monthly_balances[$m] = $balances[$coa->kode_akun][$m] ?? 0.0;
+                }
+            }
             $nodesByParent[$coa->sub_akun][] = [
                 'kode_akun' => $coa->kode_akun,
                 'nama_akun' => $coa->nama_akun,
                 'sub_akun' => $coa->sub_akun,
                 'level' => $coa->level,
-                'saldo_akhir' => $coa->saldo_akhir ?? 0,
+                'monthly_balances' => $node_monthly_balances,
                 'children' => []
             ];
         }
@@ -229,14 +180,16 @@
         if (!function_exists('calculateTreeBalances')) {
             function calculateTreeBalances(&$nodes)
             {
-                $total = 0;
+                $monthly_totals = array_fill(1, 12, 0.0);
                 foreach ($nodes as &$node) {
                     if (count($node['children']) > 0) {
-                        $node['saldo_akhir'] = calculateTreeBalances($node['children']);
+                        $node['monthly_balances'] = calculateTreeBalances($node['children']);
                     }
-                    $total += $node['saldo_akhir'];
+                    for ($m = 1; $m <= 12; $m++) {
+                        $monthly_totals[$m] += $node['monthly_balances'][$m] ?? 0.0;
+                    }
                 }
-                return $total;
+                return $monthly_totals;
             }
         }
 
@@ -263,14 +216,16 @@
             function renderTree($nodes, $level = 0)
             {
                 foreach ($nodes as $node) {
-                    $indent = $level * 20;
+                    $indent = $level * 12;
                     $hasChildren = count($node['children']) > 0;
 
                     if ($hasChildren) {
                         // Category Header (Root or Sub-Root)
                         echo '<tr class="' . ($level == 0 ? 'section-header' : '') . '">';
                         echo '<td style="padding-left: ' . $indent . 'px; font-weight: bold;">' . $node['kode_akun'] . ' &nbsp; ' . $node['nama_akun'] . '</td>';
-                        echo '<td class="text-right"></td>';
+                        for ($m = 1; $m <= 12; $m++) {
+                            echo '<td></td>';
+                        }
                         echo '</tr>';
 
                         // Render children recursively
@@ -279,13 +234,17 @@
                         // Render Subtotal/Jumlah row
                         echo '<tr class="subtotal-row">';
                         echo '<td style="padding-left: ' . $indent . 'px;">Jumlah ' . $node['nama_akun'] . '</td>';
-                        echo '<td class="text-right">' . formatNeracaValue($node['saldo_akhir']) . '</td>';
+                        for ($m = 1; $m <= 12; $m++) {
+                            echo '<td class="text-right">' . formatNeracaValue($node['monthly_balances'][$m] ?? 0) . '</td>';
+                        }
                         echo '</tr>';
                     } else {
                         // Leaf account
                         echo '<tr>';
                         echo '<td style="padding-left: ' . $indent . 'px;">' . $node['kode_akun'] . ' &nbsp; ' . $node['nama_akun'] . '</td>';
-                        echo '<td class="text-right">' . formatNeracaValue($node['saldo_akhir']) . '</td>';
+                        for ($m = 1; $m <= 12; $m++) {
+                            echo '<td class="text-right">' . formatNeracaValue($node['monthly_balances'][$m] ?? 0) . '</td>';
+                        }
                         echo '</tr>';
                     }
                 }
@@ -297,9 +256,19 @@
         <table class="datatable9">
             <thead>
                 <tr>
-                    <th style="text-align: left; width: 80%;">Description</th>
-                    <th class="text-right" style="width: 20%;">
-                        {{ !empty($sampai) ? date('M-y', strtotime($sampai)) : date('M-y') }}</th>
+                    <th style="text-align: left; width: 16%;">Description</th>
+                    <th style="width: 7%;">Jan</th>
+                    <th style="width: 7%;">Feb</th>
+                    <th style="width: 7%;">Mar</th>
+                    <th style="width: 7%;">Apr</th>
+                    <th style="width: 7%;">Mei</th>
+                    <th style="width: 7%;">Jun</th>
+                    <th style="width: 7%;">Jul</th>
+                    <th style="width: 7%;">Ags</th>
+                    <th style="width: 7%;">Sep</th>
+                    <th style="width: 7%;">Okt</th>
+                    <th style="width: 7%;">Nov</th>
+                    <th style="width: 7%;">Des</th>
                 </tr>
             </thead>
             <tbody>
@@ -310,14 +279,15 @@
 
                 <!-- Empty space separating Aktiva and Kewajiban & Ekuitas -->
                 <tr>
-                    <td colspan="2" style="height: 25px;"></td>
+                    <td colspan="13" style="height: 15px;"></td>
                 </tr>
 
                 <!-- 2. Section Heading: Kewajiban dan Ekuitas -->
                 <tr class="section-header">
-                    <td style="font-weight: bold; font-size: 14px; text-transform: uppercase;">Kewajiban dan Ekuitas
-                    </td>
-                    <td></td>
+                    <td style="font-weight: bold; font-size: 11px; text-transform: uppercase;">Kewajiban dan Ekuitas</td>
+                    @for ($m = 1; $m <= 12; $m++)
+                        <td></td>
+                    @endfor
                 </tr>
 
                 <!-- Render Kewajiban (PASIVA) -->
@@ -333,14 +303,16 @@
                 <!-- Grand Total Kewajiban dan Ekuitas -->
                 <tr class="subtotal-row-grand">
                     <td style="font-weight: bold;">Jumlah Kewajiban dan Ekuitas</td>
-                    <td class="text-right" style="font-weight: bold;">
-                        @php
-                            $totalKewajiban = !empty($pasivaTree) ? $pasivaTree[0]['saldo_akhir'] : 0;
-                            $totalEkuitas = !empty($ekuitasTree) ? $ekuitasTree[0]['saldo_akhir'] : 0;
-                            $grandTotal = $totalKewajiban + $totalEkuitas;
-                            echo formatNeracaValue($grandTotal);
-                        @endphp
-                    </td>
+                    @for ($m = 1; $m <= 12; $m++)
+                        <td class="text-right" style="font-weight: bold;">
+                            @php
+                                $totalKewajiban = !empty($pasivaTree) ? ($pasivaTree[0]['monthly_balances'][$m] ?? 0) : 0;
+                                $totalEkuitas = !empty($ekuitasTree) ? ($ekuitasTree[0]['monthly_balances'][$m] ?? 0) : 0;
+                                $grandTotal = $totalKewajiban + $totalEkuitas;
+                                echo formatNeracaValue($grandTotal);
+                            @endphp
+                        </td>
+                    @endfor
                 </tr>
             </tbody>
         </table>

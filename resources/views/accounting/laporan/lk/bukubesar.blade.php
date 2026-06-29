@@ -12,6 +12,8 @@
                     <option value="1">Buku Besar</option>
                     <option value="2">Neraca</option>
                     <option value="3">Laba Rugi</option>
+                    <option value="4">Neraca Tahunan (Horizontal)</option>
+                    <option value="5">Laba Rugi Tahunan (Horizontal)</option>
                 </select>
             </div>
         </div>
@@ -64,7 +66,7 @@
         </div>
 
         <!-- Periode -->
-        <div>
+        <div id="periode_ledger_container">
             <div class="grid grid-cols-2 gap-4">
                 <div class="relative group">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none z-10 transition-colors duration-200 group-focus-within:text-[#003d9e] text-slate-400">
@@ -79,6 +81,21 @@
                     </div>
                     <input type="text" name="sampai" id="sampai_ledger" class="w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors flatpickr-date" placeholder="Sampai Tanggal">
                 </div>
+            </div>
+        </div>
+
+        <!-- Tahun (Only for Annual/Horizontal reports) -->
+        <div id="tahun_ledger_container" style="display: none;">
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none z-10 transition-colors duration-200 group-focus-within:text-[#003d9e] text-slate-400">
+                    <i class="ti ti-calendar text-lg"></i>
+                </div>
+                <select name="tahun" id="tahun_ledger" class="w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none form-select">
+                    <option value="">Pilih Tahun</option>
+                    @for ($t = date('Y'); $t >= $start_year; $t--)
+                        <option value="{{ $t }}">{{ $t }}</option>
+                    @endfor
+                </select>
             </div>
         </div>
 
@@ -114,6 +131,15 @@
                     // Reset value COA ke kosong
                     formLedger.find("#kode_akun_dari_ledger").val("").trigger('change');
                     formLedger.find("#kode_akun_sampai_ledger").val("").trigger('change');
+                }
+
+                // Toggle between Periode (Tanggal) and Tahun
+                if (formatlaporan == '4' || formatlaporan == '5') {
+                    $("#periode_ledger_container").hide();
+                    $("#tahun_ledger_container").show();
+                } else {
+                    $("#periode_ledger_container").show();
+                    $("#tahun_ledger_container").hide();
                 }
             }
 
@@ -166,8 +192,8 @@
                 const formatlaporan = formLedger.find("#formatlaporan_ledger").val();
                 const dari = formLedger.find("#dari_ledger").val();
                 const sampai = formLedger.find("#sampai_ledger").val();
-                const start = new Date(dari);
-                const end = new Date(sampai);
+                const tahun = formLedger.find("#tahun_ledger").val();
+
                 if (formatlaporan == "") {
                     Swal.fire({
                         title: "Oops!",
@@ -179,39 +205,60 @@
                         },
                     });
                     return false;
-                } else if (dari == "") {
-                    Swal.fire({
-                        title: "Oops!",
-                        text: 'Periode Dari Harus Diisi !',
-                        icon: "warning",
-                        showConfirmButton: true,
-                        didClose: (e) => {
-                            formLedger.find("#dari_ledger").focus();
-                        },
-                    });
-                    return false;
-                } else if (sampai == "") {
-                    Swal.fire({
-                        title: "Oops!",
-                        text: 'Periode Sampai Harus Diisi !',
-                        icon: "warning",
-                        showConfirmButton: true,
-                        didClose: (e) => {
-                            formLedger.find("#sampai_ledger").focus();
-                        },
-                    });
-                    return false;
-                } else if (start > end) {
-                    Swal.fire({
-                        title: "Oops!",
-                        text: 'Periode Tidak Valid !',
-                        icon: "warning",
-                        showConfirmButton: true,
-                        didClose: (e) => {
-                            formLedger.find("#sampai_ledger").focus();
-                        },
-                    });
-                    return false;
+                }
+
+                // Validation for Annual/Horizontal Laporan
+                if (formatlaporan == '4' || formatlaporan == '5') {
+                    if (tahun == "") {
+                        Swal.fire({
+                            title: "Oops!",
+                            text: 'Tahun Harus Diisi !',
+                            icon: "warning",
+                            showConfirmButton: true,
+                            didClose: (e) => {
+                                formLedger.find("#tahun_ledger").focus();
+                            },
+                        });
+                        return false;
+                    }
+                } else {
+                    // Validation for normal reports
+                    const start = new Date(dari);
+                    const end = new Date(sampai);
+                    if (dari == "") {
+                        Swal.fire({
+                            title: "Oops!",
+                            text: 'Periode Dari Harus Diisi !',
+                            icon: "warning",
+                            showConfirmButton: true,
+                            didClose: (e) => {
+                                formLedger.find("#dari_ledger").focus();
+                            },
+                        });
+                        return false;
+                    } else if (sampai == "") {
+                        Swal.fire({
+                            title: "Oops!",
+                            text: 'Periode Sampai Harus Diisi !',
+                            icon: "warning",
+                            showConfirmButton: true,
+                            didClose: (e) => {
+                                formLedger.find("#sampai_ledger").focus();
+                            },
+                        });
+                        return false;
+                    } else if (start > end) {
+                        Swal.fire({
+                            title: "Oops!",
+                            text: 'Periode Tidak Valid !',
+                            icon: "warning",
+                            showConfirmButton: true,
+                            didClose: (e) => {
+                                formLedger.find("#sampai_ledger").focus();
+                            },
+                        });
+                        return false;
+                    }
                 }
             });
 

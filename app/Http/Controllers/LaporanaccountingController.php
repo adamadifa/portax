@@ -935,13 +935,139 @@ class LaporanaccountingController extends Controller
             $data['nama_cabang'] = 'Semua Cabang';
         }
 
+        if (in_array($request->formatlaporan, ['4', '5'])) {
+            $tahun = $request->tahun;
+            $data['tahun'] = $tahun;
+            $data['dari'] = $tahun . '-01-01';
+            $data['sampai'] = $tahun . '-12-31';
+
+            if ($request->formatlaporan == '4') {
+                $lk_headers_N = LaporanKeuangan::where('tahun', $tahun)
+                    ->where('jenis_laporan', 'N')
+                    ->where(function($query) use ($kode_cabang) {
+                        if (empty($kode_cabang)) {
+                            $query->whereNull('kode_cabang')->orWhere('kode_cabang', '');
+                        } else {
+                            $query->where('kode_cabang', $kode_cabang);
+                        }
+                    })
+                    ->get();
+
+                $lk_headers_LR = LaporanKeuangan::where('tahun', $tahun)
+                    ->where('jenis_laporan', 'LR')
+                    ->where(function($query) use ($kode_cabang) {
+                        if (empty($kode_cabang)) {
+                            $query->whereNull('kode_cabang')->orWhere('kode_cabang', '');
+                        } else {
+                            $query->where('kode_cabang', $kode_cabang);
+                        }
+                    })
+                    ->get();
+
+                $balances_N = [];
+                $lk_month_map_N = $lk_headers_N->pluck('bulan', 'kode_lk')->toArray();
+                $details_N = LaporanKeuanganDetail::whereIn('kode_lk', array_keys($lk_month_map_N))->get();
+                foreach ($details_N as $d) {
+                    $bulan = $lk_month_map_N[$d->kode_lk] ?? null;
+                    if ($bulan) {
+                        $balances_N[$d->kode_akun][$bulan] = (float) $d->jumlah;
+                    }
+                }
+
+                $balances_LR = [];
+                $lk_month_map_LR = $lk_headers_LR->pluck('bulan', 'kode_lk')->toArray();
+                $details_LR = LaporanKeuanganDetail::whereIn('kode_lk', array_keys($lk_month_map_LR))->get();
+                foreach ($details_LR as $d) {
+                    $bulan = $lk_month_map_LR[$d->kode_lk] ?? null;
+                    if ($bulan) {
+                        $balances_LR[$d->kode_akun][$bulan] = (float) $d->jumlah;
+                    }
+                }
+
+                $net_profit_loss = [];
+                for ($m = 1; $m <= 12; $m++) {
+                    $np = 0;
+                    foreach ($balances_LR as $kode_akun => $m_vals) {
+                        $first = substr($kode_akun, 0, 1);
+                        if (in_array($first, ['4', '5', '6', '7', '8', '9'])) {
+                            $val = $m_vals[$m] ?? 0;
+                            $np -= $val;
+                        }
+                    }
+                    $net_profit_loss[$m] = $np;
+                }
+
+                $data['balances'] = $balances_N;
+                $data['net_profit_loss'] = $net_profit_loss;
+
+                $data['neraca'] = CoaPortax::whereRaw('LEFT(kode_akun, 1) IN (1,2,3)')
+                    ->orderBy('kode_akun')
+                    ->get();
+
+                if (isset($_POST['exportButton'])) {
+                    header("Content-type: application/vnd-ms-excel");
+                    header("Content-Disposition: attachment; filename=Neraca Tahunan $tahun.xls");
+                }
+                return view('accounting.laporan.lk.neraca_tahunan_cetak', $data);
+
+            } else if ($request->formatlaporan == '5') {
+                $lk_headers_LR = LaporanKeuangan::where('tahun', $tahun)
+                    ->where('jenis_laporan', 'LR')
+                    ->where(function($query) use ($kode_cabang) {
+                        if (empty($kode_cabang)) {
+                            $query->whereNull('kode_cabang')->orWhere('kode_cabang', '');
+                        } else {
+                            $query->where('kode_cabang', $kode_cabang);
+                        }
+                    })
+                    ->get();
+
+                $balances_LR = [];
+                $lk_month_map_LR = $lk_headers_LR->pluck('bulan', 'kode_lk')->toArray();
+                $details_LR = LaporanKeuanganDetail::whereIn('kode_lk', array_keys($lk_month_map_LR))->get();
+                foreach ($details_LR as $d) {
+                    $bulan = $lk_month_map_LR[$d->kode_lk] ?? null;
+                    if ($bulan) {
+                        $balances_LR[$d->kode_akun][$bulan] = (float) $d->jumlah;
+                    }
+                }
+
+                $data['balances'] = $balances_LR;
+
+                $kode_laba_rugi = array('4,5,6,7,8,9');
+                $akun_jangan_ditampilkan = ['0-0000', '1', '2'];
+
+                $data['labarugi'] = CoaPortax::whereRaw('LEFT(kode_akun,1) IN (' . implode(',', $kode_laba_rugi) . ')')
+                    ->whereNotIn('kode_akun', $akun_jangan_ditampilkan)
+                    ->orderBy('kode_akun')
+                    ->get();
+
+                if (isset($_POST['exportButton'])) {
+                    header("Content-type: application/vnd-ms-excel");
+                    header("Content-Disposition: attachment; filename=Laba Rugi Tahunan $tahun.xls");
+                }
+                return view('accounting.laporan.lk.labarugi_tahunan_cetak', $data);
+            }
+        }
+
         //Saldo Awal
         $bulan = !empty($request->dari) ? date('m', strtotime($request->dari)) : '';
         $tahun = !empty($request->dari) ? date('Y', strtotime($request->dari)) : '';
         $start_date = $tahun . "-" . $bulan . "-01";
 
-        $kode_lk = 'LK-' . str_pad($bulan, 2, '0', STR_PAD_LEFT) . '-' . $tahun . '-' . (!empty($kode_cabang) ? $kode_cabang : 'ALL');
-        $lock = LaporanKeuangan::find($kode_lk);
+        $jenis_laporan = null;
+        if ($request->formatlaporan == '2') {
+            $jenis_laporan = 'N';
+        } else if ($request->formatlaporan == '3') {
+            $jenis_laporan = 'LR';
+        }
+
+        $lock = null;
+        $kode_lk = null;
+        if ($jenis_laporan) {
+            $kode_lk = 'LK-' . $jenis_laporan . '-' . str_pad($bulan, 2, '0', STR_PAD_LEFT) . '-' . $tahun . '-' . (!empty($kode_cabang) ? $kode_cabang : 'ALL');
+            $lock = LaporanKeuangan::find($kode_lk);
+        }
 
         $data['is_locked'] = $lock ? true : false;
         $data['lock_info'] = $lock;
@@ -2140,43 +2266,51 @@ class LaporanaccountingController extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $kode_cabang = $request->kode_cabang;
+        $jenis_laporan = $request->jenis_laporan; // 'N' or 'LR'
 
         $start_date = $tahun . '-' . str_pad($bulan, 2, '0', STR_PAD_LEFT) . '-01';
         $end_date = date('Y-m-t', strtotime($start_date));
 
-        // Get Neraca data
-        $requestNeraca = new Request();
-        $requestNeraca->merge([
-            'dari' => $start_date,
-            'sampai' => $end_date,
-            'kode_cabang' => $kode_cabang,
-            'formatlaporan' => '2'
-        ]);
-        
-        $responseNeraca = $this->cetakbukubesar($requestNeraca);
-        $dataNeraca = $responseNeraca->getData();
-        $neracaData = $dataNeraca['neraca'] ?? [];
+        $data_to_save = [];
 
-        // Get Laba Rugi data
-        $requestLR = new Request();
-        $requestLR->merge([
-            'dari' => $start_date,
-            'sampai' => $end_date,
-            'kode_cabang' => $kode_cabang,
-            'formatlaporan' => '3'
-        ]);
-        
-        $responseLR = $this->cetakbukubesar($requestLR);
-        $dataLR = $responseLR->getData();
-        $labaRugiData = $dataLR['labarugi'] ?? [];
+        if ($jenis_laporan == 'N') {
+            // Get Neraca data
+            $requestNeraca = new Request();
+            $requestNeraca->merge([
+                'dari' => $start_date,
+                'sampai' => $end_date,
+                'kode_cabang' => $kode_cabang,
+                'formatlaporan' => '2'
+            ]);
+            
+            $responseNeraca = $this->cetakbukubesar($requestNeraca);
+            $dataNeraca = $responseNeraca->getData();
+            $data_to_save = $dataNeraca['neraca'] ?? [];
+        } else if ($jenis_laporan == 'LR') {
+            // Get Laba Rugi data
+            $requestLR = new Request();
+            $requestLR->merge([
+                'dari' => $start_date,
+                'sampai' => $end_date,
+                'kode_cabang' => $kode_cabang,
+                'formatlaporan' => '3'
+            ]);
+            
+            $responseLR = $this->cetakbukubesar($requestLR);
+            $dataLR = $responseLR->getData();
+            $data_to_save = $dataLR['labarugi'] ?? [];
+        } else {
+            return response()->json(['success' => false, 'message' => 'Jenis laporan tidak valid.'], 400);
+        }
 
-        $kode_lk = 'LK-' . str_pad($bulan, 2, '0', STR_PAD_LEFT) . '-' . $tahun . '-' . (!empty($kode_cabang) ? $kode_cabang : 'ALL');
+        $kode_lk = 'LK-' . $jenis_laporan . '-' . str_pad($bulan, 2, '0', STR_PAD_LEFT) . '-' . $tahun . '-' . (!empty($kode_cabang) ? $kode_cabang : 'ALL');
 
         DB::beginTransaction();
         try {
             $lk = LaporanKeuangan::updateOrCreate([
                 'kode_lk' => $kode_lk
             ], [
+                'jenis_laporan' => $jenis_laporan,
                 'bulan' => $bulan,
                 'tahun' => $tahun,
                 'kode_cabang' => $kode_cabang,
@@ -2185,15 +2319,7 @@ class LaporanaccountingController extends Controller
 
             $lk->detail()->delete();
 
-            foreach ($neracaData as $coa) {
-                LaporanKeuanganDetail::create([
-                    'kode_lk' => $kode_lk,
-                    'kode_akun' => $coa->kode_akun,
-                    'jumlah' => $coa->saldo_akhir ?? 0
-                ]);
-            }
-
-            foreach ($labaRugiData as $coa) {
+            foreach ($data_to_save as $coa) {
                 LaporanKeuanganDetail::create([
                     'kode_lk' => $kode_lk,
                     'kode_akun' => $coa->kode_akun,
@@ -2214,8 +2340,9 @@ class LaporanaccountingController extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $kode_cabang = $request->kode_cabang;
+        $jenis_laporan = $request->jenis_laporan;
 
-        $kode_lk = 'LK-' . str_pad($bulan, 2, '0', STR_PAD_LEFT) . '-' . $tahun . '-' . (!empty($kode_cabang) ? $kode_cabang : 'ALL');
+        $kode_lk = 'LK-' . $jenis_laporan . '-' . str_pad($bulan, 2, '0', STR_PAD_LEFT) . '-' . $tahun . '-' . (!empty($kode_cabang) ? $kode_cabang : 'ALL');
 
         $lk = LaporanKeuangan::find($kode_lk);
         if ($lk) {
