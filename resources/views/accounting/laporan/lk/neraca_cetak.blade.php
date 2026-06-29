@@ -104,6 +104,67 @@
 </head>
 
 <body>
+    @if(!isset($_POST['exportButton']))
+    <div class="lock-bar" style="background: #f8f9fa; border-bottom: 1px solid #dee2e6; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; font-family: sans-serif; margin-bottom: 20px;">
+        <div style="font-size: 13px;">
+            Status Laporan: 
+            @if($is_locked)
+                <span style="color: #d9534f; font-weight: bold;">🔒 TERKUNCI</span>
+                <span style="font-size: 12px; color: #777;">(Oleh User ID: {{ $lock_info->user_id }} pada {{ $lock_info->created_at }})</span>
+            @else
+                <span style="color: #5cb85c; font-weight: bold;">🔓 TERBUKA (DINAMIS)</span>
+            @endif
+        </div>
+        <div>
+            @if($is_locked)
+                <button onclick="bukaKunci()" style="background: #d9534f; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Buka Kunci Laporan</button>
+            @else
+                <button onclick="kunciLaporan()" style="background: #5cb85c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">Kunci Laporan</button>
+            @endif
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function kunciLaporan() {
+            if(confirm('Apakah Anda yakin ingin mengunci laporan keuangan periode ini? Nilai akhir saldo akan disimpan tetap.')) {
+                $.post('{{ route("laporanaccounting.kuncilaporan") }}', {
+                    _token: '{{ csrf_token() }}',
+                    bulan: '{{ $bulan_angka }}',
+                    tahun: '{{ $tahun_angka }}',
+                    kode_cabang: '{{ $kode_cabang_param }}'
+                }, function(res) {
+                    alert(res.message);
+                    location.reload();
+                }).fail(function(xhr) {
+                    alert(xhr.responseJSON?.message || 'Gagal mengunci laporan.');
+                });
+            }
+        }
+        function bukaKunci() {
+            if(confirm('Apakah Anda yakin ingin membuka kunci laporan keuangan periode ini? Laporan akan kembali dihitung dinamis.')) {
+                $.post('{{ route("laporanaccounting.bukakuncilaporan") }}', {
+                    _token: '{{ csrf_token() }}',
+                    bulan: '{{ $bulan_angka }}',
+                    tahun: '{{ $tahun_angka }}',
+                    kode_cabang: '{{ $kode_cabang_param }}'
+                }, function(res) {
+                    alert(res.message);
+                    location.reload();
+                }).fail(function(xhr) {
+                    alert(xhr.responseJSON?.message || 'Gagal membuka kunci laporan.');
+                });
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            .lock-bar {
+                display: none !important;
+            }
+        }
+    </style>
+    @endif
+
     <div class="header">
         <h4 class="company-name">{{ $nama_pt }}</h4>
         <h2 class="report-title">Neraca</h2>

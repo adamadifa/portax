@@ -36,6 +36,8 @@ use App\Models\Saldoawalkaskecil;
 use App\Models\Saldoawalledger;
 use App\Models\Saldoawalpiutangpelanggan;
 use App\Models\User;
+use App\Models\LaporanKeuangan;
+use App\Models\LaporanKeuanganDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -937,6 +939,135 @@ class LaporanaccountingController extends Controller
         $bulan = !empty($request->dari) ? date('m', strtotime($request->dari)) : '';
         $tahun = !empty($request->dari) ? date('Y', strtotime($request->dari)) : '';
         $start_date = $tahun . "-" . $bulan . "-01";
+
+        $kode_lk = 'LK-' . str_pad($bulan, 2, '0', STR_PAD_LEFT) . '-' . $tahun . '-' . (!empty($kode_cabang) ? $kode_cabang : 'ALL');
+        $lock = LaporanKeuangan::find($kode_lk);
+
+        $data['is_locked'] = $lock ? true : false;
+        $data['lock_info'] = $lock;
+        $data['bulan_angka'] = $bulan;
+        $data['tahun_angka'] = $tahun;
+        $data['kode_cabang_param'] = $kode_cabang;
+
+        if ($lock && in_array($request->formatlaporan, ['2', '3'])) {
+            $lockedBalances = LaporanKeuanganDetail::where('kode_lk', $kode_lk)->get();
+            $saldo_map = [];
+            foreach ($lockedBalances as $lb) {
+                $saldo_map[$lb->kode_akun] = (float) $lb->jumlah;
+            }
+
+            $data['dari'] = $request->dari;
+            $data['sampai'] = $request->sampai;
+
+            if ($request->formatlaporan == '2') {
+                $net_profit_loss = 0;
+                foreach ($saldo_map as $kode => $saldo) {
+                    $first = substr($kode, 0, 1);
+                    if (in_array($first, ['4', '5', '6', '7', '8', '9'])) {
+                        $net_profit_loss -= $saldo;
+                    }
+                }
+
+                $saldo_33001 = ($saldo_map['33001'] ?? 0) + $net_profit_loss;
+
+                $data['neraca'] = CoaPortax::whereRaw('LEFT(kode_akun, 1) IN (1,2,3)')
+                    ->orderBy('kode_akun')
+                    ->get()
+                    ->map(function ($item) use ($saldo_map, $saldo_33001) {
+                        if ($item->kode_akun == '33001') {
+                            $item->saldo_akhir = $saldo_33001;
+                        } else {
+                            $item->saldo_akhir = $saldo_map[$item->kode_akun] ?? 0;
+                        }
+                        return $item;
+                    });
+
+                $data['net_profit_loss'] = $net_profit_loss;
+
+                if (isset($_POST['exportButton'])) {
+                    header("Content-type: application/vnd-ms-excel");
+                    header("Content-Disposition: attachment; filename=Neraca.xls");
+                }
+                return view('accounting.laporan.lk.neraca_cetak', $data);
+
+            } else if ($request->formatlaporan == '3') {
+                $kode_laba_rugi = array('4,5,6,7,8,9');
+                $akun_jangan_ditampilkan = ['0-0000', '1', '2'];
+
+                $data['labarugi'] = \App\Models\CoaPortax::whereRaw('LEFT(coa_portax.kode_akun,1) IN (' . implode(',', $kode_laba_rugi) . ')')
+                    ->whereNotIn('coa_portax.kode_akun', $akun_jangan_ditampilkan)
+                    ->orderBy('coa_portax.kode_akun')
+                    ->get()
+                    ->map(function ($item) use ($saldo_map) {
+                        $item->saldo_akhir = $saldo_map[$item->kode_akun] ?? 0;
+                        return $item;
+                    });
+
+                $kode_akun_pendapatan = 4;
+                $kode_akun_pokok_penjualan = 5;
+                $kode_akun_pendapatanlain = 8;
+                $kode_akun_biayalain = 9;
+
+                $kode_akun_biaya_penjualan = '6-1';
+                $kode_akun_biaya_adm = '6-2';
+
+                $subtotal_akun_pendapatan = 0;
+                $subtotal_akun_pokok_penjualan = 0;
+                $subtotal_akun_pendapatanlain = 0;
+                $subtotal_akun_biayalain = 0;
+                $subtotal_akun_biaya_penjualan = 0;
+                $subtotal_akun_biaya_adm = 0;
+                foreach ($data['labarugi'] as $index => $d) {
+                    $kode_akun_minus = [
+                        '4-2101',
+                        '4-2201',
+                        '4-2202',
+                        '5-1202',
+                        '5-3200',
+                        '5-3400',
+                        '5-3800',
+                        '5-1203',
+                    ];
+                    if (in_array($d->kode_akun, $kode_akun_minus)) {
+                        $saldo_akhir = $d->saldo_akhir * -1;
+                    } else {
+                        $saldo_akhir = $d->saldo_akhir;
+                    }
+
+                    if (substr($d->kode_akun, 0, 1) == $kode_akun_pendapatan) {
+                        $subtotal_akun_pendapatan += $saldo_akhir;
+                    }
+                    if (substr($d->kode_akun, 0, 1) == $kode_akun_pokok_penjualan) {
+                        $subtotal_akun_pokok_penjualan += $saldo_akhir;
+                    }
+                    if (substr($d->kode_akun, 0, 1) == $kode_akun_pendapatanlain) {
+                        $subtotal_akun_pendapatanlain += $saldo_akhir;
+                    }
+                    if (substr($d->kode_akun, 0, 1) == $kode_akun_biayalain) {
+                        $subtotal_akun_biayalain += $saldo_akhir;
+                    }
+                    if (substr($d->kode_akun, 0, 3) == $kode_akun_biaya_penjualan) {
+                        $subtotal_akun_biaya_penjualan += $saldo_akhir;
+                    }
+                    if (substr($d->kode_akun, 0, 3) == $kode_akun_biaya_adm) {
+                        $subtotal_akun_biaya_adm += $saldo_akhir;
+                    }
+                }
+
+                $gross_profit = $subtotal_akun_pendapatan - $subtotal_akun_pokok_penjualan;
+                $biaya_operasional = $subtotal_akun_biaya_adm + $subtotal_akun_biaya_penjualan;
+                $operating_profit = $gross_profit - $biaya_operasional;
+                $net_profit_loss = $operating_profit + $subtotal_akun_pendapatanlain - $subtotal_akun_biayalain;
+                $data['net_profit_loss'] = $net_profit_loss;
+
+                if (isset($_POST['exportButton'])) {
+                    header("Content-type: application/vnd-ms-excel");
+                    header("Content-Disposition: attachment; filename=Laba Rugi.xls");
+                }
+
+                return view('accounting.laporan.lk.labarugi_cetak', $data);
+            }
+        }
 
         $saldoawal = Detailsaldoawalbukubesar::query();
 
@@ -2002,5 +2133,96 @@ class LaporanaccountingController extends Controller
             return view('accounting.laporan.cetak_biaya_rekap', $data);
         }
         return view('accounting.laporan.cetak_biaya', $data);
+    }
+
+    public function kunciLaporan(Request $request)
+    {
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $kode_cabang = $request->kode_cabang;
+
+        $start_date = $tahun . '-' . str_pad($bulan, 2, '0', STR_PAD_LEFT) . '-01';
+        $end_date = date('Y-m-t', strtotime($start_date));
+
+        // Get Neraca data
+        $requestNeraca = new Request();
+        $requestNeraca->merge([
+            'dari' => $start_date,
+            'sampai' => $end_date,
+            'kode_cabang' => $kode_cabang,
+            'formatlaporan' => '2'
+        ]);
+        
+        $responseNeraca = $this->cetakbukubesar($requestNeraca);
+        $dataNeraca = $responseNeraca->getData();
+        $neracaData = $dataNeraca['neraca'] ?? [];
+
+        // Get Laba Rugi data
+        $requestLR = new Request();
+        $requestLR->merge([
+            'dari' => $start_date,
+            'sampai' => $end_date,
+            'kode_cabang' => $kode_cabang,
+            'formatlaporan' => '3'
+        ]);
+        
+        $responseLR = $this->cetakbukubesar($requestLR);
+        $dataLR = $responseLR->getData();
+        $labaRugiData = $dataLR['labarugi'] ?? [];
+
+        $kode_lk = 'LK-' . str_pad($bulan, 2, '0', STR_PAD_LEFT) . '-' . $tahun . '-' . (!empty($kode_cabang) ? $kode_cabang : 'ALL');
+
+        DB::beginTransaction();
+        try {
+            $lk = LaporanKeuangan::updateOrCreate([
+                'kode_lk' => $kode_lk
+            ], [
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+                'kode_cabang' => $kode_cabang,
+                'user_id' => auth()->id(),
+            ]);
+
+            $lk->detail()->delete();
+
+            foreach ($neracaData as $coa) {
+                LaporanKeuanganDetail::create([
+                    'kode_lk' => $kode_lk,
+                    'kode_akun' => $coa->kode_akun,
+                    'jumlah' => $coa->saldo_akhir ?? 0
+                ]);
+            }
+
+            foreach ($labaRugiData as $coa) {
+                LaporanKeuanganDetail::create([
+                    'kode_lk' => $kode_lk,
+                    'kode_akun' => $coa->kode_akun,
+                    'jumlah' => $coa->saldo_akhir ?? 0
+                ]);
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Laporan keuangan berhasil dikunci.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Gagal mengunci laporan: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function bukaKunciLaporan(Request $request)
+    {
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $kode_cabang = $request->kode_cabang;
+
+        $kode_lk = 'LK-' . str_pad($bulan, 2, '0', STR_PAD_LEFT) . '-' . $tahun . '-' . (!empty($kode_cabang) ? $kode_cabang : 'ALL');
+
+        $lk = LaporanKeuangan::find($kode_lk);
+        if ($lk) {
+            $lk->delete(); // Cascades to details
+            return response()->json(['success' => true, 'message' => 'Kunci laporan berhasil dibuka.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Laporan tidak ditemukan atau belum dikunci.'], 404);
     }
 }
