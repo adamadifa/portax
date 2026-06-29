@@ -182,6 +182,19 @@
         calculateTreeBalances($pasivaTree);
         calculateTreeBalances($ekuitasTree);
 
+        // Helper function to format negative values with parentheses
+        if (!function_exists('formatNeracaValue')) {
+            function formatNeracaValue($value) {
+                if ($value === null || $value == 0) {
+                    return '-';
+                }
+                if ($value < 0) {
+                    return '(' . formatAngkaDesimal(abs($value)) . ')';
+                }
+                return formatAngkaDesimal($value);
+            }
+        }
+
         // Recursive tree rendering function
         if (!function_exists('renderTree')) {
             function renderTree($nodes, $level = 0)
@@ -203,13 +216,13 @@
                         // Render Subtotal/Jumlah row
                         echo '<tr class="subtotal-row">';
                         echo '<td style="padding-left: ' . $indent . 'px;">Jumlah ' . $node['nama_akun'] . '</td>';
-                        echo '<td class="text-right">' . ($node['saldo_akhir'] != 0 ? formatAngkaDesimal($node['saldo_akhir']) : '-') . '</td>';
+                        echo '<td class="text-right">' . formatNeracaValue($node['saldo_akhir']) . '</td>';
                         echo '</tr>';
                     } else {
                         // Leaf account
                         echo '<tr>';
                         echo '<td style="padding-left: ' . $indent . 'px;">' . $node['kode_akun'] . ' &nbsp; ' . $node['nama_akun'] . '</td>';
-                        echo '<td class="text-right">' . ($node['saldo_akhir'] != 0 ? formatAngkaDesimal($node['saldo_akhir']) : '-') . '</td>';
+                        echo '<td class="text-right">' . formatNeracaValue($node['saldo_akhir']) . '</td>';
                         echo '</tr>';
                     }
                 }
@@ -262,7 +275,7 @@
                             $totalKewajiban = !empty($pasivaTree) ? $pasivaTree[0]['saldo_akhir'] : 0;
                             $totalEkuitas = !empty($ekuitasTree) ? $ekuitasTree[0]['saldo_akhir'] : 0;
                             $grandTotal = $totalKewajiban + $totalEkuitas;
-                            echo $grandTotal != 0 ? formatAngkaDesimal($grandTotal) : '-';
+                            echo formatNeracaValue($grandTotal);
                         @endphp
                     </td>
                 </tr>
