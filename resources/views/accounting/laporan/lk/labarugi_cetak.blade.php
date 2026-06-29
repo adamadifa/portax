@@ -168,7 +168,7 @@
         foreach ($balances as $code => $val) {
             if (str_starts_with($code, '61') && ($levels[$code] ?? 0) > 1) {
                 $beban_penjualan_list[$code] = [
-                    'nama' => $names[$code] ?? '',
+                    'nama' => $code . ' - ' . ($names[$code] ?? ''),
                     'val' => $val
                 ];
                 $total_beban_penjualan += $val;
@@ -190,15 +190,15 @@
         
         $jasa_list = [
             '63001' => [
-                'nama' => 'Sewa BANGUNAN',
+                'nama' => '63001 - Sewa BANGUNAN',
                 'val' => $sewa_bangunan
             ],
             '63002' => [
-                'nama' => 'Sewa Angkutan',
+                'nama' => '63002 - Sewa Angkutan',
                 'val' => $sewa_angkutan
             ],
             '63003' => [
-                'nama' => 'SEWA MESIN FC',
+                'nama' => '63003 - SEWA MESIN FC',
                 'val' => $sewa_mesin_fc
             ]
         ];
@@ -212,7 +212,7 @@
                 $code !== '63003' && 
                 ($levels[$code] ?? 0) > 1) {
                 $jasa_list[$code] = [
-                    'nama' => strtoupper($names[$code] ?? ''),
+                    'nama' => $code . ' - ' . strtoupper($names[$code] ?? ''),
                     'val' => $val
                 ];
             }
@@ -267,7 +267,7 @@
                 <!-- 1. Pendapatan -->
                 @php renderLabaRugiRow('Pendapatan', null, 0, true, true, false); @endphp
                 @php renderLabaRugiRow('Pendapatan', null, 1, true, false, false); @endphp
-                @php renderLabaRugiRow('Penjualan', $penjualan, 2, false, false, true); @endphp
+                @php renderLabaRugiRow('41001 - Penjualan', $penjualan, 2, false, false, true); @endphp
                 @php renderLabaRugiRow('Jumlah Pendapatan', $total_pendapatan, 0, true, false, false); @endphp
 
                 <!-- Empty space -->
@@ -275,9 +275,9 @@
 
                 <!-- 2. Harga Pokok Penjualan -->
                 @php renderLabaRugiRow('Harga Pokok Penjualan', null, 0, true, true, false); @endphp
-                @php renderLabaRugiRow('Persediaan Awal', $persediaan_awal, 1, false, false, true); @endphp
-                @php renderLabaRugiRow('Pembelian', $pembelian, 1, false, false, true); @endphp
-                @php renderLabaRugiRow('Persediaan Akhir', $abs_persediaan_akhir != 0 ? -$abs_persediaan_akhir : 0, 1, false, false, true); @endphp
+                @php renderLabaRugiRow('52001 - Persediaan Awal', $persediaan_awal, 1, false, false, true); @endphp
+                @php renderLabaRugiRow('51001 - Pembelian', $pembelian, 1, false, false, true); @endphp
+                @php renderLabaRugiRow('52002 - Persediaan Akhir', $abs_persediaan_akhir != 0 ? -$abs_persediaan_akhir : 0, 1, false, false, true); @endphp
                 @php renderLabaRugiRow('Jumlah Harga Pokok Penjualan', $total_hpp, 0, true, false, false); @endphp
 
                 <!-- Empty space -->
@@ -302,8 +302,8 @@
                 <!-- Biaya Umum & Administrasi -->
                 @php renderLabaRugiRow('Biaya Umum & Administrasi', null, 1, true, false, false); @endphp
                 @php renderLabaRugiRow('Gaji & Tunjangan Karyawan', null, 2, true, false, false); @endphp
-                @php renderLabaRugiRow('GAJI, TUNJANGAN, DLL', $gaji_tunjangan, 3, false, false, true); @endphp
-                @php renderLabaRugiRow('Komisi', $komisi, 3, false, false, true); @endphp
+                @php renderLabaRugiRow('62001 - GAJI, TUNJANGAN, DLL', $gaji_tunjangan, 3, false, false, true); @endphp
+                @php renderLabaRugiRow('62002 - Komisi', $komisi, 3, false, false, true); @endphp
                 @php renderLabaRugiRow('Jumlah Gaji & Tunjangan Karyawan', $total_gaji_komisi, 2, true, false, false); @endphp
                 
                 <!-- Jasa -->
