@@ -1000,7 +1000,9 @@ class LaporanaccountingController extends Controller
         if (auth()->user()->kode_cabang != "PST") {
             $ledger->where('bank.kode_cabang', auth()->user()->kode_cabang);
         } else {
-            $ledger->where('bank.kode_cabang', $request->kode_cabang);
+            if (!empty($request->kode_cabang)) {
+                $ledger->where('bank.kode_cabang', $request->kode_cabang);
+            }
         }
         $ledger->orderBy('coa.kode_akun_portax');
         $ledger->orderBy('tanggal');
@@ -1028,9 +1030,17 @@ class LaporanaccountingController extends Controller
             $ledger_transaksi->whereBetween('coa.kode_akun_portax', [$request->kode_akun_dari, $request->kode_akun_sampai]);
         }
         if (auth()->user()->kode_cabang != "PST") {
-            $ledger_transaksi->where('bank.kode_cabang', auth()->user()->kode_cabang);
+            $ledger_transaksi->where(function ($query) {
+                $query->where('bank.kode_cabang', auth()->user()->kode_cabang)
+                    ->orWhere('keuangan_ledger.keterangan_peruntukan', auth()->user()->kode_cabang);
+            });
         } else {
-            $ledger_transaksi->where('bank.kode_cabang', $request->kode_cabang);
+            if (!empty($request->kode_cabang)) {
+                $ledger_transaksi->where(function ($query) use ($request) {
+                    $query->where('bank.kode_cabang', $request->kode_cabang)
+                        ->orWhere('keuangan_ledger.keterangan_peruntukan', $request->kode_cabang);
+                });
+            }
         }
         $ledger_transaksi->orderBy('coa.kode_akun_portax');
         $ledger_transaksi->orderBy('keuangan_ledger.tanggal');
@@ -1149,7 +1159,9 @@ class LaporanaccountingController extends Controller
         if (auth()->user()->kode_cabang != "PST") {
             $kaskecil->where('keuangan_kaskecil.kode_cabang', auth()->user()->kode_cabang);
         } else {
-            $kaskecil->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
+            if (!empty($request->kode_cabang)) {
+                $kaskecil->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
+            }
         }
 
         $kaskecil->whereBetween('keuangan_kaskecil.tanggal', [$start_date, $request->sampai]);
@@ -1185,7 +1197,9 @@ class LaporanaccountingController extends Controller
         if (auth()->user()->kode_cabang != "PST") {
             $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', auth()->user()->kode_cabang);
         } else {
-            $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
+            if (!empty($request->kode_cabang)) {
+                $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
+            }
         }
         $kaskecil_transaksi->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil');
         $kaskecil_transaksi->orderBy('keuangan_kaskecil.kode_akun');
@@ -1328,7 +1342,9 @@ class LaporanaccountingController extends Controller
         if (auth()->user()->kode_cabang != "PST") {
             $penjualannetto->where('salesman.kode_cabang', auth()->user()->kode_cabang);
         } else {
-            $penjualannetto->where('salesman.kode_cabang', $request->kode_cabang);
+            if (!empty($request->kode_cabang)) {
+                $penjualannetto->where('salesman.kode_cabang', $request->kode_cabang);
+            }
         }
         $penjualannetto->orderBy('coa.kode_akun_portax');
         $penjualannetto->orderBy('marketing_penjualan.tanggal');
@@ -1364,7 +1380,9 @@ class LaporanaccountingController extends Controller
         if (auth()->user()->kode_cabang != "PST") {
             $ppnkeluaran->where('salesman.kode_cabang', auth()->user()->kode_cabang);
         } else {
-            $ppnkeluaran->where('salesman.kode_cabang', $request->kode_cabang);
+            if (!empty($request->kode_cabang)) {
+                $ppnkeluaran->where('salesman.kode_cabang', $request->kode_cabang);
+            }
         }
         $ppnkeluaran->orderBy('marketing_penjualan.kode_akun_ppn');
         $ppnkeluaran->orderBy('marketing_penjualan.tanggal');
@@ -1405,7 +1423,9 @@ class LaporanaccountingController extends Controller
         if (auth()->user()->kode_cabang != "PST") {
             $pembelianmarketingnetto->where('marketing_pembelian.kode_cabang', auth()->user()->kode_cabang);
         } else {
-            $pembelianmarketingnetto->where('marketing_pembelian.kode_cabang', $request->kode_cabang);
+            if (!empty($request->kode_cabang)) {
+                $pembelianmarketingnetto->where('marketing_pembelian.kode_cabang', $request->kode_cabang);
+            }
         }
         $pembelianmarketingnetto->orderBy('marketing_pembelian.kode_akun_portax');
         $pembelianmarketingnetto->orderBy('marketing_pembelian.tanggal');
@@ -1436,7 +1456,9 @@ class LaporanaccountingController extends Controller
         if (auth()->user()->kode_cabang != "PST") {
             $ppnmasukan->where('marketing_pembelian.kode_cabang', auth()->user()->kode_cabang);
         } else {
-            $ppnmasukan->where('marketing_pembelian.kode_cabang', $request->kode_cabang);
+            if (!empty($request->kode_cabang)) {
+                $ppnmasukan->where('marketing_pembelian.kode_cabang', $request->kode_cabang);
+            }
         }
         $ppnmasukan->orderBy('marketing_pembelian.kode_akun_ppn');
         $ppnmasukan->orderBy('marketing_pembelian.tanggal');
