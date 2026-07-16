@@ -224,7 +224,7 @@
     <div class="fixed inset-0 z-10 overflow-y-auto">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <!-- Modal panel -->
-            <div class="relative transform overflow-hidden rounded-xl bg-white text-left shadow-xl transition-all duration-300 ease-out sm:my-8 sm:w-full sm:max-w-4xl opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" id="modalPanel">
+            <div class="relative transform overflow-hidden rounded-xl bg-white text-left shadow-xl transition-all duration-300 ease-out sm:my-8 w-full max-w-[95%] opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" id="modalPanel">
                 <div id="modalContent">
                     <!-- Content loaded via AJAX -->
                     <div class="flex justify-center p-8">
