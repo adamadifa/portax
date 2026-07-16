@@ -111,6 +111,24 @@ class SuratjalancbgController extends Controller
             $produk = Produk::where('status_aktif_produk', 1)->get();
             $daysInMonth = (int)date('t', strtotime("$tahun-$bulan-01"));
 
+            // Delete existing records for this branch, year, and month
+            $existing_mutasi_ids = Mutasigudangcabang::where('kode_cabang', $kode_cabang)
+                ->where('jenis_mutasi', 'SJ')
+                ->whereYear('tanggal', $tahun)
+                ->whereMonth('tanggal', $bulan)
+                ->pluck('no_mutasi');
+                
+            foreach ($existing_mutasi_ids as $id) {
+                $m = Mutasigudangcabang::where('no_mutasi', $id)->first();
+                if ($m) {
+                    $cektutuplaporan = cektutupLaporan($m->tanggal, "gudangcabang");
+                    if ($cektutuplaporan > 0) {
+                        return Redirect::back()->with(messageError("Periode Laporan Tanggal " . date('d-m-Y', strtotime($m->tanggal)) . " Sudah Ditutup !"));
+                    }
+                }
+            }
+            Mutasigudangcabang::whereIn('no_mutasi', $existing_mutasi_ids)->delete();
+
             $kode_mutasi_prefix = "SJC" . substr($tahun, 2, 2);
             $lastsuratjalan = Mutasigudangcabang::select('no_mutasi')
                 ->where('jenis_mutasi', 'SJ')
@@ -351,5 +369,44 @@ class SuratjalancbgController extends Controller
             DB::rollBack();
             return Redirect::back()->with(messageError($e->getMessage()));
         }
+    }
+
+    public function getExistingData(Request $request)
+    {
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $kode_cabang = $request->kode_cabang;
+
+        if (empty($bulan) || empty($tahun) || empty($kode_cabang)) {
+            return response()->json([]);
+        }
+
+        $data = DB::table('gudang_cabang_mutasi')
+            ->join('gudang_cabang_mutasi_detail', 'gudang_cabang_mutasi.no_mutasi', '=', 'gudang_cabang_mutasi_detail.no_mutasi')
+            ->join('produk', 'gudang_cabang_mutasi_detail.kode_produk', '=', 'produk.kode_produk')
+            ->where('gudang_cabang_mutasi.kode_cabang', $kode_cabang)
+            ->where('gudang_cabang_mutasi.jenis_mutasi', 'SJ')
+            ->whereYear('gudang_cabang_mutasi.tanggal', $tahun)
+            ->whereMonth('gudang_cabang_mutasi.tanggal', $bulan)
+            ->select(
+                DB::raw('DAY(gudang_cabang_mutasi.tanggal) as day'),
+                'gudang_cabang_mutasi_detail.kode_produk',
+                'gudang_cabang_mutasi_detail.jumlah',
+                'produk.isi_pcs_dus'
+            )
+            ->get();
+
+        $result = [];
+        foreach ($data as $row) {
+            $day = (int)$row->day;
+            $kode_produk = $row->kode_produk;
+            $isi_pcs_dus = (float)$row->isi_pcs_dus;
+            
+            $qty_dus = $isi_pcs_dus > 0 ? ($row->jumlah / $isi_pcs_dus) : 0;
+            
+            $result[$day][$kode_produk] = $qty_dus;
+        }
+
+        return response()->json($result);
     }
 }

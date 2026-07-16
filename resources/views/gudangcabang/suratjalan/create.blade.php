@@ -69,19 +69,12 @@
 
         <!-- Detail Table -->
         <div class="border border-slate-200 rounded-lg overflow-hidden relative z-10 shadow-sm mb-4">
-            <div class="overflow-y-auto max-h-[450px] custom-scrollbar overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[800px]">
-                    <thead class="sticky top-0 z-20">
-                        <tr class="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
-                            <th class="px-3 py-3 w-16 bg-slate-50 text-center sticky left-0 z-30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-slate-200">Tgl</th>
-                            @foreach ($produk as $d)
-                                <th class="px-2 py-3 text-center border-l border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-help" title="{{ $d->nama_produk }}">
-                                    <span class="text-[10px] font-mono leading-none block">{{ $d->kode_produk }}</span>
-                                </th>
-                            @endforeach
-                        </tr>
+            <div class="overflow-y-auto max-h-[480px] custom-scrollbar overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[1500px]" id="suratjalan-table">
+                    <thead class="sticky top-0 z-20" id="table-head">
+                        <!-- Dynamic header will be inserted here via JS -->
                     </thead>
-                    <tbody id="table-body-days" class="divide-y divide-slate-100">
+                    <tbody id="table-body-products" class="divide-y divide-slate-100">
                         <!-- Dynamic rows will be inserted here via JS -->
                     </tbody>
                 </table>
@@ -104,45 +97,89 @@
 <script>
     $(function() {
         const form = $("#formSuratjalan");
+        const produkList = @json($produk);
 
         function generateRows() {
             const bulan = $('#bulan').val();
             const tahun = $('#tahun').val();
-            if (!bulan || !tahun) {
-                $('#table-body-days').html('<tr><td colspan="{{ count($produk) + 1 }}" class="text-center py-4 text-slate-400">Silakan pilih bulan dan tahun</td></tr>');
+            const kode_cabang = $('#kode_cabang').val();
+            if (!bulan || !tahun || !kode_cabang) {
+                $('#table-head').html('');
+                $('#table-body-products').html('<tr><td class="text-center py-4 text-slate-400">Silakan pilih bulan, tahun dan cabang</td></tr>');
                 return;
             }
             
             // Get number of days in selected month & year
             const daysInMonth = new Date(tahun, bulan, 0).getDate();
             
-            let html = '';
+            // 1. Generate Table Head
+            let headHtml = `<tr class="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                <th class="px-3 py-3 w-16 bg-slate-50 text-center sticky left-0 z-30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-slate-200">Kode</th>
+                <th class="px-3 py-3 w-48 bg-slate-50 sticky left-16 z-30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-slate-200">Produk</th>`;
+            
             for (let day = 1; day <= daysInMonth; day++) {
-                html += `<tr class="hover:bg-slate-50/50 transition-colors">
-                    <td class="px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 border-r border-slate-200 text-center sticky left-0 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">${day}</td>`;
-                
-                @foreach ($produk as $p)
-                html += `<td class="p-1 border-l border-slate-100">
-                    <input type="text" class="w-full text-right px-1 py-1 text-xs font-bold bg-transparent border border-slate-200 focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_dus" name="jml_dus[${day}][{{ $p->kode_produk }}]" placeholder="0">
-                </td>`;
-                @endforeach
-                
-                html += `</tr>`;
+                headHtml += `<th class="px-2 py-3 text-center border-l border-slate-200 bg-slate-50 w-12">${day}</th>`;
             }
+            headHtml += `</tr>`;
+            $('#table-head').html(headHtml);
             
-            $('#table-body-days').html(html);
+            // 2. Generate Table Body
+            let bodyHtml = '';
+            produkList.forEach(function(p) {
+                bodyHtml += `<tr class="hover:bg-slate-50/50 transition-colors">
+                    <td class="px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 border-r border-slate-200 sticky left-0 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">${p.kode_produk}</td>
+                    <td class="px-3 py-2 text-xs font-bold text-slate-700 bg-slate-50 border-r border-slate-200 sticky left-16 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)] max-w-[190px] truncate" title="${p.nama_produk}">${p.nama_produk}</td>`;
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    bodyHtml += `<td class="p-1 border-l border-slate-100 w-12">
+                        <input type="text" class="w-full text-right px-1 py-1 text-xs font-bold bg-transparent border border-slate-200 focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_dus" name="jml_dus[${day}][${p.kode_produk}]" id="qty_${day}_${p.kode_produk}" placeholder="0">
+                    </td>`;
+                }
+                bodyHtml += `</tr>`;
+            });
             
-            // Re-apply money mask
-            $(".money").maskMoney({
-                thousands: '.',
-                decimal: ',',
-                precision: 0,
-                allowZero: true
+            $('#table-body-products').html(bodyHtml);
+
+            // 3. Fetch Existing Data
+            $.ajax({
+                url: "{{ route('suratjalancbg.getExistingData') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    bulan: bulan,
+                    tahun: tahun,
+                    kode_cabang: kode_cabang
+                },
+                dataType: "json",
+                success: function(response) {
+                    // Populate existing values
+                    Object.keys(response).forEach(function(day) {
+                        const products = response[day];
+                        Object.keys(products).forEach(function(kode_produk) {
+                            const val = parseFloat(products[kode_produk]);
+                            if (val > 0) {
+                                $(`#qty_${day}_${kode_produk}`).val(val);
+                            }
+                        });
+                    });
+                },
+                error: function(err) {
+                    console.error("Failed to load existing data", err);
+                },
+                complete: function() {
+                    // Initialize money mask
+                    $(".money").maskMoney({
+                        thousands: '.',
+                        decimal: ',',
+                        precision: 0,
+                        allowZero: true
+                    });
+                }
             });
         }
 
         // Trigger row generation on load and on change
-        $('#bulan, #tahun').on('change', generateRows);
+        $('#bulan, #tahun, #kode_cabang').on('change', generateRows);
         generateRows();
 
         form.on('submit', function(e) {

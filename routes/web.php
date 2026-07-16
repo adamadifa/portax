@@ -1024,6 +1024,7 @@ Route::middleware('auth')->group(function () {
     Route::controller(SuratjalancbgController::class)->group(function () {
         Route::get('/suratjalancbg', 'index')->name('suratjalancbg.index')->can('suratjalancbg.index');
         Route::get('/suratjalancbg/create', 'create')->name('suratjalancbg.create')->can('suratjalancbg.create');
+        Route::post('/suratjalancbg/get-existing-data', 'getExistingData')->name('suratjalancbg.getExistingData');
         Route::get('/suratjalancbg/{no_mutasi}/show', 'show')->name('suratjalancbg.show')->can('suratjalancbg.show');
         Route::get('/suratjalancbg/{no_mutasi}/edit', 'edit')->name('suratjalancbg.edit')->can('suratjalancbg.edit');
         Route::post('/suratjalancbg', 'store')->name('suratjalancbg.store')->can('suratjalancbg.store');
