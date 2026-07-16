@@ -294,20 +294,38 @@
 
       $("#btnCreate").click(function(e) {
          e.preventDefault();
+         $("#modalContent").html(`
+            <div class="flex flex-col items-center justify-center p-12 min-h-[300px]">
+                <i class="fas fa-circle-notch fa-spin text-[#003d9e] text-3xl mb-4"></i>
+                <p class="text-sm font-semibold text-slate-500">Memuat formulir...</p>
+            </div>
+         `);
          window.openTailwindModal();
          $("#modalContent").load(`/suratjalancbg/create`);
       });
-
+ 
       $(".btnShow").click(function(e) {
          e.preventDefault();
          var no_mutasi = $(this).attr("no_mutasi");
+         $("#modalContent").html(`
+            <div class="flex flex-col items-center justify-center p-12 min-h-[300px]">
+                <i class="fas fa-circle-notch fa-spin text-[#003d9e] text-3xl mb-4"></i>
+                <p class="text-sm font-semibold text-slate-500">Memuat data...</p>
+            </div>
+         `);
          window.openTailwindModal();
          $("#modalContent").load(`/suratjalancbg/${no_mutasi}/show`);
       });
-
+ 
       $(".btnEdit").click(function(e) {
          e.preventDefault();
          var no_mutasi = $(this).attr("no_mutasi");
+         $("#modalContent").html(`
+            <div class="flex flex-col items-center justify-center p-12 min-h-[300px]">
+                <i class="fas fa-circle-notch fa-spin text-[#003d9e] text-3xl mb-4"></i>
+                <p class="text-sm font-semibold text-slate-500">Memuat formulir...</p>
+            </div>
+         `);
          window.openTailwindModal();
          $("#modalContent").load(`/suratjalancbg/${no_mutasi}/edit`);
       });
