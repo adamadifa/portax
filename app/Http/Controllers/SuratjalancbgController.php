@@ -386,18 +386,20 @@ class SuratjalancbgController extends Controller
             return response()->json([]);
         }
 
+        $startDate = sprintf('%04d-%02d-01', $tahun, $bulan);
+        $endDate = date('Y-m-t', strtotime($startDate));
+
+        $produkMap = Produk::where('status_aktif_produk', 1)->pluck('isi_pcs_dus', 'kode_produk')->toArray();
+
         $data = DB::table('gudang_cabang_mutasi')
             ->join('gudang_cabang_mutasi_detail', 'gudang_cabang_mutasi.no_mutasi', '=', 'gudang_cabang_mutasi_detail.no_mutasi')
-            ->join('produk', 'gudang_cabang_mutasi_detail.kode_produk', '=', 'produk.kode_produk')
             ->where('gudang_cabang_mutasi.kode_cabang', $kode_cabang)
             ->where('gudang_cabang_mutasi.jenis_mutasi', 'SJ')
-            ->whereYear('gudang_cabang_mutasi.tanggal', $tahun)
-            ->whereMonth('gudang_cabang_mutasi.tanggal', $bulan)
+            ->whereBetween('gudang_cabang_mutasi.tanggal', [$startDate, $endDate])
             ->select(
                 DB::raw('DAY(gudang_cabang_mutasi.tanggal) as day'),
                 'gudang_cabang_mutasi_detail.kode_produk',
-                'gudang_cabang_mutasi_detail.jumlah',
-                'produk.isi_pcs_dus'
+                'gudang_cabang_mutasi_detail.jumlah'
             )
             ->get();
 
@@ -405,7 +407,7 @@ class SuratjalancbgController extends Controller
         foreach ($data as $row) {
             $day = (int)$row->day;
             $kode_produk = $row->kode_produk;
-            $isi_pcs_dus = (float)$row->isi_pcs_dus;
+            $isi_pcs_dus = isset($produkMap[$kode_produk]) ? (float)$produkMap[$kode_produk] : 0;
             
             $qty_dus = $isi_pcs_dus > 0 ? ($row->jumlah / $isi_pcs_dus) : 0;
             

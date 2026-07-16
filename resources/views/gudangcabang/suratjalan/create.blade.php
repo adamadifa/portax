@@ -69,7 +69,15 @@
 
         <!-- Detail Table -->
         <div class="border border-slate-200 rounded-lg overflow-hidden relative z-10 shadow-sm mb-4">
-            <div class="overflow-y-auto max-h-[480px] custom-scrollbar overflow-x-auto">
+            <div class="overflow-y-auto max-h-[480px] custom-scrollbar overflow-x-auto relative">
+                <!-- Loading Indicator Overlay -->
+                <div id="table-loading-overlay" class="absolute inset-0 bg-white/70 z-50 flex items-center justify-center hidden">
+                    <div class="flex flex-col items-center gap-2">
+                        <i class="fas fa-circle-notch fa-spin text-[#003d9e] text-2xl"></i>
+                        <span class="text-xs font-semibold text-slate-600">Memuat data...</span>
+                    </div>
+                </div>
+
                 <table class="w-full text-left border-collapse min-w-[1500px]" id="suratjalan-table">
                     <thead class="sticky top-0 z-20" id="table-head">
                         <!-- Dynamic header will be inserted here via JS -->
@@ -109,6 +117,9 @@
                 return;
             }
             
+            // Show loading
+            $('#table-loading-overlay').removeClass('hidden');
+
             // Get number of days in selected month & year
             const daysInMonth = new Date(tahun, bulan, 0).getDate();
             
@@ -167,6 +178,9 @@
                     console.error("Failed to load existing data", err);
                 },
                 complete: function() {
+                    // Hide loading
+                    $('#table-loading-overlay').addClass('hidden');
+
                     // Initialize money mask
                     $(".money").maskMoney({
                         thousands: '.',
