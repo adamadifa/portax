@@ -85,41 +85,33 @@ class SuratjalancbgController extends Controller
 
     public function store(Request $request)
     {
-
         $user = User::findorFail(auth()->user()->id);
         $roles_show_cabang = config('global.roles_show_cabang');
+        
+        $rules = [
+            'bulan' => 'required|integer|between:1,12',
+            'tahun' => 'required|integer',
+        ];
+        
         if ($user->hasRole($roles_show_cabang)) {
-            $kode_cabang = $request->kode_cabang;
-            $request->validate([
-                'tanggal' => 'required',
-                'kode_cabang' => 'required',
-            ]);
-        } else {
-            $kode_cabang = auth()->user()->kode_cabang;
-            $request->validate([
-                'no_surat_jalan' => 'required',
-                'tanggal' => 'required'
-            ]);
+            $rules['kode_cabang'] = 'required';
         }
+        
+        $request->validate($rules);
+        
+        $kode_cabang = $user->hasRole($roles_show_cabang) ? $request->kode_cabang : auth()->user()->kode_cabang;
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
 
-        $kode_produk = $request->kode_produk;
-        $jml_dus = $request->jml_dus;
-        $jml_pack = $request->jml_pack;
-        $jml_pcs = $request->jml_pcs;
-        $isi_pcs_dus = $request->isi_pcs_dus;
-        $isi_pcs_pack = $request->isi_pcs_pack;
-
+        $cabang = Cabang::where('kode_cabang', $kode_cabang)->first();
+        $kode_pt = $cabang ? $cabang->kode_pt : 'GCP';
 
         DB::beginTransaction();
         try {
+            $produk = Produk::where('status_aktif_produk', 1)->get();
+            $daysInMonth = (int)date('t', strtotime("$tahun-$bulan-01"));
 
-            $cektutuplaporan = cektutupLaporan($request->tanggal, "gudangcabang");
-            if ($cektutuplaporan > 0) {
-                return Redirect::back()->with(messageError('Periode Laporan Sudah Ditutup !'));
-            }
-
-            $kode = "SJC";
-            $tahun = date('Y', strtotime($request->tanggal));
+            $kode_mutasi_prefix = "SJC" . substr($tahun, 2, 2);
             $lastsuratjalan = Mutasigudangcabang::select('no_mutasi')
                 ->where('jenis_mutasi', 'SJ')
                 ->whereRaw('YEAR(tanggal)="' . $tahun . '"')
@@ -127,43 +119,78 @@ class SuratjalancbgController extends Controller
                 ->orderBy('no_mutasi', 'desc')
                 ->first();
             $last_no_suratjalan = $lastsuratjalan != null ? $lastsuratjalan->no_mutasi : '';
-            $no_suratjalan = buatkode($last_no_suratjalan, $kode . substr($tahun, 2, 2), 5);
-            $detail = [];
-            for ($i = 0; $i < count($kode_produk); $i++) {
-                $dus = toNumber(!empty($jml_dus[$i]) ? $jml_dus[$i] : 0);
-                $pack = toNumber(!empty($jml_pack[$i]) ? $jml_pack[$i] : 0);
-                $pcs = toNumber(!empty($jml_pcs[$i]) ? $jml_pcs[$i] : 0);
 
-                $jumlah = ((float)$dus * (float)$isi_pcs_dus[$i]) + ((float)$pack * (float)$isi_pcs_pack[$i]) + (float)$pcs;
-                if (!empty($jumlah)) {
-                    $detail[]   = [
-                        'no_mutasi' => $no_suratjalan,
-                        'kode_produk' => $kode_produk[$i],
-                        'jumlah' => $jumlah
-                    ];
+            $sj_prefix = "SJ" . $kode_pt . substr($tahun, 2, 2);
+            $lastsj = Mutasigudangcabang::select('no_surat_jalan')
+                ->where('no_surat_jalan', 'like', $sj_prefix . '%')
+                ->whereRaw('LENGTH(no_surat_jalan) = 11')
+                ->orderBy('no_surat_jalan', 'desc')
+                ->first();
+            $last_no_sj = $lastsj != null ? $lastsj->no_surat_jalan : '';
+
+            $total_records_saved = 0;
+
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $tanggal = sprintf('%04d-%02d-%02d', $tahun, $bulan, $day);
+                
+                $day_details = [];
+                foreach ($produk as $p) {
+                    $kode_p = $p->kode_produk;
+                    if (isset($request->jml_dus[$day][$kode_p])) {
+                        $dus = toNumber($request->jml_dus[$day][$kode_p]);
+                        if ($dus > 0) {
+                            $jumlah = (float)$dus * (float)$p->isi_pcs_dus;
+                            $day_details[] = [
+                                'kode_produk' => $kode_p,
+                                'jumlah' => $jumlah
+                            ];
+                        }
+                    }
+                }
+
+                if (!empty($day_details)) {
+                    $cektutuplaporan = cektutupLaporan($tanggal, "gudangcabang");
+                    if ($cektutuplaporan > 0) {
+                        return Redirect::back()->with(messageError("Periode Laporan Tanggal " . date('d-m-Y', strtotime($tanggal)) . " Sudah Ditutup !"));
+                    }
+
+                    $no_suratjalan = buatkode($last_no_suratjalan, $kode_mutasi_prefix, 5);
+                    $last_no_suratjalan = $no_suratjalan;
+
+                    $no_surat_jalan = buatkode($last_no_sj, $sj_prefix, 4);
+                    $last_no_sj = $no_surat_jalan;
+
+                    Mutasigudangcabang::create([
+                        'no_mutasi'  => $no_suratjalan,
+                        'no_surat_jalan' => $no_surat_jalan,
+                        'tanggal' => $tanggal,
+                        'kode_cabang' => $kode_cabang,
+                        'kondisi' => 'G',
+                        'in_out_good' => 'I',
+                        'in_out_bad' => null,
+                        'jenis_mutasi' => 'SJ',
+                        'keterangan' => $request->keterangan,
+                        'id_user' => auth()->user()->id
+                    ]);
+
+                    $detail_inserts = [];
+                    foreach ($day_details as $det) {
+                        $detail_inserts[] = [
+                            'no_mutasi' => $no_suratjalan,
+                            'kode_produk' => $det['kode_produk'],
+                            'jumlah' => $det['jumlah']
+                        ];
+                    }
+                    Detailmutasigudangcabang::insert($detail_inserts);
+                    $total_records_saved++;
                 }
             }
 
-            if (empty($detail)) {
-                return Redirect::back()->with(messageError('Data Produk Masih Kosong'));
+            if ($total_records_saved === 0) {
+                return Redirect::back()->with(messageError('Data Produk Masih Kosong (Tidak ada qty > 0 yang diinput)'));
             }
 
-            Mutasigudangcabang::create([
-                'no_mutasi'  => $no_suratjalan,
-                'no_surat_jalan' => $request->no_surat_jalan,
-                'tanggal' => $request->tanggal,
-                'kode_cabang' => $kode_cabang,
-                'kondisi' => 'G',
-                'in_out_good' => 'I',
-                'in_out_bad' => null,
-                'jenis_mutasi' => 'SJ',
-                'keterangan' => $request->keterangan,
-                'id_user' => auth()->user()->id
-            ]);
-
-            Detailmutasigudangcabang::insert($detail);
             DB::commit();
-
             return Redirect::back()->with(messageSuccess('Data Berhasil Disimpan'));
         } catch (\Exception $e) {
             DB::rollBack();

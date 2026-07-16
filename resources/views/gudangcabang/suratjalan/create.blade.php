@@ -9,7 +9,7 @@
             </div>
             <div>
                 <h3 class="text-lg font-bold text-white">Tambah Surat Jalan Gudang Cabang</h3>
-                <p class="text-blue-200 text-xs text-left">Form input data mutasi surat jalan produk</p>
+                <p class="text-blue-200 text-xs text-left">Form input data mutasi surat jalan produk bulanan</p>
             </div>
         </div>
         <button type="button" class="btn-close-modal w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors" onclick="window.closeTailwindModal()">
@@ -19,100 +19,70 @@
 
     <!-- Info Cards / Form Inputs Group -->
     <div class="p-6 pb-2 text-left">
-        <div class="flex flex-col gap-y-4 mb-6 relative z-20">
-            <!-- No Surat Jalan -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 relative z-20">
+            <!-- Bulan -->
             <div class="relative">
-                <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-slate-600 z-10">No. Surat Jalan <span class="text-red-500">*</span></label>
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-barcode text-slate-400 text-xs"></i>
-                </div>
-                <input type="text" name="no_surat_jalan" id="no_surat_jalan" class="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 transition-all font-medium uppercase" placeholder="Masukkan Nomor Surat Jalan">
+                <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-slate-600 z-10">Bulan <span class="text-red-500">*</span></label>
+                <select name="bulan" id="bulan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none font-medium text-slate-700">
+                    <option value="">Pilih Bulan</option>
+                    @foreach (config('global.list_bulan') as $b)
+                        <option value="{{ $b['kode_bulan'] }}" {{ date('n') == $b['kode_bulan'] ? 'selected' : '' }}>{{ $b['nama_bulan'] }}</option>
+                    @endforeach
+                </select>
             </div>
 
-            <!-- Tanggal -->
+            <!-- Tahun -->
             <div class="relative">
-                <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-slate-600 z-10">Tanggal <span class="text-red-500">*</span></label>
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-calendar-alt text-slate-400 text-xs"></i>
-                </div>
-                <input type="text" name="tanggal" id="tanggal" class="flatpickr-date w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 transition-all font-medium" placeholder="Pilih Tanggal">
+                <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-slate-600 z-10">Tahun <span class="text-red-500">*</span></label>
+                <select name="tahun" id="tahun" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none font-medium text-slate-700">
+                    <option value="">Pilih Tahun</option>
+                    @for ($t = config('global.start_year'); $t <= date('Y'); $t++)
+                        <option value="{{ $t }}" {{ date('Y') == $t ? 'selected' : '' }}>{{ $t }}</option>
+                    @endfor
+                </select>
             </div>
 
             <!-- Cabang (Conditional) -->
             @hasanyrole($roles_show_cabang)
             <div class="relative">
                 <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-slate-600 z-10">Pilih Cabang <span class="text-red-500">*</span></label>
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-                    <i class="fas fa-building text-slate-400 text-xs"></i>
-                </div>
                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                     <i class="fas fa-chevron-down text-slate-400 text-[10px]"></i>
                 </div>
-                <select name="kode_cabang" id="kode_cabang" class="w-full pl-10 pr-8 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none cursor-pointer font-medium text-slate-700">
+                <select name="kode_cabang" id="kode_cabang" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e] transition-colors appearance-none cursor-pointer font-medium text-slate-700">
                     <option value="">Pilih Cabang</option>
                     @foreach ($cabang as $c)
                         <option value="{{ $c->kode_cabang }}">{{ strtoupper($c->nama_cabang) }}</option>
                     @endforeach
                 </select>
             </div>
+            @else
+            <input type="hidden" name="kode_cabang" id="kode_cabang" value="{{ auth()->user()->kode_cabang }}">
             @endrole
 
             <!-- Keterangan -->
             <div class="relative">
                 <label class="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-slate-600 z-10">Keterangan</label>
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-file-alt text-slate-400 text-xs"></i>
-                </div>
-                <input type="text" name="keterangan" id="keterangan" class="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 transition-all font-medium" placeholder="Masukkan keterangan tambahan (opsional)">
+                <input type="text" name="keterangan" id="keterangan" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 transition-all font-medium" placeholder="Keterangan tambahan (opsional)">
             </div>
         </div>
 
         <!-- Detail Table -->
         <div class="border border-slate-200 rounded-lg overflow-hidden relative z-10 shadow-sm mb-4">
-            <div class="overflow-y-auto max-h-[400px] custom-scrollbar overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+            <div class="overflow-y-auto max-h-[450px] custom-scrollbar overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[800px]">
                     <thead class="sticky top-0 z-20">
                         <tr class="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
-                            <th class="px-3 py-3 w-20 bg-slate-50">Kode</th>
-                            <th class="px-3 py-3 w-1/3 bg-slate-50 min-w-[200px]">Produk</th>
-                            <th class="px-3 py-3 text-center border-l border-slate-200 bg-slate-50" colspan="3">Kuantitas</th>
-                        </tr>
-                        <tr class="bg-slate-50 border-b border-slate-200 text-[9px] uppercase tracking-wider text-slate-400 font-bold sticky top-[41px] z-10">
-                            <th class="px-3 py-2 bg-slate-50"></th>
-                            <th class="px-3 py-2 bg-slate-50"></th>
-                            <th class="px-3 py-2 text-center border-l border-slate-200 bg-slate-50 w-24">Dus</th>
-                            <th class="px-3 py-2 text-center border-l border-slate-200 bg-slate-50 w-24">Pack</th>
-                            <th class="px-3 py-2 text-center border-l border-slate-200 bg-slate-50 w-24">Pcs</th>
+                            <th class="px-3 py-3 w-16 bg-slate-50 text-center sticky left-0 z-30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-slate-200">Tgl</th>
+                            @foreach ($produk as $d)
+                                <th class="px-2 py-3 text-center border-l border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-help" title="{{ $d->nama_produk }}">
+                                    <span class="text-[10px] font-mono leading-none block">{{ $d->kode_produk }}</span>
+                                </th>
+                            @endforeach
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        @foreach ($produk as $d)
-                            @php
-                                $hasPack = !empty($d->isi_pcs_pack);
-                                $packDisabledClass = !$hasPack ? 'bg-slate-50/70 text-slate-400 cursor-not-allowed placeholder:text-transparent' : 'bg-transparent text-slate-700 focus:bg-white focus:ring-1 focus:ring-[#003d9e]/50';
-                                $packReadOnlyAttr = !$hasPack ? 'readonly' : '';
-                            @endphp
-                            <tr class="hover:bg-slate-50/50 transition-colors">
-                                <td class="px-3 py-2">
-                                    <input type="hidden" class="kode_produk" name="kode_produk[]" value="{{ $d->kode_produk }}">
-                                    <input type="hidden" class="isi_pcs_dus" name="isi_pcs_dus[]" value="{{ $d->isi_pcs_dus }}">
-                                    <input type="hidden" class="isi_pcs_pack" name="isi_pcs_pack[]" value="{{ $d->isi_pcs_pack }}">
-                                    <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-[11px] font-mono font-bold border border-slate-200 leading-none inline-block">{{ $d->kode_produk }}</span>
-                                </td>
-                                <td class="px-3 py-2 text-[13px] text-slate-700 font-bold leading-tight">
-                                    {{ $d->nama_produk }}
-                                </td>
-                                <td class="p-1 border-l border-slate-100">
-                                    <input type="text" class="w-full text-right px-2 py-2 text-sm font-bold bg-transparent border-0 focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_dus placeholder:text-slate-200" name="jml_dus[]" placeholder="0">
-                                </td>
-                                <td class="p-1 border-l border-slate-100 {{ !$hasPack ? 'bg-slate-50/50' : '' }}">
-                                    <input type="text" class="w-full text-right px-2 py-2 text-sm font-bold border-0 rounded transition-colors money jml_pack placeholder:text-slate-200 {{ $packDisabledClass }}" name="jml_pack[]" placeholder="{{ $hasPack ? '0' : '-' }}" {{ $packReadOnlyAttr }}>
-                                </td>
-                                <td class="p-1 border-l border-slate-100">
-                                    <input type="text" class="w-full text-right px-2 py-2 text-sm font-bold bg-transparent border-0 focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_pcs placeholder:text-slate-200" name="jml_pcs[]" placeholder="0">
-                                </td>
-                            </tr>
-                        @endforeach
+                    <tbody id="table-body-days" class="divide-y divide-slate-100">
+                        <!-- Dynamic rows will be inserted here via JS -->
                     </tbody>
                 </table>
             </div>
@@ -134,44 +104,71 @@
 <script>
     $(function() {
         const form = $("#formSuratjalan");
-        $(".money").maskMoney({
-            thousands: '.',
-            decimal: ',',
-            precision: 0,
-            allowZero: true
-        });
 
-        $(".flatpickr-date").flatpickr({
-            enable: [{
-                from: "{{ $start_periode }}",
-                to: "{{ $end_periode }}"
-            }]
-        });
+        function generateRows() {
+            const bulan = $('#bulan').val();
+            const tahun = $('#tahun').val();
+            if (!bulan || !tahun) {
+                $('#table-body-days').html('<tr><td colspan="{{ count($produk) + 1 }}" class="text-center py-4 text-slate-400">Silakan pilih bulan dan tahun</td></tr>');
+                return;
+            }
+            
+            // Get number of days in selected month & year
+            const daysInMonth = new Date(tahun, bulan, 0).getDate();
+            
+            let html = '';
+            for (let day = 1; day <= daysInMonth; day++) {
+                html += `<tr class="hover:bg-slate-50/50 transition-colors">
+                    <td class="px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 border-r border-slate-200 text-center sticky left-0 z-10 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">${day}</td>`;
+                
+                @foreach ($produk as $p)
+                html += `<td class="p-1 border-l border-slate-100">
+                    <input type="text" class="w-full text-right px-1 py-1 text-xs font-bold bg-transparent border border-slate-200 focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_dus" name="jml_dus[${day}][{{ $p->kode_produk }}]" placeholder="0">
+                </td>`;
+                @endforeach
+                
+                html += `</tr>`;
+            }
+            
+            $('#table-body-days').html(html);
+            
+            // Re-apply money mask
+            $(".money").maskMoney({
+                thousands: '.',
+                decimal: ',',
+                precision: 0,
+                allowZero: true
+            });
+        }
+
+        // Trigger row generation on load and on change
+        $('#bulan, #tahun').on('change', generateRows);
+        generateRows();
 
         form.on('submit', function(e) {
-            const no_surat_jalan = $(this).find("#no_surat_jalan").val();
-            const tanggal = $(this).find("#tanggal").val();
+            const bulan = $(this).find("#bulan").val();
+            const tahun = $(this).find("#tahun").val();
             const kode_cabang = $(this).find("#kode_cabang").val();
 
-            if (no_surat_jalan == "") {
+            if (bulan == "") {
                 Swal.fire({
                     title: "Oops!",
-                    text: "No. Surat Jalan Harus Diisi !",
+                    text: "Bulan Harus Diisi !",
                     icon: "warning",
                     showConfirmButton: true,
                     didClose: () => {
-                        $(this).find("#no_surat_jalan").focus();
+                        $(this).find("#bulan").focus();
                     },
                 });
                 return false;
-            } else if (tanggal == "") {
+            } else if (tahun == "") {
                 Swal.fire({
                     title: "Oops!",
-                    text: "Tanggal Harus Diisi !",
+                    text: "Tahun Harus Diisi !",
                     icon: "warning",
                     showConfirmButton: true,
                     didClose: () => {
-                        $(this).find("#tanggal").focus();
+                        $(this).find("#tahun").focus();
                     },
                 });
                 return false;
@@ -187,7 +184,7 @@
                 });
                 return false;
             } else {
-                $(this).find("#btnSubmit").prop('disabled', true).addClass('opacity-50 cursor-not-allowed').html('<i class="fas fa-circle-notch fa-spin"></i> Menyimpa...');
+                $(this).find("#btnSubmit").prop('disabled', true).addClass('opacity-50 cursor-not-allowed').html('<i class="fas fa-circle-notch fa-spin"></i> Menyimpan...');
                 return true;
             }
         });
