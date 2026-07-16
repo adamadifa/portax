@@ -69,9 +69,9 @@
 
         <!-- Detail Table -->
         <div class="border border-slate-200 rounded-lg overflow-hidden relative z-10 shadow-sm mb-4">
-            <div class="overflow-y-auto max-h-[480px] custom-scrollbar overflow-x-auto relative">
+            <div class="overflow-y-auto max-h-[480px] min-h-[300px] custom-scrollbar overflow-x-auto relative bg-white">
                 <!-- Loading Indicator Overlay -->
-                <div id="table-loading-overlay" class="absolute inset-0 bg-white/70 z-50 flex items-center justify-center hidden">
+                <div id="table-loading-overlay" class="absolute inset-0 bg-white/80 z-50 flex items-center justify-center hidden">
                     <div class="flex flex-col items-center gap-2">
                         <i class="fas fa-circle-notch fa-spin text-[#003d9e] text-2xl"></i>
                         <span class="text-xs font-semibold text-slate-600">Memuat data...</span>
@@ -132,7 +132,7 @@
                 return;
             }
             
-            // Show loading
+            // Show loading overlay
             $('#table-loading-overlay').removeClass('hidden');
 
             // Get number of days in selected month & year
@@ -146,7 +146,7 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 headHtml += `<th class="px-2 py-3 text-center border-l border-slate-200 bg-slate-50 w-12">${day}</th>`;
             }
-            headHtml += `<th class="px-3 py-3 w-20 bg-slate-50 text-center sticky right-0 z-30 shadow-[-2px_0_5px_rgba(0,0,0,0.05)] border-l border-slate-200">Total</th>`;
+            headHtml += `<th class="px-3 py-3 bg-slate-50 text-center sticky right-0 z-30 shadow-[-2px_0_5px_rgba(0,0,0,0.05)] border-l border-slate-200" style="width: 70px; min-width: 70px; max-width: 70px;">Total</th>`;
             headHtml += `</tr>`;
             $('#table-head').html(headHtml);
             
@@ -162,7 +162,7 @@
                         <input type="text" class="w-full text-right px-1 py-1 text-xs font-bold bg-transparent border border-slate-200 focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_dus key-input-${p.kode_produk}" name="jml_dus[${day}][${p.kode_produk}]" id="qty_${day}_${p.kode_produk}" data-product="${p.kode_produk}" placeholder="0">
                     </td>`;
                 }
-                bodyHtml += `<td class="px-3 py-2 text-xs font-bold text-right text-slate-700 bg-slate-50 border-l border-slate-200 sticky right-0 z-10 shadow-[-2px_0_5px_rgba(0,0,0,0.05)]" id="total_${p.kode_produk}">0</td>`;
+                bodyHtml += `<td class="px-3 py-2 text-xs font-bold text-right text-slate-700 bg-slate-50 border-l border-slate-200 sticky right-0 z-10 shadow-[-2px_0_5px_rgba(0,0,0,0.05)]" id="total_${p.kode_produk}" style="width: 70px; min-width: 70px; max-width: 70px;">0</td>`;
                 bodyHtml += `</tr>`;
             });
             
@@ -200,7 +200,7 @@
                     console.error("Failed to load existing data", err);
                 },
                 complete: function() {
-                    // Hide loading
+                    // Hide loading overlay
                     $('#table-loading-overlay').addClass('hidden');
 
                     // Initialize money mask
