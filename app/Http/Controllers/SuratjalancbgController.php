@@ -111,24 +111,6 @@ class SuratjalancbgController extends Controller
             $produk = Produk::where('status_aktif_produk', 1)->get();
             $daysInMonth = (int)date('t', strtotime("$tahun-$bulan-01"));
 
-            // Delete existing records for this branch, year, and month
-            $existing_mutasi_ids = Mutasigudangcabang::where('kode_cabang', $kode_cabang)
-                ->where('jenis_mutasi', 'SJ')
-                ->whereYear('tanggal', $tahun)
-                ->whereMonth('tanggal', $bulan)
-                ->pluck('no_mutasi');
-                
-            foreach ($existing_mutasi_ids as $id) {
-                $m = Mutasigudangcabang::where('no_mutasi', $id)->first();
-                if ($m) {
-                    $cektutuplaporan = cektutupLaporan($m->tanggal, "gudangcabang");
-                    if ($cektutuplaporan > 0) {
-                        return Redirect::back()->with(messageError("Periode Laporan Tanggal " . date('d-m-Y', strtotime($m->tanggal)) . " Sudah Ditutup !"));
-                    }
-                }
-            }
-            Mutasigudangcabang::whereIn('no_mutasi', $existing_mutasi_ids)->delete();
-
             $kode_mutasi_prefix = "SJC" . substr($tahun, 2, 2);
             $lastsuratjalan = Mutasigudangcabang::select('no_mutasi')
                 ->where('jenis_mutasi', 'SJ')
@@ -146,7 +128,7 @@ class SuratjalancbgController extends Controller
                 ->first();
             $last_no_sj = $lastsj != null ? $lastsj->no_surat_jalan : '';
 
-            $total_records_saved = 0;
+            $has_changes = false;
 
             for ($day = 1; $day <= $daysInMonth; $day++) {
                 $tanggal = sprintf('%04d-%02d-%02d', $tahun, $bulan, $day);
@@ -166,30 +148,44 @@ class SuratjalancbgController extends Controller
                     }
                 }
 
+                $existing_record = Mutasigudangcabang::where('kode_cabang', $kode_cabang)
+                    ->where('jenis_mutasi', 'SJ')
+                    ->where('tanggal', $tanggal)
+                    ->first();
+
                 if (!empty($day_details)) {
                     $cektutuplaporan = cektutupLaporan($tanggal, "gudangcabang");
                     if ($cektutuplaporan > 0) {
                         return Redirect::back()->with(messageError("Periode Laporan Tanggal " . date('d-m-Y', strtotime($tanggal)) . " Sudah Ditutup !"));
                     }
 
-                    $no_suratjalan = buatkode($last_no_suratjalan, $kode_mutasi_prefix, 5);
-                    $last_no_suratjalan = $no_suratjalan;
+                    if ($existing_record) {
+                        $no_suratjalan = $existing_record->no_mutasi;
+                        $existing_record->update([
+                            'keterangan' => $request->keterangan,
+                            'id_user' => auth()->user()->id
+                        ]);
+                        Detailmutasigudangcabang::where('no_mutasi', $no_suratjalan)->delete();
+                    } else {
+                        $no_suratjalan = buatkode($last_no_suratjalan, $kode_mutasi_prefix, 5);
+                        $last_no_suratjalan = $no_suratjalan;
 
-                    $no_surat_jalan = buatkode($last_no_sj, $sj_prefix, 4);
-                    $last_no_sj = $no_surat_jalan;
+                        $no_surat_jalan = buatkode($last_no_sj, $sj_prefix, 4);
+                        $last_no_sj = $no_surat_jalan;
 
-                    Mutasigudangcabang::create([
-                        'no_mutasi'  => $no_suratjalan,
-                        'no_surat_jalan' => $no_surat_jalan,
-                        'tanggal' => $tanggal,
-                        'kode_cabang' => $kode_cabang,
-                        'kondisi' => 'G',
-                        'in_out_good' => 'I',
-                        'in_out_bad' => null,
-                        'jenis_mutasi' => 'SJ',
-                        'keterangan' => $request->keterangan,
-                        'id_user' => auth()->user()->id
-                    ]);
+                        Mutasigudangcabang::create([
+                            'no_mutasi'  => $no_suratjalan,
+                            'no_surat_jalan' => $no_surat_jalan,
+                            'tanggal' => $tanggal,
+                            'kode_cabang' => $kode_cabang,
+                            'kondisi' => 'G',
+                            'in_out_good' => 'I',
+                            'in_out_bad' => null,
+                            'jenis_mutasi' => 'SJ',
+                            'keterangan' => $request->keterangan,
+                            'id_user' => auth()->user()->id
+                        ]);
+                    }
 
                     $detail_inserts = [];
                     foreach ($day_details as $det) {
@@ -200,11 +196,20 @@ class SuratjalancbgController extends Controller
                         ];
                     }
                     Detailmutasigudangcabang::insert($detail_inserts);
-                    $total_records_saved++;
+                    $has_changes = true;
+                } else {
+                    if ($existing_record) {
+                        $cektutuplaporan = cektutupLaporan($tanggal, "gudangcabang");
+                        if ($cektutuplaporan > 0) {
+                            return Redirect::back()->with(messageError("Periode Laporan Tanggal " . date('d-m-Y', strtotime($tanggal)) . " Sudah Ditutup !"));
+                        }
+                        $existing_record->delete();
+                        $has_changes = true;
+                    }
                 }
             }
 
-            if ($total_records_saved === 0) {
+            if (!$has_changes) {
                 return Redirect::back()->with(messageError('Data Produk Masih Kosong (Tidak ada qty > 0 yang diinput)'));
             }
 
