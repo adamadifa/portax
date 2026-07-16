@@ -67,7 +67,6 @@
                 <input type="text" name="keterangan" id="keterangan" value="{{ $suratjalan->keterangan }}" class="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#003d9e]/20 focus:border-[#003d9e] text-sm text-slate-700 transition-all font-medium" placeholder="Masukkan keterangan tambahan (opsional)">
             </div>
         </div>
-
         <!-- Detail Table -->
         <div class="border border-slate-200 rounded-lg overflow-hidden relative z-10 shadow-sm mb-4">
             <div class="overflow-y-auto max-h-[400px] custom-scrollbar overflow-x-auto">
@@ -76,46 +75,25 @@
                         <tr class="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
                             <th class="px-3 py-3 w-20 bg-slate-50">Kode</th>
                             <th class="px-3 py-3 w-1/3 bg-slate-50 min-w-[200px]">Produk</th>
-                            <th class="px-3 py-3 text-center border-l border-slate-200 bg-slate-50" colspan="3">Kuantitas</th>
-                        </tr>
-                        <tr class="bg-slate-50 border-b border-slate-200 text-[9px] uppercase tracking-wider text-slate-400 font-bold sticky top-[41px] z-10">
-                            <th class="px-3 py-2 bg-slate-50"></th>
-                            <th class="px-3 py-2 bg-slate-50"></th>
-                            <th class="px-3 py-2 text-center border-l border-slate-200 bg-slate-50 w-24">Dus</th>
-                            <th class="px-3 py-2 text-center border-l border-slate-200 bg-slate-50 w-24">Pack</th>
-                            <th class="px-3 py-2 text-center border-l border-slate-200 bg-slate-50 w-24">Pcs</th>
+                            <th class="px-3 py-3 text-center border-l border-slate-200 bg-slate-50 w-32">Kuantitas (Dus)</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @foreach ($produk as $d)
                             @php
-                                $jumlah = explode('|', convertToduspackpcsv2($d->isi_pcs_dus, $d->isi_pcs_pack, $d->jumlah));
-                                $jumlah_dus = $jumlah[0];
-                                $jumlah_pack = $jumlah[1];
-                                $jumlah_pcs = $jumlah[2];
-                                
-                                $hasPack = !empty($d->isi_pcs_pack);
-                                $packDisabledClass = !$hasPack ? 'bg-slate-50/70 text-slate-400 cursor-not-allowed placeholder:text-transparent' : 'bg-transparent text-slate-700 focus:bg-white focus:ring-1 focus:ring-[#003d9e]/50';
-                                $packReadOnlyAttr = !$hasPack ? 'readonly' : '';
+                                $jumlah_dus = !empty($d->isi_pcs_dus) && !empty($d->jumlah) ? ($d->jumlah / $d->isi_pcs_dus) : 0;
                             @endphp
                             <tr class="hover:bg-slate-50/50 transition-colors">
                                 <td class="px-3 py-2">
                                     <input type="hidden" class="kode_produk" name="kode_produk[]" value="{{ $d->kode_produk }}">
                                     <input type="hidden" class="isi_pcs_dus" name="isi_pcs_dus[]" value="{{ $d->isi_pcs_dus }}">
-                                    <input type="hidden" class="isi_pcs_pack" name="isi_pcs_pack[]" value="{{ $d->isi_pcs_pack }}">
                                     <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-[11px] font-mono font-bold border border-slate-200 leading-none inline-block">{{ $d->kode_produk }}</span>
                                 </td>
                                 <td class="px-3 py-2 text-[13px] text-slate-700 font-bold leading-tight">
                                     {{ $d->nama_produk }}
                                 </td>
                                 <td class="p-1 border-l border-slate-100">
-                                    <input type="text" class="w-full text-right px-2 py-2 text-sm font-bold bg-transparent border-0 focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_dus" name="jml_dus[]" value="{{ formatAngka($jumlah_dus) }}" placeholder="0">
-                                </td>
-                                <td class="p-1 border-l border-slate-100 {{ !$hasPack ? 'bg-slate-50/50' : '' }}">
-                                    <input type="text" class="w-full text-right px-2 py-2 text-sm font-bold border-0 rounded transition-colors money jml_pack placeholder:text-slate-200 {{ $packDisabledClass }}" name="jml_pack[]" value="{{ $hasPack ? formatAngka($jumlah_pack) : '-' }}" placeholder="{{ $hasPack ? '0' : '-' }}" {{ $packReadOnlyAttr }}>
-                                </td>
-                                <td class="p-1 border-l border-slate-100">
-                                    <input type="text" class="w-full text-right px-2 py-2 text-sm font-bold bg-transparent border-0 focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_pcs" name="jml_pcs[]" value="{{ formatAngka($jumlah_pcs) }}" placeholder="0">
+                                    <input type="text" class="w-full text-right px-2 py-2 text-sm font-bold bg-transparent border-0 focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_dus" name="jml_dus[]" value="{{ $jumlah_dus > 0 ? formatAngka($jumlah_dus) : '' }}" placeholder="0">
                                 </td>
                             </tr>
                         @endforeach

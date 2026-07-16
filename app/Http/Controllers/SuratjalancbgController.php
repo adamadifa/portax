@@ -276,10 +276,7 @@ class SuratjalancbgController extends Controller
         $no_mutasi = Crypt::decrypt($request->no_mutasi);
         $kode_produk = $request->kode_produk;
         $jml_dus = $request->jml_dus;
-        $jml_pack = $request->jml_pack;
-        $jml_pcs = $request->jml_pcs;
         $isi_pcs_dus = $request->isi_pcs_dus;
-        $isi_pcs_pack = $request->isi_pcs_pack;
 
         DB::beginTransaction();
         try {
@@ -303,10 +300,8 @@ class SuratjalancbgController extends Controller
             $detail = [];
             for ($i = 0; $i < count($kode_produk); $i++) {
                 $dus = toNumber(!empty($jml_dus[$i]) ? $jml_dus[$i] : 0);
-                $pack = toNumber(!empty($jml_pack[$i]) ? $jml_pack[$i] : 0);
-                $pcs = toNumber(!empty($jml_pcs[$i]) ? $jml_pcs[$i] : 0);
 
-                $jumlah = ((float)$dus * (float)$isi_pcs_dus[$i]) + ((float)$pack * (float)$isi_pcs_pack[$i]) + (float)$pcs;
+                $jumlah = (float)$dus * (float)$isi_pcs_dus[$i];
                 if (!empty($jumlah)) {
                     $detail[]   = [
                         'no_mutasi' => $no_mutasi,
