@@ -1409,10 +1409,7 @@ class LaporanaccountingController extends Controller
         $kaskecil->leftJoinSub($coa_kas_kecil, 'coa_kas_kecil', function ($join) {
             $join->on('keuangan_kaskecil.kode_cabang', '=', 'coa_kas_kecil.kode_cabang_coa');
         });
-        $kaskecil->where(function ($query) {
-            $query->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil')
-                ->orWhere('keuangan_kaskecil.kode_cabang', '=', 'PST');
-        });
+        // Removed Penerimaan Kas Kecil filter so receipts appear in ledger
         if (auth()->user()->kode_cabang != "PST") {
             $kaskecil->where('keuangan_kaskecil.kode_cabang', auth()->user()->kode_cabang);
         } else {
@@ -1458,7 +1455,7 @@ class LaporanaccountingController extends Controller
                 $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
             }
         }
-        $kaskecil_transaksi->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil');
+        // Removed Penerimaan Kas Kecil filter
         $kaskecil_transaksi->orderBy('keuangan_kaskecil.kode_akun');
         $kaskecil_transaksi->orderBy('keuangan_kaskecil.tanggal');
         $kaskecil_transaksi->orderBy('keuangan_kaskecil.no_bukti');
@@ -2199,7 +2196,7 @@ class LaporanaccountingController extends Controller
         if (!empty($request->kode_cabang)) {
             $kaskecil_transaksi->where('keuangan_kaskecil.kode_cabang', $request->kode_cabang);
         }
-        $kaskecil_transaksi->where('keuangan_kaskecil.keterangan', '!=', 'Penerimaan Kas Kecil');
+        // Removed Penerimaan Kas Kecil filter
         $kaskecil_transaksi->join('coa', 'keuangan_kaskecil.kode_akun', '=', 'coa.kode_akun');
         $kaskecil_transaksi->join('coa_portax', 'coa.kode_akun_portax', '=', 'coa_portax.kode_akun');
 
