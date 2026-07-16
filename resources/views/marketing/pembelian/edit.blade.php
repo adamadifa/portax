@@ -1275,7 +1275,7 @@
                         </td>
                         <td class="px-4 py-2.5 text-slate-700 font-medium text-wrap">{{ $d->nama_produk }}</td>
                         <td class="px-4 py-2.5 text-center text-slate-700 font-medium">
-                           {{ $d->jumlah }}
+                           {{ !empty($d->isi_pcs_dus) ? ($d->jumlah / $d->isi_pcs_dus) : $d->jumlah }}
                         </td>
                         <td class="px-4 py-2.5 text-right text-slate-700 font-medium">
                            ${convertToRupiah({{ $d->harga_dus }})}
