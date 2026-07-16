@@ -702,45 +702,59 @@
         let currentRow;
         $(document).on('click', '.edit', function(e) {
             e.preventDefault();
-            // Dapatkan baris tabel yang sesuai
             currentRow = $(this).closest('tr');
 
-            // Ambil data dari sel
-            let kode_harga = currentRow.find('.kode_harga').val();
             let kode_produk = currentRow.find('.kode_produk').val();
-            let nama_produk = currentRow.find('td:eq(1)').text();
-            let jml_dus = currentRow.find('td:eq(2)').text();
-            let harga_dus = currentRow.find('td:eq(3)').text();
-            let subtotal = currentRow.find('td:eq(4)').text();
-            let kode_supplier = $("#kode_supplier").val();
-            let index_old = kode_harga;
-            let dataProduk = {
-                'kode_supplier': kode_supplier,
-                'kode_harga': kode_harga,
-                'kode_produk': kode_produk,
-                'nama_produk': nama_produk,
-                'jml_dus': jml_dus,
-                'harga_dus': harga_dus,
-                'jml_pack': '',
-                'harga_pack': '',
-                'jml_pcs': '',
-                'harga_pcs': '',
-                'status_promosi': 0,
-                'index_old': index_old
-            };
-            $.ajax({
-                type: 'POST',
-                url: '/penjualan/editproduk',
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    dataproduk: dataProduk
-                },
-                cache: false,
-                success: function(respond) {
-                    $("#modaleditProduk").modal("show");
-                    $("#modaleditProduk").find(".modal-title").text("Edit Produk");
-                    $("#loadmodaleditProduk").html(respond);
-                }
+            let nama_produk = currentRow.find('td:eq(1)').text().trim();
+            let jml_dus = currentRow.find('td:eq(2)').text().trim();
+            let harga_dus = currentRow.find('td:eq(3)').text().trim();
+            let isi_pcs_dus = currentRow.find('input[name="isi_pcs_dus_produk[]"]').val() || 0;
+            let isi_pcs_pack = currentRow.find('input[name="isi_pcs_pack_produk[]"]').val() || 0;
+            let kode_kategori_diskon = currentRow.find('input[name="kode_kategori_diskon[]"]').val() || '';
+            let index_old = kode_produk;
+
+            let html = `
+            <form action="#" id="formEditproduk">
+                <input type="hidden" name="isi_pcs_dus" id="isi_pcs_dus" value="${isi_pcs_dus}">
+                <input type="hidden" name="isi_pcs_pack" id="isi_pcs_pack" value="${isi_pcs_pack}">
+                <input type="hidden" name="kode_kategori_diskon" id="kode_kategori_diskon" value="${kode_kategori_diskon}">
+                <input type="hidden" name="kode_produk" id="kode_produk" value="${kode_produk}">
+                <input type="hidden" name="nama_produk" id="nama_produk" value="${nama_produk}">
+                <input type="hidden" name="index_old" id="index_old" value="${index_old}">
+                
+                <div class="form-group mb-3">
+                    <label class="form-label font-bold text-slate-700">Nama Produk</label>
+                    <input type="text" class="form-control" value="${nama_produk}" readonly>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-4 col-md-12 col-sm-12">
+                        <div class="form-group mb-3">
+                            <label class="form-label font-bold text-slate-700">Dus</label>
+                            <input type="text" name="jml_dus" id="jml_dus" class="form-control text-right money font-bold" value="${jml_dus}">
+                        </div>
+                    </div>
+                    <div class="col-lg-8 col-md-12 col-sm-12">
+                        <div class="form-group mb-3">
+                            <label class="form-label font-bold text-slate-700">Harga / Dus</label>
+                            <input type="text" name="harga_dus" id="harga_dus" class="form-control text-right money font-bold" value="${harga_dus}">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <button class="btn btn-primary w-100" type="submit" id="btnUpdateproduk"><i class="ti ti-send me-1"></i>Update</button>
+                </div>
+            </form>
+            `;
+            $("#modaleditProduk").modal("show");
+            $("#modaleditProduk").find(".modal-title").text("Edit Produk");
+            $("#loadmodaleditProduk").html(html);
+            $("#loadmodaleditProduk").find(".money").maskMoney({
+                thousands: '.',
+                decimal: ',',
+                precision: 0,
+                allowZero: true
             });
         });
 
