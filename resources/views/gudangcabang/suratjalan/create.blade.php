@@ -107,6 +107,21 @@
         const form = $("#formSuratjalan");
         const produkList = @json($produk);
 
+        function getNumber(val) {
+            if (!val) return 0;
+            return parseFloat(val.replace(/\./g, '')) || 0;
+        }
+
+        function updateProductTotal(productCode) {
+            let total = 0;
+            $(`.key-input-${productCode}`).each(function() {
+                const val = getNumber($(this).val() || '0');
+                total += val;
+            });
+            const formattedTotal = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            $(`#total_${productCode}`).text(formattedTotal);
+        }
+
         function generateRows() {
             const bulan = $('#bulan').val();
             const tahun = $('#tahun').val();
@@ -131,6 +146,7 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 headHtml += `<th class="px-2 py-3 text-center border-l border-slate-200 bg-slate-50 w-12">${day}</th>`;
             }
+            headHtml += `<th class="px-3 py-3 w-20 bg-slate-50 text-center sticky right-0 z-30 shadow-[-2px_0_5px_rgba(0,0,0,0.05)] border-l border-slate-200">Total</th>`;
             headHtml += `</tr>`;
             $('#table-head').html(headHtml);
             
@@ -143,9 +159,10 @@
                 
                 for (let day = 1; day <= daysInMonth; day++) {
                     bodyHtml += `<td class="p-1 border-l border-slate-100 w-12">
-                        <input type="text" class="w-full text-right px-1 py-1 text-xs font-bold bg-transparent border border-slate-200 focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_dus" name="jml_dus[${day}][${p.kode_produk}]" id="qty_${day}_${p.kode_produk}" placeholder="0">
+                        <input type="text" class="w-full text-right px-1 py-1 text-xs font-bold bg-transparent border border-slate-200 focus:border-[#003d9e] focus:ring-1 focus:ring-[#003d9e]/50 focus:bg-white rounded transition-colors money jml_dus key-input-${p.kode_produk}" name="jml_dus[${day}][${p.kode_produk}]" id="qty_${day}_${p.kode_produk}" data-product="${p.kode_produk}" placeholder="0">
                     </td>`;
                 }
+                bodyHtml += `<td class="px-3 py-2 text-xs font-bold text-right text-slate-700 bg-slate-50 border-l border-slate-200 sticky right-0 z-10 shadow-[-2px_0_5px_rgba(0,0,0,0.05)]" id="total_${p.kode_produk}">0</td>`;
                 bodyHtml += `</tr>`;
             });
             
@@ -173,6 +190,11 @@
                             }
                         });
                     });
+
+                    // Update all product totals
+                    produkList.forEach(function(p) {
+                        updateProductTotal(p.kode_produk);
+                    });
                 },
                 error: function(err) {
                     console.error("Failed to load existing data", err);
@@ -191,6 +213,12 @@
                 }
             });
         }
+
+        // Listener for input changes to update totals dynamically
+        $(document).on('keyup change', '.jml_dus', function() {
+            const productCode = $(this).attr('data-product');
+            updateProductTotal(productCode);
+        });
 
         // Trigger row generation on load and on change
         $('#bulan, #tahun, #kode_cabang').on('change', generateRows);
