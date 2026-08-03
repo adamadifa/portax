@@ -145,18 +145,39 @@ class SyncPenjualanController extends Controller
             $kode_cabang = $user->kode_cabang;
 
             // Check & Create Salesman
-            $cekSalesman = Salesman::where('kode_salesman', $request->kode_salesman)->first();
-            if (!$cekSalesman && $request->has('salesman')) {
+            // 1. Process salesman payload if sent
+            if ($request->has('salesman') && !empty($request->salesman)) {
                 $salesmanData = $request->salesman;
-                if (!isset($salesmanData['kode_cabang'])) {
-                    $salesmanData['kode_cabang'] = $kode_cabang;
+                $salesmanKode = $salesmanData['kode_salesman'] ?? null;
+                if ($salesmanKode) {
+                    if (!isset($salesmanData['kode_cabang'])) {
+                        $salesmanData['kode_cabang'] = $kode_cabang;
+                    }
+                    $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('salesman');
+                    $filteredData = array_intersect_key($salesmanData, array_flip($tableColumns));
+
+                    Salesman::updateOrCreate(
+                        ['kode_salesman' => $salesmanKode],
+                        $filteredData
+                    );
                 }
+            }
 
-                // Filter columns to prevent "Column not found" error
-                $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('salesman');
-                $filteredData = array_intersect_key($salesmanData, array_flip($tableColumns));
-
-                Salesman::create($filteredData);
+            // 2. If the transaction has a different kode_salesman than the payload, and it does not exist,
+            // we should still ensure it exists (we can create a minimal placeholder for it).
+            if ($request->kode_salesman) {
+                $cekSalesman = Salesman::where('kode_salesman', $request->kode_salesman)->first();
+                if (!$cekSalesman) {
+                    Salesman::create([
+                        'kode_salesman' => $request->kode_salesman,
+                        'nama_salesman' => 'Placeholder ' . $request->kode_salesman,
+                        'alamat_salesman' => '-',
+                        'kode_kategori_salesman' => 'TC',
+                        'status_komisi_salesman' => '1',
+                        'status_aktif_salesman' => '1',
+                        'kode_cabang' => $kode_cabang
+                    ]);
+                }
             }
 
             // Check & Create Wilayah
@@ -183,6 +204,21 @@ class SyncPenjualanController extends Controller
                 }
                 if (!isset($pelangganData['kode_salesman'])) {
                     $pelangganData['kode_salesman'] = $request->kode_salesman;
+                }
+
+                // Ensure the customer's salesman exists in the database to prevent FK constraint failure
+                $pelangganSalesmanKode = $pelangganData['kode_salesman'];
+                $cekPelangganSalesman = Salesman::where('kode_salesman', $pelangganSalesmanKode)->first();
+                if (!$cekPelangganSalesman) {
+                    Salesman::create([
+                        'kode_salesman' => $pelangganSalesmanKode,
+                        'nama_salesman' => 'Placeholder ' . $pelangganSalesmanKode,
+                        'alamat_salesman' => '-',
+                        'kode_kategori_salesman' => 'TC',
+                        'status_komisi_salesman' => '1',
+                        'status_aktif_salesman' => '1',
+                        'kode_cabang' => $pelangganData['kode_cabang'] ?? $kode_cabang
+                    ]);
                 }
 
                 // Filter columns
@@ -515,16 +551,39 @@ class SyncPenjualanController extends Controller
                     $penjualanData['id_user'] = $id_user;
 
                     // Check & Create Salesman
-                    $cekSalesman = Salesman::where('kode_salesman', $penjualanData['kode_salesman'])->first();
-                    if (!$cekSalesman && isset($penjualanData['salesman'])) {
+                    // 1. Process salesman payload if sent
+                    if (isset($penjualanData['salesman']) && !empty($penjualanData['salesman'])) {
                         $salesmanData = $penjualanData['salesman'];
-                        if (!isset($salesmanData['kode_cabang'])) {
-                            $salesmanData['kode_cabang'] = $kode_cabang;
+                        $salesmanKode = $salesmanData['kode_salesman'] ?? null;
+                        if ($salesmanKode) {
+                            if (!isset($salesmanData['kode_cabang'])) {
+                                $salesmanData['kode_cabang'] = $kode_cabang;
+                            }
+                            $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('salesman');
+                            $filteredData = array_intersect_key($salesmanData, array_flip($tableColumns));
+
+                            Salesman::updateOrCreate(
+                                ['kode_salesman' => $salesmanKode],
+                                $filteredData
+                            );
                         }
-                        // Filter columns
-                        $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('salesman');
-                        $filteredData = array_intersect_key($salesmanData, array_flip($tableColumns));
-                        Salesman::create($filteredData);
+                    }
+
+                    // 2. If the transaction has a different kode_salesman than the payload, and it does not exist,
+                    // we should still ensure it exists (we can create a minimal placeholder for it).
+                    if ($penjualanData['kode_salesman']) {
+                        $cekSalesman = Salesman::where('kode_salesman', $penjualanData['kode_salesman'])->first();
+                        if (!$cekSalesman) {
+                            Salesman::create([
+                                'kode_salesman' => $penjualanData['kode_salesman'],
+                                'nama_salesman' => 'Placeholder ' . $penjualanData['kode_salesman'],
+                                'alamat_salesman' => '-',
+                                'kode_kategori_salesman' => 'TC',
+                                'status_komisi_salesman' => '1',
+                                'status_aktif_salesman' => '1',
+                                'kode_cabang' => $kode_cabang
+                            ]);
+                        }
                     }
 
                     // Check & Create Wilayah
@@ -551,6 +610,22 @@ class SyncPenjualanController extends Controller
                         if (!isset($pelangganData['kode_salesman'])) {
                             $pelangganData['kode_salesman'] = $penjualanData['kode_salesman'];
                         }
+
+                        // Ensure the customer's salesman exists in the database to prevent FK constraint failure
+                        $pelangganSalesmanKode = $pelangganData['kode_salesman'];
+                        $cekPelangganSalesman = Salesman::where('kode_salesman', $pelangganSalesmanKode)->first();
+                        if (!$cekPelangganSalesman) {
+                            Salesman::create([
+                                'kode_salesman' => $pelangganSalesmanKode,
+                                'nama_salesman' => 'Placeholder ' . $pelangganSalesmanKode,
+                                'alamat_salesman' => '-',
+                                'kode_kategori_salesman' => 'TC',
+                                'status_komisi_salesman' => '1',
+                                'status_aktif_salesman' => '1',
+                                'kode_cabang' => $pelangganData['kode_cabang'] ?? $kode_cabang
+                            ]);
+                        }
+
                         // Filter columns
                         $tableColumns = \Illuminate\Support\Facades\Schema::getColumnListing('pelanggan');
                         $filteredData = array_intersect_key($pelangganData, array_flip($tableColumns));
